@@ -19,6 +19,7 @@ public class CharacterStats : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log($"[CharacterStats] Initializing with maxHealth: {maxHealth}, actionPoints: {startingActionPoints}");
         ApplyCharacterData();  // Apply values from ScriptableObject
         Initialize(maxHealth, startingActionPoints);
     }
@@ -34,7 +35,9 @@ public class CharacterStats : MonoBehaviour
 
     public void ModifyHealth(int amount)
     {
+        int previousHealth = CurrentHealth;
         CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, MaxHealth);
+        Debug.Log($"[CharacterStats] Health changed from {previousHealth} to {CurrentHealth}. Amount: {amount}");
         OnHealthChanged?.Invoke(CurrentHealth);
     }
 
