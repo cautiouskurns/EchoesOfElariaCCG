@@ -3,9 +3,12 @@ using UnityEngine;
 
 public class HandManager : MonoBehaviour
 {
-    [SerializeField] private Transform handArea;    // Reference to the UI Panel where cards are displayed
-    [SerializeField] private GameObject cardPrefab; // The Card Prefab
-    [SerializeField] private DeckManager deckManager; // Reference to the DeckManager
+    [SerializeField] private Transform handArea;
+    [SerializeField] private GameObject cardPrefab;
+    [SerializeField] private DeckManager deckManager;
+    [SerializeField] private int maxHandSize = 3;  // Set max hand size in Inspector
+
+    private List<GameObject> currentHand = new List<GameObject>();
 
     private void Start()
     {
@@ -15,12 +18,14 @@ public class HandManager : MonoBehaviour
             return;
         }
 
-        DrawCards(5);
+        DrawCards(maxHandSize);
     }
 
     public void DrawCards(int number)
     {
-        for (int i = 0; i < number; i++)
+        int cardsToDraw = Mathf.Min(number, maxHandSize - currentHand.Count);
+
+        for (int i = 0; i < cardsToDraw; i++)
         {
             if (deckManager.deck.Count == 0)
             {
@@ -34,8 +39,9 @@ public class HandManager : MonoBehaviour
             if (cardBehavior != null)
             {
                 cardBehavior.cardData = deckManager.deck[0];
-                cardBehavior.UpdateCardDisplay();  // Ensure the card UI updates
+                cardBehavior.UpdateCardDisplay();
                 deckManager.deck.RemoveAt(0);
+                currentHand.Add(cardObject);
 
                 Debug.Log($"[HandManager] ✅ Drew card: {cardBehavior.cardData.cardName}");
             }
@@ -45,4 +51,15 @@ public class HandManager : MonoBehaviour
             }
         }
     }
+
+    public void DiscardCard(GameObject card)
+    {
+        if (currentHand.Contains(card))
+        {
+            currentHand.Remove(card);
+            Destroy(card);
+            Debug.Log("[HandManager] 🗑️ Card discarded.");
+        }
+    }
 }
+

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class EnemyUnitClickHandler : MonoBehaviour
 {
@@ -8,14 +7,31 @@ public class EnemyUnitClickHandler : MonoBehaviour
     private void Awake()
     {
         enemyUnit = GetComponent<EnemyUnit>();
+        if (enemyUnit == null)
+        {
+            Debug.LogError("[EnemyUnitClickHandler] ❌ EnemyUnit component not found on " + gameObject.name);
+        }
     }
 
     private void OnMouseDown()
     {
-        if (enemyUnit != null)
+        if (enemyUnit == null)
         {
-            Debug.Log($"Clicked on {enemyUnit.Name}");
-            enemyUnit.TakeDamage(5);  // Deal 5 damage on click for testing
+            Debug.LogWarning("[EnemyUnitClickHandler] ⚠️ EnemyUnit is null.");
+            return;
+        }
+
+        // Check if a card is selected
+        CardBehavior selectedCard = CardBehavior.GetSelectedCard();
+        if (selectedCard != null)
+        {
+            Debug.Log($"[EnemyUnitClickHandler] 🎯 Using {selectedCard.cardData.cardName} on {enemyUnit.Name}");
+            selectedCard.PlayCard(enemyUnit); // Apply card effect
+        }
+        else
+        {
+            Debug.Log($"[EnemyUnitClickHandler] 👊 No card selected. Dealing 5 test damage to {enemyUnit.Name}.");
+            enemyUnit.TakeDamage(5); // Default behavior for testing
         }
     }
 }

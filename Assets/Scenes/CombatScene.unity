@@ -198,6 +198,7 @@ MonoBehaviour:
   handArea: {fileID: 425968895}
   cardPrefab: {fileID: 3534639883565823492, guid: 24eeee5e7688746dd8cec9c1468164d7, type: 3}
   deckManager: {fileID: 557268148}
+  maxHandSize: 5
 --- !u!1001 &252647899
 PrefabInstance:
   m_ObjectHideFlags: 0

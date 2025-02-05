@@ -17,7 +17,6 @@ public class HealthBarUI : MonoBehaviour
             healthFill.type = Image.Type.Filled;
             healthFill.fillMethod = Image.FillMethod.Horizontal;
             healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
-            Debug.Log("[HealthBarUI] Configured Image fill settings");
         }
 
         // Step 1: Find the BaseCharacter (PlayerUnit/EnemyUnit)
@@ -52,7 +51,6 @@ public class HealthBarUI : MonoBehaviour
                 Debug.LogError("[HealthBarUI] ❌ Image type must be set to FILLED!");
                 return;
             }
-            Debug.Log("[HealthBarUI] ✅ Image component properly configured");
         }
     }
 
@@ -67,7 +65,7 @@ public class HealthBarUI : MonoBehaviour
             }
             else
             {
-                Debug.LogError("[HealthBarUI] Health fill Image reference is missing!");
+                Debug.LogError("[HealthBarUI] ❌ Health fill Image reference is missing!");
             }
         }
     }
