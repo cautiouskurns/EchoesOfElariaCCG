@@ -15,5 +15,5 @@ MonoBehaviour:
   cardName: Heal
   cost: 2
   cardArt: {fileID: -4733039052000751752, guid: d3e286cbd6d3a4b31ad84668f461f9cb, type: 3}
-  effectValue: 2
+  effectValue: 10
   cardEffect: {fileID: 11400000, guid: 9dbd9adbc8fb840a2879a5aa1620e101, type: 2}

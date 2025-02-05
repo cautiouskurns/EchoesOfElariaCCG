@@ -1,7 +1,6 @@
 using UnityEngine;
 using System;
 
-
 public class CharacterStats : MonoBehaviour
 {
     [Header("Data Source")]
@@ -13,9 +12,12 @@ public class CharacterStats : MonoBehaviour
 
     public int MaxHealth { get; private set; }
     public int CurrentHealth { get; private set; }
-    public int ActionPoints { get; private set; }
+    public int MaxActionPoints { get; private set; }
+    public int CurrentActionPoints { get; private set; }
 
+    // ✅ Events for Health & Action Points
     public event Action<int> OnHealthChanged;
+    public event Action<int> OnActionPointsChanged;
 
     private void Awake()
     {
@@ -28,22 +30,38 @@ public class CharacterStats : MonoBehaviour
     {
         MaxHealth = maxHealth;
         CurrentHealth = maxHealth;
-        ActionPoints = actionPoints;
 
+        MaxActionPoints = actionPoints;
+        CurrentActionPoints = actionPoints;
+
+        // Trigger UI updates
         OnHealthChanged?.Invoke(CurrentHealth);
+        OnActionPointsChanged?.Invoke(CurrentActionPoints);
     }
 
+    // ✅ HEALTH MANAGEMENT
     public void ModifyHealth(int amount)
     {
         int previousHealth = CurrentHealth;
         CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, MaxHealth);
-        Debug.Log($"[CharacterStats] Health changed from {previousHealth} to {CurrentHealth}. Amount: {amount}");
+        Debug.Log($"[CharacterStats] ❤️ Health changed from {previousHealth} to {CurrentHealth} (Change: {amount})");
         OnHealthChanged?.Invoke(CurrentHealth);
     }
 
+    // ✅ ACTION POINTS MANAGEMENT
     public void UseActionPoints(int amount)
     {
-        ActionPoints = Mathf.Max(0, ActionPoints - amount);
+        int previousAP = CurrentActionPoints;
+        CurrentActionPoints = Mathf.Max(0, CurrentActionPoints - amount);
+        Debug.Log($"[CharacterStats] ⚡ AP changed from {previousAP} to {CurrentActionPoints} (Used: {amount})");
+        OnActionPointsChanged?.Invoke(CurrentActionPoints);
+    }
+
+    public void RefreshActionPoints()
+    {
+        CurrentActionPoints = MaxActionPoints;
+        Debug.Log($"[CharacterStats] 🔄 Action Points refreshed to {CurrentActionPoints}");
+        OnActionPointsChanged?.Invoke(CurrentActionPoints);
     }
 
     // ✅ Automatically update values in the Inspector during Edit Mode
@@ -62,7 +80,3 @@ public class CharacterStats : MonoBehaviour
         }
     }
 }
-
-
-
-
