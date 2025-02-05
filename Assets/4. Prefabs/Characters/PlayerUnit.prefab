@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f761e7d4124242b6864673d84cd4a17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  characterData: {fileID: 11400000, guid: 9ccc0755df7064c21bbd9bcb67cacca1, type: 2}
 --- !u!114 &2564612464425915869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,6 +123,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59bca17ac11f14264a6c58058a5d2fb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 100
+  maxActionPoints: 3
 --- !u!114 &3849004577806978974
 MonoBehaviour:
   m_ObjectHideFlags: 0
