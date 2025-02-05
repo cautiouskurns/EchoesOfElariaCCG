@@ -4,25 +4,24 @@ using TMPro;
 
 public class CardDisplay : MonoBehaviour
 {
-    public TextMeshProUGUI cardNameText;
-    public TextMeshProUGUI costText;
-    public Image artworkImage;
+    [SerializeField] private TextMeshProUGUI cardNameText;
+    [SerializeField] private TextMeshProUGUI costText;
+    [SerializeField] private Image artworkImage;
 
-    private CardBehavior card;
-
-    private void Awake()
+    public void UpdateCardVisual(CardData cardData)
     {
-        card = GetComponent<CardBehavior>();
-        UpdateCardVisual();
-    }
-
-    public void UpdateCardVisual()
-    {
-        if (card.cardData != null)
+        if (cardData != null)
         {
-            cardNameText.text = card.cardData.cardName;
-            costText.text = card.cardData.cost.ToString();
-            artworkImage.sprite = card.cardData.cardArt;
+            cardNameText.text = cardData.cardName;
+            costText.text = cardData.cost.ToString();
+            artworkImage.sprite = cardData.cardArt;
+
+            Debug.Log($"[CardDisplay] ✅ Display updated for {cardData.cardName}");
+        }
+        else
+        {
+            Debug.LogError("[CardDisplay] ❌ CardData is null.");
         }
     }
 }
+

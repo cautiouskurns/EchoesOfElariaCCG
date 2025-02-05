@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class DeckManager : MonoBehaviour
 {
-    public List<CardData> allCards;
-    public List<CardData> deck;
+    [SerializeField] public List<CardData> allCards; // All available cards
+    public List<CardData> deck;                      // Active deck
 
     private void Start()
     {
@@ -21,6 +21,9 @@ public class DeckManager : MonoBehaviour
             deck[i] = deck[randomIndex];
             deck[randomIndex] = temp;
         }
+
+        Debug.Log("[DeckManager] ✅ Deck shuffled.");
     }
 }
+
 
