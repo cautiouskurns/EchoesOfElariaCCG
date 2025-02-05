@@ -29,15 +29,16 @@ public class CardBehavior : MonoBehaviour
 
     public void PlayCard(BaseCharacter target)
     {
-        Debug.Log($"[CardBehavior] 🎯 Playing {cardData.cardName} on {target.Name}");
+        if (cardData != null && cardData.cardEffect != null)
+        {
+            Debug.Log($"[CardBehavior] 🎯 Playing {cardData.cardName} on {target.Name}");
 
-        if (cardData.effectType == CardEffectType.Damage)
-        {
-            target.TakeDamage(cardData.effectValue);
+            // Apply the card's effect using the ScriptableObject
+            cardData.cardEffect.ApplyEffect(target, cardData.effectValue);
         }
-        else if (cardData.effectType == CardEffectType.Heal)
+        else
         {
-            target.Heal(cardData.effectValue);
+            Debug.LogWarning($"[CardBehavior] ⚠️ No CardEffect assigned for {cardData?.cardName}");
         }
 
         Destroy(gameObject); // Remove the card from the hand after playing

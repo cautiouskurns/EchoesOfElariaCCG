@@ -476,8 +476,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allCards:
-  - {fileID: 11400000, guid: 311fa51e6cfc04c7496e508560eb4e1a, type: 2}
   - {fileID: 11400000, guid: 632e77373fa1e497abdd8a7e0400a78f, type: 2}
+  - {fileID: 11400000, guid: 632e77373fa1e497abdd8a7e0400a78f, type: 2}
+  - {fileID: 11400000, guid: df45efbbe1c7b413b9404b8953746d87, type: 2}
+  - {fileID: 11400000, guid: 989d75fc134004097b90953ee7d6537e, type: 2}
+  - {fileID: 11400000, guid: 989d75fc134004097b90953ee7d6537e, type: 2}
+  - {fileID: 11400000, guid: 989d75fc134004097b90953ee7d6537e, type: 2}
   deck: []
 --- !u!1 &565458002
 GameObject:
