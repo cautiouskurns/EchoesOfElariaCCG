@@ -6,8 +6,15 @@ public class DeckManager : MonoBehaviour
     [SerializeField] public List<CardData> allCards; // All available cards
     public List<CardData> deck;                      // Active deck
 
-    private void Start()
+    private void Awake()  // Changed from Start to Awake
     {
+        if (allCards == null || allCards.Count == 0)
+        {
+            Debug.LogError("[DeckManager] ❌ No cards assigned to allCards!");
+            return;
+        }
+        
+        Debug.Log($"[DeckManager] Initializing with {allCards.Count} cards");
         ShuffleDeck();
     }
 
@@ -22,7 +29,7 @@ public class DeckManager : MonoBehaviour
             deck[randomIndex] = temp;
         }
 
-        Debug.Log("[DeckManager] ✅ Deck shuffled.");
+        Debug.Log($"[DeckManager] ✅ Deck shuffled. Deck size: {deck.Count}");
     }
 }
 
