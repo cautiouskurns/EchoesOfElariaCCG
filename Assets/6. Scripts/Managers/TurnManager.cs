@@ -34,11 +34,18 @@ public class TurnManager : MonoBehaviour
     private void StartEnemyTurn()
     {
         Debug.Log("[TurnManager] 👿 Enemy turn started");
-        // TODO: Implement enemy AI here
-        EndEnemyTurn(); // For now, immediately end enemy turn
+        if (EnemyAIManager.Instance != null)
+        {
+            EnemyAIManager.Instance.ExecuteEnemyTurn();
+        }
+        else
+        {
+            Debug.LogError("[TurnManager] ❌ No EnemyAIManager found in scene!");
+            EndEnemyTurn();
+        }
     }
 
-    private void EndEnemyTurn()
+    public void EndEnemyTurn()
     {
         Debug.Log("[TurnManager] Enemy turn ended");
         CurrentTurn = TurnState.PlayerTurn;
