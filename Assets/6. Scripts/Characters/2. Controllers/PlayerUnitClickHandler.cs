@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+[RequireComponent(typeof(PlayerUnit))]
 public class PlayerUnitClickHandler : MonoBehaviour
 {
     private PlayerUnit playerUnit;
@@ -12,15 +13,17 @@ public class PlayerUnitClickHandler : MonoBehaviour
 
     private void OnMouseDown()
     {
-        Debug.Log("[PlayerUnitClickHandler] Click detected");
-        if (playerUnit != null)
+        if (playerUnit == null) return;
+
+        if (!playerUnit.IsSelected)
         {
-            Debug.Log($"[PlayerUnitClickHandler] Dealing damage to {playerUnit.Name}");
-            playerUnit.TakeDamage(5);  // Deal 5 damage on click for testing
+            Debug.Log($"[PlayerUnitClickHandler] 👆 Selecting {playerUnit.Name} ({playerUnit.Stats.CharacterClass})");
+            playerUnit.Select();
         }
         else
         {
-            Debug.LogError("[PlayerUnitClickHandler] PlayerUnit reference is null!");
+            Debug.Log($"[PlayerUnitClickHandler] 👇 Deselecting {playerUnit.Name}");
+            playerUnit.Deselect();
         }
     }
 }

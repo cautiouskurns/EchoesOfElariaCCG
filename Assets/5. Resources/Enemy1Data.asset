@@ -10,7 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5dfc67e40266643ce8e7b1a8de0ea1bd, type: 3}
-  m_Name: EnemyData
+  m_Name: Enemy1Data
   m_EditorClassIdentifier: 
   maxHealth: 100
   startingActionPoints: 2
+  characterName: Enemy Rogue
+  description: 
+  characterClass: 4
+  classBonus: 1

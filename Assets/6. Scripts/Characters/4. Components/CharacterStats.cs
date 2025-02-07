@@ -14,6 +14,8 @@ public class CharacterStats : MonoBehaviour
     public int CurrentHealth { get; private set; }
     public int MaxActionPoints { get; private set; }
     public int CurrentActionPoints { get; private set; }
+    public CharacterClass CharacterClass { get; private set; }
+    public float ClassBonus { get; private set; }
 
     // ✅ Events for Health & Action Points
     public event Action<int> OnHealthChanged;
@@ -21,7 +23,6 @@ public class CharacterStats : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log($"[CharacterStats] Initializing with maxHealth: {maxHealth}, actionPoints: {startingActionPoints}");
         ApplyCharacterData();  // Apply values from ScriptableObject
         Initialize(maxHealth, startingActionPoints);
     }
@@ -77,6 +78,8 @@ public class CharacterStats : MonoBehaviour
         {
             maxHealth = characterData.maxHealth;
             startingActionPoints = characterData.startingActionPoints;
+            CharacterClass = characterData.characterClass;
+            ClassBonus = characterData.classBonus;
         }
     }
 }

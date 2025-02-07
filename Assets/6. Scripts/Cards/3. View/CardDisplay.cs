@@ -16,7 +16,6 @@ public class CardDisplay : MonoBehaviour
             costText.text = cardData.Cost.ToString();
             artworkImage.sprite = cardData.CardArt;
 
-            Debug.Log($"[CardDisplay] ✅ Display updated for {cardData.CardName}");
         }
         else
         {

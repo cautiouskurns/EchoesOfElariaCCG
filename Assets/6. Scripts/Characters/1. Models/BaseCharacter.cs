@@ -6,6 +6,10 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public CharacterStats Stats { get; private set; }
     public CharacterCombat Combat { get; private set; }
 
+    private bool isSelected = false;
+    public bool IsSelected => isSelected;
+    private static BaseCharacter currentlySelectedCharacter;
+
     protected virtual void Awake()
     {
         Stats = GetComponent<CharacterStats>();
@@ -34,5 +38,31 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
                 break;
         }
     }
+
+    public virtual void Select()
+    {
+        if (isSelected) return;
+        
+        if (currentlySelectedCharacter != null)
+        {
+            currentlySelectedCharacter.Deselect();
+        }
+            
+        isSelected = true;
+        currentlySelectedCharacter = this;
+        Debug.Log($"[BaseCharacter] Selected character: {Name} (Class: {Stats.CharacterClass})");
+    }
+
+    public virtual void Deselect()
+    {
+        isSelected = false;
+        if (currentlySelectedCharacter == this)
+        {
+            currentlySelectedCharacter = null;
+            Debug.Log($"[BaseCharacter] Deselected character: {Name}");
+        }
+    }
+
+    public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
 }
 

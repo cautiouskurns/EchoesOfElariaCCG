@@ -60,7 +60,6 @@ public class HealthBarUI : MonoBehaviour
         {
             if (healthFill != null)
             {
-                Debug.Log($"[HealthBarUI] Initialized health bar for {character.Name}. Max Health: {characterStats.MaxHealth}");
                 UpdateHealthBar(characterStats.CurrentHealth);
             }
             else
@@ -88,10 +87,6 @@ public class HealthBarUI : MonoBehaviour
             healthText.text = $"{currentHealth}/{characterStats.MaxHealth}";
         }
 
-        Debug.Log($"[HealthBarUI] Updated health - Fill: {fillAmount:F2}, Text: {currentHealth}/{characterStats.MaxHealth}");
-
-        // Verify Image properties
-        Debug.Log($"[HealthBarUI] Image.type: {healthFill.type}, fillMethod: {healthFill.fillMethod}");
     }
 
     private void OnDestroy()
