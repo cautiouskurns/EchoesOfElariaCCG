@@ -3,9 +3,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "HealEffect", menuName = "Cards/Effects/Heal")]
 public class HealEffect : CardEffect
 {
-    public override void ApplyEffect(BaseCharacter target, int value)
+    public override void ApplyEffect(IEffectTarget target, int value)
     {
-        target.Heal(value);
+        target.ApplyEffect(value, EffectType.Heal);
     }
 }
-
