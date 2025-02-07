@@ -14,9 +14,23 @@ public class EndTurnButton : MonoBehaviour
         button.onClick.AddListener(OnEndTurnClicked);
     }
 
+    private void Start()
+    {
+        if (TurnManager.Instance != null)
+        {
+            TurnManager.Instance.OnTurnChanged += UpdateButtonState;
+            UpdateButtonState(TurnManager.Instance.CurrentTurn);
+        }
+        else
+        {
+            Debug.LogError("[EndTurnButton] ❌ No TurnManager instance found!");
+            button.interactable = false;
+        }
+    }
+
     private void OnEnable()
     {
-        TurnManager.Instance.OnTurnChanged += UpdateButtonState;
+        // Moved to Start
     }
 
     private void OnDisable()

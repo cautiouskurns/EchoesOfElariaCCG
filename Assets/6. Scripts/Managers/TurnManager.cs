@@ -10,6 +10,8 @@ public class TurnManager : MonoBehaviour
     
     public event Action<TurnState> OnTurnChanged;
 
+    [SerializeField] private HandManager handManager;  // Assign in inspector
+
     private void Awake()
     {
         if (Instance == null)
@@ -57,5 +59,15 @@ public class TurnManager : MonoBehaviour
     {
         Debug.Log("[TurnManager] 👑 Player turn started");
         APManager.Instance.ResetAP();
+        
+        if (handManager != null)
+        {
+            handManager.RefreshHand(); // Use RefreshHand instead of just drawing
+            Debug.Log("[TurnManager] 🎴 Hand refreshed for turn start");
+        }
+        else
+        {
+            Debug.LogError("[TurnManager] ❌ HandManager reference missing!");
+        }
     }
 }
