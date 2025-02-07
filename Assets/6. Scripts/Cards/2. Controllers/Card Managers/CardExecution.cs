@@ -31,6 +31,29 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
+        // Get selected character
+        BaseCharacter sourceCharacter = BaseCharacter.GetSelectedCharacter();
+        if (sourceCharacter == null)
+        {
+            Debug.LogWarning("[CardExecution] ❌ No character selected to play card!");
+            return;
+        }
+
+        // Calculate effect value with class bonus
+        int baseValue = cardBehavior.cardData.EffectValue;
+        float multiplier = 1.0f;
+        
+        Debug.Log($"[CardExecution] Character Class: {sourceCharacter.Stats.CharacterClass}, Card Preferred Class: {cardBehavior.cardData.PreferredClass}");
+        
+        if (sourceCharacter.Stats.CharacterClass == cardBehavior.cardData.PreferredClass)
+        {
+            multiplier = cardBehavior.cardData.ClassBonus;
+            Debug.Log($"[CardExecution] ⚔️ Class bonus of {multiplier}x applied!");
+        }
+
+        int finalValue = Mathf.RoundToInt(baseValue * multiplier);
+        Debug.Log($"[CardExecution] Damage calculation: {baseValue} × {multiplier} = {finalValue}");
+
         // Apply the card effect
         CardEffect effect = cardBehavior.cardData.CardEffect;
         if (effect == null)
@@ -39,8 +62,8 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[CardExecution] 🎯 Playing {cardBehavior.cardData.CardName} on {target}.");
-        effect.ApplyEffect(target, cardBehavior.cardData.EffectValue);
+        Debug.Log($"[CardExecution] 🎯 {sourceCharacter.Name} ({sourceCharacter.Stats.CharacterClass}) played {cardBehavior.cardData.CardName} for {finalValue} damage");
+        effect.ApplyEffect(target, finalValue);
 
         // Remove the card from hand
         Destroy(gameObject);

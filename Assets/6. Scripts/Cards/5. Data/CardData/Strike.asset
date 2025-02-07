@@ -17,3 +17,5 @@ MonoBehaviour:
   cardArt: {fileID: 7482667652216324306, guid: e9a224ec988444a69ab29bb01c6d6f7b, type: 3}
   effectValue: 10
   cardEffect: {fileID: 11400000, guid: 812a4ba9b87f24baba61593e5b6a5e75, type: 2}
+  preferredClass: 1
+  classBonus: 1.5
