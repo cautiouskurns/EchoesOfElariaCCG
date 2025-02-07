@@ -15,6 +15,12 @@ public class CardExecution : MonoBehaviour
 
     public void PlayCard(IEffectTarget target)
     {
+        if (TurnManager.Instance.CurrentTurn != TurnManager.TurnState.PlayerTurn)
+        {
+            Debug.LogWarning("[CardExecution] ❌ Cannot play cards during enemy turn!");
+            return;
+        }
+
         if (cardBehavior == null || cardBehavior.cardData == null)
         {
             Debug.LogError("[CardExecution] ❌ CardBehavior or CardData is missing.");
