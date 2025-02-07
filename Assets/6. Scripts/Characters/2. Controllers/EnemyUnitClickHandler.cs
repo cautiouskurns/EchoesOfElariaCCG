@@ -25,7 +25,7 @@ public class EnemyUnitClickHandler : MonoBehaviour
         CardBehavior selectedCard = CardBehavior.GetSelectedCard();
         if (selectedCard != null)
         {
-            Debug.Log($"[EnemyUnitClickHandler] 🎯 Using {selectedCard.cardData.cardName} on {enemyUnit.Name}");
+            Debug.Log($"[EnemyUnitClickHandler] 🎯 Using {selectedCard.cardData.CardName} on {enemyUnit.Name}");
             selectedCard.PlayCard(enemyUnit); // Apply card effect
         }
         else

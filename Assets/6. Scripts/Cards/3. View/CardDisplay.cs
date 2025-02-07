@@ -12,11 +12,11 @@ public class CardDisplay : MonoBehaviour
     {
         if (cardData != null)
         {
-            cardNameText.text = cardData.cardName;
-            costText.text = cardData.cost.ToString();
-            artworkImage.sprite = cardData.cardArt;
+            cardNameText.text = cardData.CardName;
+            costText.text = cardData.Cost.ToString();
+            artworkImage.sprite = cardData.CardArt;
 
-            Debug.Log($"[CardDisplay] ✅ Display updated for {cardData.cardName}");
+            Debug.Log($"[CardDisplay] ✅ Display updated for {cardData.CardName}");
         }
         else
         {

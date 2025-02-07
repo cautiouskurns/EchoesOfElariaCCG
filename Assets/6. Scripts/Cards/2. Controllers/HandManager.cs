@@ -69,7 +69,7 @@ public class HandManager : MonoBehaviour
                 cardBehavior.UpdateCardDisplay();
                 deckManager.deck.RemoveAt(0);
                 currentHand.Add(cardObject);
-                Debug.Log($"[HandManager] ✅ Added {cardBehavior.cardData.cardName} to hand");
+                Debug.Log($"[HandManager] ✅ Added {cardBehavior.cardData.CardName} to hand");
             }
         }
     }

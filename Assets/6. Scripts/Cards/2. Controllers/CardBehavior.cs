@@ -33,7 +33,7 @@ public class CardBehavior : MonoBehaviour, IPointerClickHandler  // Implement in
     // Replace OnMouseDown with this
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log($"[CardBehavior] Card clicked: {cardData?.cardName ?? "Unknown Card"}");
+        Debug.Log($"[CardBehavior] Card clicked: {cardData?.CardName ?? "Unknown Card"}");
         
         if (currentlySelectedCard != null && currentlySelectedCard != this)
         {
@@ -58,7 +58,7 @@ public class CardBehavior : MonoBehaviour, IPointerClickHandler  // Implement in
         {
             selectionHighlight.SetActive(true); // ✅ Activate the GameObject
         }
-        Debug.Log($"[CardBehavior] ✅ Selected card: {cardData.cardName}");
+        Debug.Log($"[CardBehavior] ✅ Selected card: {cardData.CardName}");
     }
 
     private void DeselectCard()
@@ -70,7 +70,7 @@ public class CardBehavior : MonoBehaviour, IPointerClickHandler  // Implement in
         }
         else
         {
-            Debug.LogWarning($"[CardBehavior] ⚠️ No selectionHighlight assigned for {cardData?.cardName ?? "Unknown Card"}.");
+            Debug.LogWarning($"[CardBehavior] ⚠️ No selectionHighlight assigned for {cardData?.CardName ?? "Unknown Card"}.");
         }
 
         if (currentlySelectedCard == this)
@@ -81,11 +81,11 @@ public class CardBehavior : MonoBehaviour, IPointerClickHandler  // Implement in
 
     public void PlayCard(BaseCharacter target)
     {
-        Debug.Log($"[CardBehavior] 🎯 Playing {cardData.cardName} on {target.Name}");
+        Debug.Log($"[CardBehavior] 🎯 Playing {cardData.CardName} on {target.Name}");
 
-        if (cardData.cardEffect != null)
+        if (cardData.CardEffect != null)
         {
-            cardData.cardEffect.ApplyEffect(target, cardData.effectValue);
+            cardData.CardEffect.ApplyEffect(target, cardData.EffectValue);
         }
 
         Destroy(gameObject); // Remove the card from hand after playing
