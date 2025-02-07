@@ -5,46 +5,47 @@ public class APManager : MonoBehaviour
 {
     public static APManager Instance { get; private set; }
 
-    [SerializeField] private int maxActionPoints = 10;
-    private int currentActionPoints;
+    [SerializeField] private int maxAP = 6;  // Set max AP in the Inspector
+    private int currentAP;
 
-    public event Action<int, int> OnAPChanged; // Event to update UI (current, max)
+    public event Action<int> OnAPChanged; // 🔹 Event for UI updates
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
-        else
-        {
-            Instance = this;
-        }
-
-        currentActionPoints = maxActionPoints;
-        OnAPChanged?.Invoke(currentActionPoints, maxActionPoints);
+        Instance = this;
     }
 
-    public void UseActionPoints(int amount)
+    private void Start()
     {
-        if (currentActionPoints >= amount)
-        {
-            currentActionPoints -= amount;
-            OnAPChanged?.Invoke(currentActionPoints, maxActionPoints);
-            Debug.Log($"[APManager] Used {amount} AP. Remaining: {currentActionPoints}/{maxActionPoints}");
-        }
-        else
-        {
-            Debug.LogWarning($"[APManager] Not enough AP! Required: {amount}, Available: {currentActionPoints}");
-        }
+        ResetAP();
     }
 
-    public bool HasEnoughAP(int cost) => currentActionPoints >= cost;
-
-    public void RefillAP()
+    public void ResetAP()
     {
-        currentActionPoints = maxActionPoints;
-        OnAPChanged?.Invoke(currentActionPoints, maxActionPoints);
-        Debug.Log($"[APManager] Refilled AP to {maxActionPoints}");
+        currentAP = maxAP;
+        OnAPChanged?.Invoke(currentAP);  // 🔹 Notify UI
     }
+
+    public bool SpendAP(int amount)
+    {
+        if (amount > currentAP)
+        {
+            Debug.LogWarning("[APManager] ❌ Not enough AP!");
+            return false; 
+        }
+
+        currentAP -= amount;
+        OnAPChanged?.Invoke(currentAP);  // 🔹 Notify UI
+        Debug.Log($"[APManager] 🔥 {amount} AP spent. Remaining: {currentAP}");
+        return true;
+    }
+
+    public int GetCurrentAP() => currentAP;
 }
+
+

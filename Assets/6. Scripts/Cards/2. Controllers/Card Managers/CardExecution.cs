@@ -21,7 +21,17 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        // Get the card effect
+        // Get card cost
+        int cost = cardBehavior.cardData.Cost;
+        
+        // Check if enough AP is available
+        if (!APManager.Instance.SpendAP(cost))
+        {
+            Debug.LogWarning($"[CardExecution] ❌ Not enough AP to play {cardBehavior.cardData.CardName}");
+            return;
+        }
+
+        // Apply the card effect
         CardEffect effect = cardBehavior.cardData.CardEffect;
         if (effect == null)
         {
@@ -29,9 +39,11 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        // Apply the effect
-        Debug.Log($"[CardExecution] 🎯 Applying {effect.name} to {target}.");
+        Debug.Log($"[CardExecution] 🎯 Playing {cardBehavior.cardData.CardName} on {target}.");
         effect.ApplyEffect(target, cardBehavior.cardData.EffectValue);
+
+        // Remove the card from hand
+        Destroy(gameObject);
     }
 }
 

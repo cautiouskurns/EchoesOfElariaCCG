@@ -1,52 +1,37 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class APBarUI : MonoBehaviour
 {
-    [SerializeField] private Image apFill; // Drag & drop the APFill image here in Inspector
-    private CharacterStats characterStats;
-
-    private void Awake()
-    {
-        characterStats = GetComponentInParent<CharacterStats>();
-
-        if (characterStats != null)
-        {
-            characterStats.OnActionPointsChanged += UpdateAPBar;
-        }
-        else
-        {
-            Debug.LogError("[APBarUI] ❌ CharacterStats not found in parent.");
-        }
-    }
+    [SerializeField] private Image apFillImage;  // 🔹 Reference to the AP bar fill (Image)
+    [SerializeField] private TextMeshProUGUI apText; // UI text for displaying AP amount
+    private int maxAP;
 
     private void Start()
     {
-        if (characterStats != null)
+        if (APManager.Instance != null)
         {
-            UpdateAPBar(characterStats.CurrentActionPoints); // Initialize AP bar
+            maxAP = APManager.Instance.GetCurrentAP();  // Get initial max AP
+            APManager.Instance.OnAPChanged += UpdateAPDisplay;
+            UpdateAPDisplay(maxAP); // Initialize
+        }
+        else
+        {
+            Debug.LogError("[APBarUI] ❌ APManager not found in scene!");
         }
     }
 
-    private void UpdateAPBar(int currentAP)
+    private void UpdateAPDisplay(int currentAP)
     {
-        if (apFill == null)
+        if (apFillImage != null)
         {
-            Debug.LogError("[APBarUI] ❌ APFill reference missing.");
-            return;
+            apFillImage.fillAmount = (float)currentAP / maxAP;  // 🔹 Adjust fill amount
         }
-
-        float fillAmount = (float)currentAP / characterStats.MaxActionPoints;
-        apFill.fillAmount = fillAmount;
-
-        Debug.Log($"[APBarUI] ✅ AP Updated: {currentAP}/{characterStats.MaxActionPoints}");
-    }
-
-    private void OnDestroy()
-    {
-        if (characterStats != null)
+        
+        if (apText != null)
         {
-            characterStats.OnActionPointsChanged -= UpdateAPBar;
+            apText.text = $"AP: {currentAP} / {maxAP}"; // 🔹 Update AP text
         }
     }
 }
