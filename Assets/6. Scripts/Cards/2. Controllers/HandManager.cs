@@ -63,6 +63,7 @@ public class HandManager : MonoBehaviour
             }
 
             CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
+
             if (cardBehavior != null)
             {
                 cardBehavior.cardData = deckManager.deck[0];

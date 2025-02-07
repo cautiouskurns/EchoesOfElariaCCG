@@ -22,11 +22,11 @@ public class EnemyUnitClickHandler : MonoBehaviour
         }
 
         // Check if a card is selected
-        CardBehavior selectedCard = CardBehavior.GetSelectedCard();
+        CardSelection selectedCard = CardSelection.GetSelectedCard();
+        CardExecution cardExecution = selectedCard?.GetComponent<CardExecution>();
         if (selectedCard != null)
         {
-            Debug.Log($"[EnemyUnitClickHandler] 🎯 Using {selectedCard.cardData.CardName} on {enemyUnit.Name}");
-            selectedCard.PlayCard(enemyUnit); // Apply card effect
+            cardExecution.PlayCard(enemyUnit); // Apply card effect
         }
         else
         {

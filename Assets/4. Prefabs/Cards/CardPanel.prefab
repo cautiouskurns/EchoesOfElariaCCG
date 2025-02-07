@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 1946542193312447229}
   - component: {fileID: 1167423905235653218}
   - component: {fileID: 4815525505931415834}
+  - component: {fileID: -2722575198389117581}
+  - component: {fileID: -6471008968748891351}
   - component: {fileID: 2265684309829472174}
   m_Layer: 5
   m_Name: CardPanel
@@ -94,7 +96,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardData: {fileID: 11400000, guid: 311fa51e6cfc04c7496e508560eb4e1a, type: 2}
-  selectionHighlight: {fileID: 7827176225076841770}
+--- !u!114 &-2722575198389117581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3534639883565823492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f43fafc96b787431da5008eca0d582b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-6471008968748891351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3534639883565823492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 649c69b8d3b4547df806b816f93afb95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectionHighlight: {fileID: 0}
 --- !u!114 &2265684309829472174
 MonoBehaviour:
   m_ObjectHideFlags: 0
