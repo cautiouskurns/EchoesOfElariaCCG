@@ -169,21 +169,21 @@ MonoBehaviour:
   musicFadeTime: 1
   sfxSourcesCount: 5
   cardSounds:
-  - name: CardDraw
+  - name: AttackSlash
     type: 1
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: acf94774fdc6c41b393ef07d1b3a6a5c, type: 3}
     volume: 1
     pitch: 1
     loop: 0
-  - name: CardPlay
+  - name: FireballCast
     type: 1
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: acf94774fdc6c41b393ef07d1b3a6a5c, type: 3}
     volume: 1
     pitch: 1
     loop: 0
-  - name: CardDiscard
+  - name: HealEffect
     type: 1
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: acf94774fdc6c41b393ef07d1b3a6a5c, type: 3}
     volume: 1
     pitch: 1
     loop: 0

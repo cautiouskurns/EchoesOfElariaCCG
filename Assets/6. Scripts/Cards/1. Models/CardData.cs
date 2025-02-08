@@ -22,6 +22,20 @@ public class CardData : ScriptableObject
     [Header("Card Type")]
     [SerializeField] private CardType cardType;
 
+    [Header("Audio")]
+    [SerializeField] private string soundEffectName = CardSoundConfig.CARD_PLAY;
+    public string SoundEffectName
+    {
+        get
+        {
+            // Override sound based on card type
+            if (cardType == CardType.Attack)
+                return CardSoundConfig.ATTACK_SLASH;
+            // Add other type-specific sounds here
+            return soundEffectName;
+        }
+    }
+
     // 🔹 Public Read-Only Properties
     public string CardName => cardName;
     public int Cost => cost;

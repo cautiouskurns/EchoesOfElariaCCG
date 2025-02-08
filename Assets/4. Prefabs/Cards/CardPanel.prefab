@@ -97,6 +97,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardData: {fileID: 11400000, guid: 311fa51e6cfc04c7496e508560eb4e1a, type: 2}
+  cardBackground: {fileID: 0}
 --- !u!114 &-2722575198389117581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,7 +136,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardNameText: {fileID: 2789064361040517528}
   costText: {fileID: 258908557976746424}
+  descriptionText: {fileID: 6264237707763743641}
   artworkImage: {fileID: 7307118914084450897}
+  cardFrame: {fileID: 0}
   selectionHighlight: {fileID: 7827176225076841770}
 --- !u!1 &5207225537844852488
 GameObject:
@@ -171,7 +174,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0.4, y: -210.8}
+  m_AnchoredPosition: {x: 0.4, y: -257.9}
   m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7874497562280399512
@@ -267,7 +270,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 35.40497, y: 0, z: 36.89566, w: -50.312317}
+  m_margin: {x: 35.40497, y: 0, z: 36.89566, w: -11.311123}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -307,8 +310,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1.5, y: 30}
-  m_SizeDelta: {x: 180, y: 130}
+  m_AnchoredPosition: {x: 1.5, y: 12.3}
+  m_SizeDelta: {x: 170, y: 170}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3272518571344474603
 CanvasRenderer:
@@ -383,7 +386,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 160, y: 235}
+  m_SizeDelta: {x: 200, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &749602284003306741
 CanvasRenderer:

@@ -258,9 +258,11 @@ public class AudioManager : MonoBehaviour
         {
             cardSounds = new Sound[]
             {
-                new Sound { name = "CardDraw", type = AudioType.CardEffects },
-                new Sound { name = "CardPlay", type = AudioType.CardEffects },
-                new Sound { name = "CardDiscard", type = AudioType.CardEffects }
+                new Sound { name = CardSoundConfig.CARD_DRAW, type = AudioType.CardEffects },
+                new Sound { name = CardSoundConfig.CARD_PLAY, type = AudioType.CardEffects },
+                new Sound { name = CardSoundConfig.ATTACK_SLASH, type = AudioType.CardEffects },
+                new Sound { name = CardSoundConfig.FIREBALL, type = AudioType.CardEffects },
+                new Sound { name = CardSoundConfig.HEAL, type = AudioType.CardEffects }
             };
         }
     }

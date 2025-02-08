@@ -62,6 +62,32 @@ public class CardBehavior : MonoBehaviour
                 return Color.white;
         }
     }
+
+    public void PlayCardSound()
+    {
+        if (AudioManager.Instance != null && cardData != null)
+        {
+            AudioManager.Instance.PlaySound(cardData.SoundEffectName);  // Changed from PlaySound to SoundEffectName
+            Debug.Log($"[CardBehavior] Playing sound: {cardData.SoundEffectName}");
+        }
+        else
+        {
+            Debug.LogWarning("[CardBehavior] Cannot play sound - AudioManager or CardData is null!");
+        }
+    }
+
+    public void PlayEffect()
+    {
+        PlayCardSound();
+        // Add your effect/animation code here
+    }
+
+    // Example method to play attack animation with sound
+    public void PlayAttackAnimation()
+    {
+        // Your existing animation code here
+        PlayCardSound();  // Uses the sound defined in cardData
+    }
 }
 
 

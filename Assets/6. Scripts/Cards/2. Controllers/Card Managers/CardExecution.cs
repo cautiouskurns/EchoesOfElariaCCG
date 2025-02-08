@@ -25,15 +25,32 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        StartCoroutine(PerformAttackSequence(sourceCharacter, target));
+        int finalValue = GetFinalEffectValue(sourceCharacter);
+        
+        // ✅ Play sound before applying effect
+        if (cardBehavior != null)
+        {
+            cardBehavior.PlayCardSound();
+        }
+
+        // ✅ Play attack animation before applying effect
+        StartCoroutine(PerformAttackSequence(target));
     }
+
 
     /// <summary>
     /// ✅ Moves the character, plays animation, then applies effect.
     /// </summary>
-    private IEnumerator PerformAttackSequence(BaseCharacter sourceCharacter, IEffectTarget target)
+    private IEnumerator PerformAttackSequence(IEffectTarget target)
     {
-        // ✅ Now searches for the animation controller on both the parent and children
+        BaseCharacter sourceCharacter = BaseCharacter.GetSelectedCharacter();
+        if (sourceCharacter == null)
+        {
+            Debug.LogError("[CardExecution] ❌ No character selected to perform attack.");
+            yield break;
+        }
+
+        // ✅ Get animation controller from source character
         CharacterAnimationController animationController = sourceCharacter.GetComponentInChildren<CharacterAnimationController>();
 
         if (animationController == null)
@@ -42,15 +59,15 @@ public class CardExecution : MonoBehaviour
             yield break;
         }
 
-        // Move forward & perform attack sequence
+        // ✅ Move forward and perform attack
         Vector3 targetPosition = ((MonoBehaviour)target).transform.position;
         yield return StartCoroutine(animationController.PlayAttackSequence(targetPosition));
 
-        // Apply effect after animation
+        // ✅ Apply effect after animation completes
         int finalValue = GetFinalEffectValue(sourceCharacter);
         ApplyCardEffect(target, finalValue);
 
-        // Remove card from hand and destroy it
+        // ✅ Remove card from hand and destroy it
         HandManager handManager = FindAnyObjectByType<HandManager>();
         if (handManager != null)
         {
@@ -58,6 +75,7 @@ public class CardExecution : MonoBehaviour
             Debug.Log("[CardExecution] Card removed from hand and discarded");
         }
     }
+
 
     private bool ValidatePlayConditions()
     {

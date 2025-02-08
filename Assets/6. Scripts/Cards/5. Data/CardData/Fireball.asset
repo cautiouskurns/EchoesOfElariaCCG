@@ -21,3 +21,4 @@ MonoBehaviour:
   preferredClass: 2
   classBonus: 1.5
   cardType: 2
+  playSound: 
