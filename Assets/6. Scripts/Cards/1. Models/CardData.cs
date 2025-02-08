@@ -1,4 +1,5 @@
 using UnityEngine;
+using Cards;
 
 [CreateAssetMenu(fileName = "NewCard", menuName = "Cards/Card Data")]
 public class CardData : ScriptableObject
@@ -18,6 +19,9 @@ public class CardData : ScriptableObject
     [SerializeField] private CharacterClass preferredClass;
     [SerializeField] private float classBonus = 1.5f;
 
+    [Header("Card Type")]
+    [SerializeField] private CardType cardType;
+
     // 🔹 Public Read-Only Properties
     public string CardName => cardName;
     public int Cost => cost;
@@ -27,6 +31,7 @@ public class CardData : ScriptableObject
     public CardEffect CardEffect => cardEffect;
     public CharacterClass PreferredClass => preferredClass;
     public float ClassBonus => classBonus;
+    public CardType CardType => cardType;
 
     // 🔹 Validate in Editor to prevent missing data
     private void OnValidate()
