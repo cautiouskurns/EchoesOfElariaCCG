@@ -192,7 +192,7 @@ MonoBehaviour:
   musicTracks:
   - name: Main Battle theme
     type: 3
-    clip: {fileID: 8300000, guid: dbce1f48a211b40ef9927bf30c8a613e, type: 3}
+    clip: {fileID: 8300000, guid: e434090c9a9564d97a55e9460a973e33, type: 3}
     volume: 0.7
     pitch: 0
     loop: 1
@@ -408,6 +408,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1035442949}
     m_Modifications:
+    - target: {fileID: -5938672298123698510, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
+      propertyPath: moveSpeed
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 20005129447786752, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
       propertyPath: m_Sprite
       value: 

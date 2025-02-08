@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class CardExecution : MonoBehaviour
 {
@@ -24,16 +25,35 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        int finalValue = GetFinalEffectValue(sourceCharacter);
-        ApplyCardEffect(target, finalValue);
-
-        // Remove the card from hand
-        Destroy(gameObject);
+        StartCoroutine(PerformAttackSequence(sourceCharacter, target));
     }
 
     /// <summary>
-    /// ✅ Checks if the card can be played (AP, turn validation, and null checks).
+    /// ✅ Moves the character, plays animation, then applies effect.
     /// </summary>
+    private IEnumerator PerformAttackSequence(BaseCharacter sourceCharacter, IEffectTarget target)
+    {
+        // ✅ Now searches for the animation controller on both the parent and children
+        CharacterAnimationController animationController = sourceCharacter.GetComponentInChildren<CharacterAnimationController>();
+
+        if (animationController == null)
+        {
+            Debug.LogError($"[CardExecution] ❌ CharacterAnimationController is missing on {sourceCharacter.Name}!");
+            yield break;
+        }
+
+        // Move forward & perform attack sequence
+        Vector3 targetPosition = ((MonoBehaviour)target).transform.position;
+        yield return StartCoroutine(animationController.PlayAttackSequence(targetPosition));
+
+        // Wait for the full sequence to complete before applying damage
+        yield return new WaitForSeconds(0.5f);
+
+        int finalValue = GetFinalEffectValue(sourceCharacter);
+        ApplyCardEffect(target, finalValue);
+    }
+
+
     private bool ValidatePlayConditions()
     {
         if (TurnManager.Instance.CurrentTurn != TurnManager.TurnState.PlayerTurn)
@@ -57,9 +77,6 @@ public class CardExecution : MonoBehaviour
         return true;
     }
 
-    /// <summary>
-    /// ✅ Calculates the final effect value, applying class bonuses if needed.
-    /// </summary>
     private int GetFinalEffectValue(BaseCharacter sourceCharacter)
     {
         int baseValue = cardBehavior.CardData.EffectValue;
@@ -72,9 +89,6 @@ public class CardExecution : MonoBehaviour
         return finalValue;
     }
 
-    /// <summary>
-    /// ✅ Applies the card effect on the target.
-    /// </summary>
     private void ApplyCardEffect(IEffectTarget target, int finalValue)
     {
         CardEffect effect = cardBehavior.CardData.CardEffect;
@@ -88,4 +102,3 @@ public class CardExecution : MonoBehaviour
         effect.ApplyEffect(target, finalValue);
     }
 }
-

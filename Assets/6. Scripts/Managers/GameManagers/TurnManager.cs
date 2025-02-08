@@ -27,6 +27,13 @@ public class TurnManager : MonoBehaviour
 
     public void EndPlayerTurn()
     {
+        // Deselect current character if one exists
+        BaseCharacter selectedChar = BaseCharacter.GetSelectedCharacter();
+        if (selectedChar != null)
+        {
+            selectedChar.Deselect();
+        }
+
         Debug.Log("[TurnManager] 🔄 Player turn ended");
         CurrentTurn = TurnState.EnemyTurn;
         OnTurnChanged?.Invoke(CurrentTurn);
