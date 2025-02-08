@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Fireball
   cost: 2
-  cardArt: {fileID: -9023002539764390441, guid: 1aed488dbce3346e291d68888bb73d81, type: 3}
+  cardArt: {fileID: 21300000, guid: dd3885098198d104888439be4c590aba, type: 3}
+  cardDescription: 
   effectValue: 15
   cardEffect: {fileID: 11400000, guid: a8281e157f41848b5985ec1d98005bda, type: 2}
   preferredClass: 2

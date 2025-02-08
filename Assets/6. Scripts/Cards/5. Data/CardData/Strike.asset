@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Strike
   cost: 1
-  cardArt: {fileID: 7482667652216324306, guid: e9a224ec988444a69ab29bb01c6d6f7b, type: 3}
+  cardArt: {fileID: 21300000, guid: 917871e5c6d34ed4b93dfafad1277db5, type: 3}
+  cardDescription: 
   effectValue: 10
   cardEffect: {fileID: 11400000, guid: 812a4ba9b87f24baba61593e5b6a5e75, type: 2}
   preferredClass: 1

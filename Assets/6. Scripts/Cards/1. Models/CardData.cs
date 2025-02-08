@@ -7,6 +7,7 @@ public class CardData : ScriptableObject
     [SerializeField] private string cardName;
     [SerializeField] private int cost;
     [SerializeField] private Sprite cardArt;
+    [SerializeField] private string cardDescription;
 
     [Header("Card Effect")]
     [SerializeField] private int effectValue;  
@@ -21,6 +22,7 @@ public class CardData : ScriptableObject
     public string CardName => cardName;
     public int Cost => cost;
     public Sprite CardArt => cardArt;
+    public string CardDescription => cardDescription;
     public int EffectValue => effectValue;
     public CardEffect CardEffect => cardEffect;
     public CharacterClass PreferredClass => preferredClass;

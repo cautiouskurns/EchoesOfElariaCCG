@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Heal
   cost: 2
-  cardArt: {fileID: -4733039052000751752, guid: d3e286cbd6d3a4b31ad84668f461f9cb, type: 3}
+  cardArt: {fileID: 21300000, guid: c46d83f2b73aaa141bd5015819342d81, type: 3}
+  cardDescription: 
   effectValue: 10
   cardEffect: {fileID: 11400000, guid: 9dbd9adbc8fb840a2879a5aa1620e101, type: 2}
   preferredClass: 3
