@@ -70,12 +70,19 @@ public class HandManager : MonoBehaviour
             GameObject cardObject = Instantiate(cardPrefab, handArea);
             CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
             
+            // if (cardBehavior != null)
+            // {
+            //     cardBehavior.cardData = deckManager.deck[0];
+            //     cardBehavior.UpdateCardDisplay();
+            //     deckManager.deck.RemoveAt(0);
+            //     currentHand.Add(cardObject);
+            // }
             if (cardBehavior != null)
             {
-                cardBehavior.cardData = deckManager.deck[0];
-                cardBehavior.UpdateCardDisplay();
+                cardBehavior.Initialize(deckManager.deck[0]); // ✅ Assign card data + update UI
                 deckManager.deck.RemoveAt(0);
                 currentHand.Add(cardObject);
+                Debug.Log($"[HandManager] ✅ Added card: {cardBehavior.CardData.CardName}");
             }
         }
 
@@ -87,9 +94,9 @@ public class HandManager : MonoBehaviour
         if (currentHand.Contains(card))
         {
             CardBehavior cardBehavior = card.GetComponent<CardBehavior>();
-            if (cardBehavior != null && cardBehavior.cardData != null)
+            if (cardBehavior != null && cardBehavior.CardData != null)
             {
-                deckManager.discardPile.Add(cardBehavior.cardData);
+                deckManager.discardPile.Add(cardBehavior.CardData);
             }
             currentHand.Remove(card);
             Destroy(card);
@@ -108,9 +115,9 @@ public class HandManager : MonoBehaviour
             if (card != null)
             {
                 CardBehavior cardBehavior = card.GetComponent<CardBehavior>();
-                if (cardBehavior != null && cardBehavior.cardData != null)
+                if (cardBehavior != null && cardBehavior.CardData != null)
                 {
-                    cardsToDiscard.Add(cardBehavior.cardData);
+                    cardsToDiscard.Add(cardBehavior.CardData);
                 }
             }
         }

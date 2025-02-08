@@ -1,0 +1,1509 @@
+// File: ScriptExporter.cs
+//===========================================
+using UnityEngine;
+using UnityEditor;
+using System.IO;
+using System.Text;
+
+public class ScriptExporter : EditorWindow
+{
+    [MenuItem("Tools/Export Scripts to Text File")]
+    public static void ExportScripts()
+    {
+        string projectPath = Application.dataPath;
+        string outputPath = Path.Combine(Application.dataPath, "../ScriptExport.txt");
+        StringBuilder content = new StringBuilder();
+
+        // Find all .cs files in the Assets folder and its subfolders
+        string[] scriptFiles = Directory.GetFiles(projectPath, "*.cs", SearchOption.AllDirectories);
+
+        foreach (string filePath in scriptFiles)
+        {
+            content.AppendLine($"// File: {Path.GetFileName(filePath)}");
+            content.AppendLine("//===========================================");
+            content.AppendLine(File.ReadAllText(filePath));
+            content.AppendLine("\n\n");
+        }
+
+        // Write to file
+        File.WriteAllText(outputPath, content.ToString());
+        Debug.Log($"Scripts exported to: {outputPath}");
+        
+        // Open the folder containing the exported file
+        EditorUtility.RevealInFinder(outputPath);
+    }
+}
+
+
+
+
+// File: EnemyAIManager.cs
+//===========================================
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class EnemyAIManager : MonoBehaviour
+{
+    public static EnemyAIManager Instance { get; private set; }
+
+    [SerializeField] private List<CardData> enemyActions;
+    [SerializeField] private float actionDelay = 1.5f;
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
+    public void ExecuteEnemyTurn()
+    {
+        StartCoroutine(ProcessEnemyTurn());
+    }
+
+    private IEnumerator ProcessEnemyTurn()
+    {
+        Debug.Log("[EnemyAI] 🤖 Processing enemy turn");
+        
+        // Get all active units
+        var enemies = FindObjectsByType<EnemyUnit>(FindObjectsSortMode.None);
+        var players = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None);
+
+        foreach (var enemy in enemies)
+        {
+            enemy.Stats.RefreshActionPoints();
+            
+            while (enemy.Stats.CurrentActionPoints > 0)
+            {
+                // Choose random action and target
+                var action = enemyActions[Random.Range(0, enemyActions.Count)];
+                var target = players[Random.Range(0, players.Length)];
+
+                if (action.Cost <= enemy.Stats.CurrentActionPoints)
+                {
+                    // Calculate effect with class bonus
+                    float multiplier = enemy.Stats.CharacterClass == action.PreferredClass ? action.ClassBonus : 1f;
+                    int finalValue = Mathf.RoundToInt(action.EffectValue * multiplier);
+
+                    Debug.Log($"[EnemyAI] {enemy.Name} using {action.CardName} on {target.Name} for {finalValue} damage");
+                    
+                    action.CardEffect.ApplyEffect(target, finalValue);
+                    enemy.Stats.UseActionPoints(action.Cost);
+                    
+                    yield return new WaitForSeconds(actionDelay);
+                }
+                else
+                {
+                    break; // Not enough AP for any action
+                }
+            }
+        }
+
+        Debug.Log("[EnemyAI] Enemy turn complete");
+        TurnManager.Instance.EndEnemyTurn();
+    }
+}
+
+
+
+
+// File: TurnManager.cs
+//===========================================
+using UnityEngine;
+using System;
+
+public class TurnManager : MonoBehaviour
+{
+    public static TurnManager Instance { get; private set; }
+    
+    public enum TurnState { PlayerTurn, EnemyTurn }
+    public TurnState CurrentTurn { get; private set; } = TurnState.PlayerTurn;
+    
+    public event Action<TurnState> OnTurnChanged;
+
+    [SerializeField] private HandManager handManager;  // Assign in inspector
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
+
+    private void Start()
+    {
+        StartPlayerTurn();
+    }
+
+    public void EndPlayerTurn()
+    {
+        Debug.Log("[TurnManager] 🔄 Player turn ended");
+        CurrentTurn = TurnState.EnemyTurn;
+        OnTurnChanged?.Invoke(CurrentTurn);
+        StartEnemyTurn();
+    }
+
+    private void StartEnemyTurn()
+    {
+        Debug.Log("[TurnManager] 👿 Enemy turn started");
+        if (EnemyAIManager.Instance != null)
+        {
+            EnemyAIManager.Instance.ExecuteEnemyTurn();
+        }
+        else
+        {
+            Debug.LogError("[TurnManager] ❌ No EnemyAIManager found in scene!");
+            EndEnemyTurn();
+        }
+    }
+
+    public void EndEnemyTurn()
+    {
+        Debug.Log("[TurnManager] Enemy turn ended");
+        CurrentTurn = TurnState.PlayerTurn;
+        OnTurnChanged?.Invoke(CurrentTurn);
+        StartPlayerTurn();
+    }
+
+    private void StartPlayerTurn()
+    {
+        Debug.Log("[TurnManager] 👑 Player turn started");
+        APManager.Instance.ResetAP();
+        
+        if (handManager != null)
+        {
+            handManager.RefreshHand(); // Use RefreshHand instead of just drawing
+            Debug.Log("[TurnManager] 🎴 Hand refreshed for turn start");
+        }
+        else
+        {
+            Debug.LogError("[TurnManager] ❌ HandManager reference missing!");
+        }
+    }
+}
+
+
+
+
+// File: EndTurnButton.cs
+//===========================================
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+[RequireComponent(typeof(Button))]
+public class EndTurnButton : MonoBehaviour
+{
+    private Button button;
+    [SerializeField] private TextMeshProUGUI buttonText;
+
+    private void Awake()
+    {
+        button = GetComponent<Button>();
+        button.onClick.AddListener(OnEndTurnClicked);
+    }
+
+    private void Start()
+    {
+        if (TurnManager.Instance != null)
+        {
+            TurnManager.Instance.OnTurnChanged += UpdateButtonState;
+            UpdateButtonState(TurnManager.Instance.CurrentTurn);
+        }
+        else
+        {
+            Debug.LogError("[EndTurnButton] ❌ No TurnManager instance found!");
+            button.interactable = false;
+        }
+    }
+
+    private void OnEnable()
+    {
+        // Moved to Start
+    }
+
+    private void OnDisable()
+    {
+        if (TurnManager.Instance != null)
+            TurnManager.Instance.OnTurnChanged -= UpdateButtonState;
+    }
+
+    private void OnEndTurnClicked()
+    {
+        TurnManager.Instance.EndPlayerTurn();
+    }
+
+    private void UpdateButtonState(TurnManager.TurnState newTurn)
+    {
+        button.interactable = (newTurn == TurnManager.TurnState.PlayerTurn);
+        buttonText.text = newTurn == TurnManager.TurnState.PlayerTurn ? "End Turn" : "Enemy Turn";
+    }
+}
+
+
+
+
+// File: SpriteGenerator.cs
+//===========================================
+using UnityEngine;
+
+[RequireComponent(typeof(SpriteRenderer))]
+public class SpriteGenerator : MonoBehaviour
+{
+    [Header("Sprite Settings")]
+    [SerializeField] private int width = 256;      // Width of the sprite
+    [SerializeField] private int height = 256;     // Height of the sprite
+    [SerializeField] private Color fillColor = Color.green;  // Color to fill the sprite
+
+    [Header("Shape Settings")]
+    public ShapeType shape = ShapeType.Square;    // Shape type: Square or Circle
+
+    private SpriteRenderer spriteRenderer;
+
+    public enum ShapeType
+    {
+        Square,
+        Circle
+    }
+
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        GenerateSprite();
+    }
+
+    [ContextMenu("Generate Sprite")]
+    public void GenerateSprite()
+    {
+        Texture2D texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
+        texture.filterMode = FilterMode.Point;  // Makes edges sharp for pixel art
+        texture.wrapMode = TextureWrapMode.Clamp;
+
+        Color[] pixels = new Color[width * height];
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int index = x + y * width;
+
+                if (shape == ShapeType.Circle)
+                {
+                    float centerX = width / 2f;
+                    float centerY = height / 2f;
+                    float radius = Mathf.Min(width, height) / 2f;
+
+                    float distance = Vector2.Distance(new Vector2(x, y), new Vector2(centerX, centerY));
+                    pixels[index] = distance <= radius ? fillColor : Color.clear;
+                }
+                else // Square
+                {
+                    pixels[index] = fillColor;
+                }
+            }
+        }
+
+        texture.SetPixels(pixels);
+        texture.Apply();
+
+        // Create the sprite
+        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f), 100f);
+        spriteRenderer.sprite = sprite;
+
+        Debug.Log($"[SpriteGenerator] ✅ Sprite generated successfully ({shape}) with color {fillColor}.");
+    }
+}
+
+
+
+
+// File: ReadOnlyAttribute.cs
+//===========================================
+
+using UnityEngine;
+
+namespace EchoesOfElaria.Editor
+{
+    public class ReadOnlyAttribute : PropertyAttribute { }
+}
+
+
+
+// File: ReadOnlyDrawer.cs
+//===========================================
+
+
+
+
+// File: CardData.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "NewCard", menuName = "Cards/Card Data")]
+public class CardData : ScriptableObject
+{
+    [Header("Card Info")]
+    [SerializeField] private string cardName;
+    [SerializeField] private int cost;
+    [SerializeField] private Sprite cardArt;
+
+    [Header("Card Effect")]
+    [SerializeField] private int effectValue;  
+    [SerializeField, Tooltip("Assign a ScriptableObject that defines the effect. Required!")] 
+    private CardEffect cardEffect;
+
+    [Header("Class Bonuses")]
+    [SerializeField] private CharacterClass preferredClass;
+    [SerializeField] private float classBonus = 1.5f;
+
+    // 🔹 Public Read-Only Properties
+    public string CardName => cardName;
+    public int Cost => cost;
+    public Sprite CardArt => cardArt;
+    public int EffectValue => effectValue;
+    public CardEffect CardEffect => cardEffect;
+    public CharacterClass PreferredClass => preferredClass;
+    public float ClassBonus => classBonus;
+
+    // 🔹 Validate in Editor to prevent missing data
+    private void OnValidate()
+    {
+        if (cardEffect == null)
+        {
+            Debug.LogWarning($"[CardData] ⚠️ Card '{cardName}' is missing a CardEffect!");
+        }
+    }
+}
+
+
+
+
+
+// File: CardEffect.cs
+//===========================================
+using UnityEngine;
+
+// ✅ Abstract class for all card effects
+public abstract class CardEffect : ScriptableObject
+{
+    public abstract void ApplyEffect(IEffectTarget target, int value);
+}
+
+
+
+
+
+
+// File: EffectType.cs
+//===========================================
+using UnityEngine;
+
+public enum EffectType
+{
+    Damage,
+    Heal
+}
+
+
+
+// File: APManager.cs
+//===========================================
+using UnityEngine;
+using System;
+
+public class APManager : MonoBehaviour
+{
+    public static APManager Instance { get; private set; }
+
+    [SerializeField] private int maxAP = 6;  // Set max AP in the Inspector
+    private int currentAP;
+
+    public event Action<int> OnAPChanged; // 🔹 Event for UI updates
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
+    private void Start()
+    {
+        ResetAP();
+    }
+
+    public void ResetAP()
+    {
+        currentAP = maxAP;
+        OnAPChanged?.Invoke(currentAP);  // 🔹 Notify UI
+    }
+
+    public bool SpendAP(int amount)
+    {
+        if (amount > currentAP)
+        {
+            Debug.LogWarning("[APManager] ❌ Not enough AP!");
+            return false; 
+        }
+
+        currentAP -= amount;
+        OnAPChanged?.Invoke(currentAP);  // 🔹 Notify UI
+        Debug.Log($"[APManager] 🔥 {amount} AP spent. Remaining: {currentAP}");
+        return true;
+    }
+
+    public int GetCurrentAP() => currentAP;
+}
+
+
+
+
+
+
+// File: DeckManager.cs
+//===========================================
+using System.Collections.Generic;
+using UnityEngine;
+
+public class DeckManager : MonoBehaviour
+{
+    [SerializeField] private List<CardData> allCards;
+    [SerializeField] private int deckSize = 20;  // Set fixed deck size
+    public List<CardData> deck { get; private set; } = new List<CardData>();
+    public List<CardData> discardPile { get; private set; } = new List<CardData>();
+
+    private void Awake()
+    {
+        if (allCards == null || allCards.Count == 0)
+        {
+            Debug.LogError("[DeckManager] ❌ No cards assigned to allCards!");
+            return;
+        }
+        
+        InitializeDeck();
+    }
+
+    private void InitializeDeck()
+    {
+        deck.Clear();
+        discardPile.Clear();
+
+        // Fill deck up to deckSize, repeating cards if necessary
+        for (int i = 0; i < deckSize; i++)
+        {
+            int randomIndex = Random.Range(0, allCards.Count);
+            deck.Add(allCards[randomIndex]);
+        }
+
+        ShuffleDeck();
+        Debug.Log($"[DeckManager] ✅ Deck initialized with {deck.Count} cards");
+    }
+
+    public void ShuffleDeck()
+    {
+        // Fisher-Yates shuffle
+        for (int i = deck.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            var temp = deck[i];
+            deck[i] = deck[j];
+            deck[j] = temp;
+        }
+    }
+
+    public void ReshuffleDeck()
+    {
+        Debug.Log($"[DeckManager] Reshuffling. Deck: {deck.Count}, Discard: {discardPile.Count}");
+        deck.AddRange(discardPile);
+        discardPile.Clear();
+        ShuffleDeck();
+        Debug.Log($"[DeckManager] 🔄 Deck reshuffled. New size: {deck.Count}");
+    }
+}
+
+
+
+
+
+
+// File: HandManager.cs
+//===========================================
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class HandManager : MonoBehaviour
+{
+    [SerializeField] private Transform handArea;
+    [SerializeField] private GameObject cardPrefab;
+    [SerializeField] private DeckManager deckManager;
+    [SerializeField] private int maxHandSize = 5;  // Changed default to 5 cards
+
+    private List<GameObject> currentHand = new List<GameObject>();
+
+    private void Start()
+    {
+        if (!ValidateSetup()) return;
+        
+        // Ensure hand area has proper layout
+        if (handArea.GetComponent<HorizontalLayoutGroup>() == null)
+        {
+            HorizontalLayoutGroup layout = handArea.gameObject.AddComponent<HorizontalLayoutGroup>();
+            layout.spacing = 10f;
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+        }
+        
+        DrawCards(maxHandSize);
+    }
+
+    private bool ValidateSetup()
+    {
+        if (handArea == null)
+        {
+            Debug.LogError("[HandManager] ❌ Hand Area not assigned!");
+            return false;
+        }
+        if (cardPrefab == null)
+        {
+            Debug.LogError("[HandManager] ❌ Card Prefab not assigned!");
+            return false;
+        }
+        if (deckManager == null)
+        {
+            Debug.LogError("[HandManager] ❌ DeckManager not assigned!");
+            return false;
+        }
+        if (deckManager.deck == null || deckManager.deck.Count == 0)
+        {
+            Debug.LogError("[HandManager] ❌ Deck is empty or null!");
+            return false;
+        }
+        Debug.Log("[HandManager] ✅ Setup validated successfully");
+        return true;
+    }
+
+    public void DrawCards(int number)
+    {
+        int desiredCards = Mathf.Min(number, maxHandSize - currentHand.Count);
+        Debug.Log($"[HandManager] Drawing {desiredCards} cards. Current hand: {currentHand.Count}");
+
+        // Reshuffle if needed before drawing
+        if (deckManager.deck.Count < desiredCards)
+        {
+            deckManager.ReshuffleDeck();
+        }
+
+        for (int i = 0; i < desiredCards && deckManager.deck.Count > 0; i++)
+        {
+            GameObject cardObject = Instantiate(cardPrefab, handArea);
+            CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
+            
+            if (cardBehavior != null)
+            {
+                cardBehavior.cardData = deckManager.deck[0];
+                cardBehavior.UpdateCardDisplay();
+                deckManager.deck.RemoveAt(0);
+                currentHand.Add(cardObject);
+            }
+        }
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(handArea as RectTransform);
+    }
+
+    public void DiscardCard(GameObject card)
+    {
+        if (currentHand.Contains(card))
+        {
+            CardBehavior cardBehavior = card.GetComponent<CardBehavior>();
+            if (cardBehavior != null && cardBehavior.cardData != null)
+            {
+                deckManager.discardPile.Add(cardBehavior.cardData);
+            }
+            currentHand.Remove(card);
+            Destroy(card);
+            Debug.Log("[HandManager] 🗑️ Card discarded to discard pile");
+        }
+    }
+
+    public void ClearHand()
+    {
+        // Create a temporary list to store cards to be discarded
+        List<CardData> cardsToDiscard = new List<CardData>();
+        
+        // First, collect all card data
+        foreach (GameObject card in currentHand)
+        {
+            if (card != null)
+            {
+                CardBehavior cardBehavior = card.GetComponent<CardBehavior>();
+                if (cardBehavior != null && cardBehavior.cardData != null)
+                {
+                    cardsToDiscard.Add(cardBehavior.cardData);
+                }
+            }
+        }
+
+        // Then destroy the game objects
+        foreach (GameObject card in currentHand)
+        {
+            if (card != null)
+            {
+                Destroy(card);
+            }
+        }
+
+        // Add collected cards to discard pile
+        foreach (CardData cardData in cardsToDiscard)
+        {
+            deckManager.discardPile.Add(cardData);
+        }
+
+        currentHand.Clear();
+        Debug.Log($"[HandManager] 🧹 Hand cleared, added {cardsToDiscard.Count} cards to discard pile");
+    }
+
+    public void RefreshHand()
+    {
+        ClearHand();
+        deckManager.ReshuffleDeck();
+        DrawCards(maxHandSize);
+        Debug.Log($"[HandManager] 🔄 Hand refreshed to {currentHand.Count}/{maxHandSize} cards");
+    }
+
+}
+
+
+
+
+
+// File: CardDisplay.cs
+//===========================================
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class CardDisplay : MonoBehaviour
+{
+    [SerializeField] private TextMeshProUGUI cardNameText;
+    [SerializeField] private TextMeshProUGUI costText;
+    [SerializeField] private Image artworkImage;
+
+    public void UpdateCardVisual(CardData cardData)
+    {
+        if (cardData != null)
+        {
+            cardNameText.text = cardData.CardName;
+            costText.text = cardData.Cost.ToString();
+            artworkImage.sprite = cardData.CardArt;
+
+        }
+        else
+        {
+            Debug.LogError("[CardDisplay] ❌ CardData is null.");
+        }
+    }
+}
+
+
+
+
+
+// File: IEffectTarget.cs
+//===========================================
+public interface IEffectTarget
+{
+    void ApplyEffect(int value, EffectType type);
+}
+
+
+
+
+
+// File: BaseCharacter.cs
+//===========================================
+using UnityEngine;
+
+public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
+{
+    public string Name { get; protected set; }
+    public CharacterStats Stats { get; private set; }
+    public CharacterCombat Combat { get; private set; }
+
+    private bool isSelected = false;
+    public bool IsSelected => isSelected;
+    private static BaseCharacter currentlySelectedCharacter;
+
+    protected virtual void Awake()
+    {
+        Stats = GetComponent<CharacterStats>();
+        Combat = GetComponent<CharacterCombat>();
+    }
+
+    public virtual void TakeDamage(int damage) => Stats.ModifyHealth(-damage);
+    public virtual void Heal(int amount) => Stats.ModifyHealth(amount);
+    public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
+
+    // ✅ Apply correct effect type
+    public void ApplyEffect(int value, EffectType type)
+    {
+        switch (type)
+        {
+            case EffectType.Damage:
+                TakeDamage(value);
+                Debug.Log($"{Name} took {value} damage.");
+                break;
+            case EffectType.Heal:
+                Heal(value);
+                Debug.Log($"{Name} healed {value} HP.");
+                break;
+            default:
+                Debug.LogWarning($"[BaseCharacter] Unknown effect type: {type}");
+                break;
+        }
+    }
+
+    public virtual void Select()
+    {
+        if (isSelected) return;
+        
+        if (currentlySelectedCharacter != null)
+        {
+            currentlySelectedCharacter.Deselect();
+        }
+            
+        isSelected = true;
+        currentlySelectedCharacter = this;
+        Debug.Log($"[BaseCharacter] Selected character: {Name} (Class: {Stats.CharacterClass})");
+    }
+
+    public virtual void Deselect()
+    {
+        isSelected = false;
+        if (currentlySelectedCharacter == this)
+        {
+            currentlySelectedCharacter = null;
+            Debug.Log($"[BaseCharacter] Deselected character: {Name}");
+        }
+    }
+
+    public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
+}
+
+
+
+
+
+// File: CharacterClass.cs
+//===========================================
+public enum CharacterClass
+{
+    None,
+    Knight,
+    Mage,
+    Healer,
+    Rogue
+}
+
+
+
+
+// File: EnemyUnit.cs
+//===========================================
+using UnityEngine;
+
+[RequireComponent(typeof(CharacterStats))]
+[RequireComponent(typeof(CharacterCombat))]
+public class EnemyUnit : BaseCharacter
+{
+    private CharacterStats stats;
+    private CharacterCombat combat;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        Name = "Enemy";
+
+        stats = GetComponent<CharacterStats>();  
+        combat = GetComponent<CharacterCombat>();
+    }
+
+    public void PerformBasicAttack(ICharacter target)
+    {
+        Combat.ExecuteAttack(target, 5); // Example damage value
+    }
+}
+
+
+
+
+
+// File: PlayerUnit.cs
+//===========================================
+using UnityEngine;
+
+[RequireComponent(typeof(CharacterStats))]
+[RequireComponent(typeof(CharacterCombat))]
+public class PlayerUnit : BaseCharacter
+{
+    [SerializeField] private GameObject selectionSprite;  // Assign in inspector
+
+    private CharacterStats stats;
+    private CharacterCombat combat;
+    
+    protected override void Awake()
+    {
+        base.Awake();
+        Name = "Player";
+
+        stats = GetComponent<CharacterStats>();  
+        combat = GetComponent<CharacterCombat>();
+
+        if (selectionSprite != null)
+        {
+            selectionSprite.SetActive(false);  // Start deselected
+        }
+    }
+
+    public override void Select()
+    {
+        base.Select();
+        if (selectionSprite != null)
+        {
+            selectionSprite.SetActive(true);
+        }
+    }
+
+    public override void Deselect()
+    {
+        base.Deselect();
+        if (selectionSprite != null)
+        {
+            selectionSprite.SetActive(false);
+        }
+    }
+}
+
+
+
+
+// File: EnemyUnitClickHandler.cs
+//===========================================
+using UnityEngine;
+
+public class EnemyUnitClickHandler : MonoBehaviour
+{
+    private EnemyUnit enemyUnit;
+
+    private void Awake()
+    {
+        enemyUnit = GetComponent<EnemyUnit>();
+        if (enemyUnit == null)
+        {
+            Debug.LogError("[EnemyUnitClickHandler] ❌ EnemyUnit component not found on " + gameObject.name);
+        }
+    }
+
+    private void OnMouseDown()
+    {
+        if (enemyUnit == null)
+        {
+            Debug.LogWarning("[EnemyUnitClickHandler] ⚠️ EnemyUnit is null.");
+            return;
+        }
+
+        // Check if a card is selected
+        CardSelection selectedCard = CardSelection.GetSelectedCard();
+        CardExecution cardExecution = selectedCard?.GetComponent<CardExecution>();
+        if (selectedCard != null)
+        {
+            cardExecution.PlayCard(enemyUnit); // Apply card effect
+        }
+        else
+        {
+            Debug.Log($"[EnemyUnitClickHandler] 👊 No card selected. Dealing 5 test damage to {enemyUnit.Name}.");
+            enemyUnit.TakeDamage(5); // Default behavior for testing
+        }
+    }
+}
+
+
+
+
+// File: PlayerUnitClickHandler.cs
+//===========================================
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+[RequireComponent(typeof(PlayerUnit))]
+public class PlayerUnitClickHandler : MonoBehaviour
+{
+    private PlayerUnit playerUnit;
+
+    private void Awake()
+    {
+        playerUnit = GetComponent<PlayerUnit>();
+    }
+
+    private void OnMouseDown()
+    {
+        if (playerUnit == null) return;
+
+        if (!playerUnit.IsSelected)
+        {
+            Debug.Log($"[PlayerUnitClickHandler] 👆 Selecting {playerUnit.Name} ({playerUnit.Stats.CharacterClass})");
+            playerUnit.Select();
+        }
+        else
+        {
+            Debug.Log($"[PlayerUnitClickHandler] 👇 Deselecting {playerUnit.Name}");
+            playerUnit.Deselect();
+        }
+    }
+}
+
+
+
+
+// File: CharacterCombat.cs
+//===========================================
+using UnityEngine;
+
+public class CharacterCombat : MonoBehaviour
+{
+    public void ExecuteAttack(ICharacter target, int damage)
+    {
+        target.TakeDamage(damage);
+    }
+}
+
+
+
+
+// File: CharacterStats.cs
+//===========================================
+using UnityEngine;
+using System;
+
+public class CharacterStats : MonoBehaviour
+{
+    [Header("Data Source")]
+    [SerializeField] private CharacterData characterData;  // ScriptableObject for base stats
+
+    [Header("Base Stats")]
+    [SerializeField] private int maxHealth;               // Exposed in Inspector
+    [SerializeField] private int startingActionPoints;    // Exposed in Inspector
+
+    public int MaxHealth { get; private set; }
+    public int CurrentHealth { get; private set; }
+    public int MaxActionPoints { get; private set; }
+    public int CurrentActionPoints { get; private set; }
+    public CharacterClass CharacterClass { get; private set; }
+    public float ClassBonus { get; private set; }
+
+    // ✅ Events for Health & Action Points
+    public event Action<int> OnHealthChanged;
+    public event Action<int> OnActionPointsChanged;
+
+    private void Awake()
+    {
+        ApplyCharacterData();  // Apply values from ScriptableObject
+        Initialize(maxHealth, startingActionPoints);
+    }
+
+    public void Initialize(int maxHealth, int actionPoints)
+    {
+        MaxHealth = maxHealth;
+        CurrentHealth = maxHealth;
+
+        MaxActionPoints = actionPoints;
+        CurrentActionPoints = actionPoints;
+
+        // Trigger UI updates
+        OnHealthChanged?.Invoke(CurrentHealth);
+        OnActionPointsChanged?.Invoke(CurrentActionPoints);
+    }
+
+    // ✅ HEALTH MANAGEMENT
+    public void ModifyHealth(int amount)
+    {
+        int previousHealth = CurrentHealth;
+        CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, MaxHealth);
+        Debug.Log($"[CharacterStats] ❤️ Health changed from {previousHealth} to {CurrentHealth} (Change: {amount})");
+        OnHealthChanged?.Invoke(CurrentHealth);
+    }
+
+    // ✅ ACTION POINTS MANAGEMENT
+    public void UseActionPoints(int amount)
+    {
+        int previousAP = CurrentActionPoints;
+        CurrentActionPoints = Mathf.Max(0, CurrentActionPoints - amount);
+        Debug.Log($"[CharacterStats] ⚡ AP changed from {previousAP} to {CurrentActionPoints} (Used: {amount})");
+        OnActionPointsChanged?.Invoke(CurrentActionPoints);
+    }
+
+    public void RefreshActionPoints()
+    {
+        CurrentActionPoints = MaxActionPoints;
+        Debug.Log($"[CharacterStats] 🔄 Action Points refreshed to {CurrentActionPoints}");
+        OnActionPointsChanged?.Invoke(CurrentActionPoints);
+    }
+
+    // ✅ Automatically update values in the Inspector during Edit Mode
+    private void OnValidate()
+    {
+        ApplyCharacterData();
+    }
+
+    // Apply data from the ScriptableObject to the exposed fields
+    private void ApplyCharacterData()
+    {
+        if (characterData != null)
+        {
+            maxHealth = characterData.maxHealth;
+            startingActionPoints = characterData.startingActionPoints;
+            CharacterClass = characterData.characterClass;
+            ClassBonus = characterData.classBonus;
+        }
+    }
+}
+
+
+
+
+// File: CharacterData.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "NewCharacterData", menuName = "Game/Character Data")]
+public class CharacterData : ScriptableObject
+{
+    [Header("Base Stats")]
+    [SerializeField] public int maxHealth = 100;
+    [SerializeField] public int startingActionPoints = 3;
+
+    [Header("Character Info")]
+    [SerializeField] public string characterName;
+    [TextArea]
+    [SerializeField] public string description;
+
+    [Header("Class Settings")]
+    public CharacterClass characterClass;
+    public float classBonus = 1.0f;
+}
+
+
+
+
+// File: ICharacter.cs
+//===========================================
+public interface ICharacter
+{
+    string Name { get; }
+    CharacterStats Stats { get; }
+    CharacterCombat Combat { get; }
+
+    void TakeDamage(int damage);
+    void Heal(int amount);
+    void UseActionPoints(int amount);
+}
+
+
+
+
+// File: APBarUI.cs
+//===========================================
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class APBarUI : MonoBehaviour
+{
+    [SerializeField] private Image apFillImage;  // 🔹 Reference to the AP bar fill (Image)
+    [SerializeField] private TextMeshProUGUI apText; // UI text for displaying AP amount
+    private int maxAP;
+
+    private void Start()
+    {
+        if (APManager.Instance != null)
+        {
+            maxAP = APManager.Instance.GetCurrentAP();  // Get initial max AP
+            APManager.Instance.OnAPChanged += UpdateAPDisplay;
+            UpdateAPDisplay(maxAP); // Initialize
+        }
+        else
+        {
+            Debug.LogError("[APBarUI] ❌ APManager not found in scene!");
+        }
+    }
+
+    private void UpdateAPDisplay(int currentAP)
+    {
+        if (apFillImage != null)
+        {
+            apFillImage.fillAmount = (float)currentAP / maxAP;  // 🔹 Adjust fill amount
+        }
+        
+        if (apText != null)
+        {
+            apText.text = $"AP: {currentAP} / {maxAP}"; // 🔹 Update AP text
+        }
+    }
+}
+
+
+
+
+// File: HealthBarUI.cs
+//===========================================
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class HealthBarUI : MonoBehaviour
+{
+    [SerializeField] private Image healthFill;  // Reference to UI Image component
+    [SerializeField] private TextMeshProUGUI healthText;  // Add reference to TMP text
+    private BaseCharacter character;
+    private CharacterStats characterStats;
+
+    private void Awake()
+    {
+        // Configure Image component
+        if (healthFill != null)
+        {
+            healthFill.type = Image.Type.Filled;
+            healthFill.fillMethod = Image.FillMethod.Horizontal;
+            healthFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        }
+
+        // Step 1: Find the BaseCharacter (PlayerUnit/EnemyUnit)
+        character = GetComponentInParent<BaseCharacter>();
+        if (character == null)
+        {
+            Debug.LogError("[HealthBarUI] ❌ BaseCharacter not found in parent of " + gameObject.name);
+            return;
+        }
+
+        // Step 2: Try to find CharacterStats directly or in the parent
+        characterStats = character.GetComponent<CharacterStats>();
+        if (characterStats == null)
+        {
+            characterStats = GetComponentInParent<CharacterStats>(); // Look further up if needed
+        }
+
+        if (characterStats == null)
+        {
+            Debug.LogError("[HealthBarUI] ❌ CharacterStats not found for " + character.Name);
+            return;
+        }
+
+        // Subscribe to health changes
+        characterStats.OnHealthChanged += UpdateHealthBar;
+
+        // Verify Image setup
+        if (healthFill != null)
+        {
+            if (healthFill.type != Image.Type.Filled)
+            {
+                Debug.LogError("[HealthBarUI] ❌ Image type must be set to FILLED!");
+                return;
+            }
+        }
+    }
+
+    private void Start()
+    {
+        if (characterStats != null)
+        {
+            if (healthFill != null)
+            {
+                UpdateHealthBar(characterStats.CurrentHealth);
+            }
+            else
+            {
+                Debug.LogError("[HealthBarUI] ❌ Health fill Image reference is missing!");
+            }
+        }
+    }
+
+    private void UpdateHealthBar(int currentHealth)
+    {
+        if (healthFill == null)
+        {
+            Debug.LogError("[HealthBarUI] Health fill Image reference not assigned.");
+            return;
+        }
+
+        // Update fill amount
+        float fillAmount = (float)currentHealth / characterStats.MaxHealth;
+        healthFill.fillAmount = fillAmount;
+
+        // Update text display
+        if (healthText != null)
+        {
+            healthText.text = $"{currentHealth}/{characterStats.MaxHealth}";
+        }
+
+    }
+
+    private void OnDestroy()
+    {
+        if (characterStats != null)
+        {
+            characterStats.OnHealthChanged -= UpdateHealthBar;
+        }
+    }
+}
+
+
+
+
+
+
+// File: DamageEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "DamageEffect", menuName = "Cards/Effects/Damage")]
+public class DamageEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        target.ApplyEffect(value, EffectType.Damage);
+    }
+}
+
+
+
+
+// File: HealEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "HealEffect", menuName = "Cards/Effects/Heal")]
+public class HealEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        target.ApplyEffect(value, EffectType.Heal);
+    }
+}
+
+
+
+
+// File: CardBehavior.cs
+//===========================================
+using UnityEngine;
+
+/// <summary>
+/// Core card behavior that delegates responsibilities to other components.
+/// </summary>
+public class CardBehavior : MonoBehaviour
+{
+    [SerializeField] public CardData cardData; // ScriptableObject data
+    private CardDisplay cardDisplay;
+    private CardSelection cardSelection;
+    private CardExecution cardExecution;
+
+    public CardData CardData => cardData; // Read-only access to card data
+
+    private void Awake()
+    {
+        cardDisplay = GetComponent<CardDisplay>();
+        cardSelection = GetComponent<CardSelection>();
+        cardExecution = GetComponent<CardExecution>();
+
+        UpdateCardDisplay();
+    }
+
+    public void UpdateCardDisplay()
+    {
+        if (cardDisplay != null && cardData != null)
+        {
+            cardDisplay.UpdateCardVisual(cardData);
+        }
+    }
+
+    public void PlayCard(IEffectTarget target)
+    {
+        if (cardExecution != null)
+        {
+            cardExecution.PlayCard(target);
+        }
+    }
+}
+
+
+
+
+
+
+
+// File: CardExecution.cs
+//===========================================
+using UnityEngine;
+
+public class CardExecution : MonoBehaviour
+{
+    private CardBehavior cardBehavior;
+
+    private void Awake()
+    {
+        cardBehavior = GetComponent<CardBehavior>();
+        if (cardBehavior == null)
+        {
+            Debug.LogError("[CardExecution] ❌ CardBehavior component is missing!");
+        }
+    }
+
+    public void PlayCard(IEffectTarget target)
+    {
+        if (TurnManager.Instance.CurrentTurn != TurnManager.TurnState.PlayerTurn)
+        {
+            Debug.LogWarning("[CardExecution] ❌ Cannot play cards during enemy turn!");
+            return;
+        }
+
+        if (cardBehavior == null || cardBehavior.cardData == null)
+        {
+            Debug.LogError("[CardExecution] ❌ CardBehavior or CardData is missing.");
+            return;
+        }
+
+        // Get card cost
+        int cost = cardBehavior.cardData.Cost;
+        
+        // Check if enough AP is available
+        if (!APManager.Instance.SpendAP(cost))
+        {
+            Debug.LogWarning($"[CardExecution] ❌ Not enough AP to play {cardBehavior.cardData.CardName}");
+            return;
+        }
+
+        // Get selected character
+        BaseCharacter sourceCharacter = BaseCharacter.GetSelectedCharacter();
+        if (sourceCharacter == null)
+        {
+            Debug.LogWarning("[CardExecution] ❌ No character selected to play card!");
+            return;
+        }
+
+        // Calculate effect value with class bonus
+        int baseValue = cardBehavior.cardData.EffectValue;
+        float multiplier = 1.0f;
+        
+        Debug.Log($"[CardExecution] Character Class: {sourceCharacter.Stats.CharacterClass}, Card Preferred Class: {cardBehavior.cardData.PreferredClass}");
+        
+        if (sourceCharacter.Stats.CharacterClass == cardBehavior.cardData.PreferredClass)
+        {
+            multiplier = cardBehavior.cardData.ClassBonus;
+            Debug.Log($"[CardExecution] ⚔️ Class bonus of {multiplier}x applied!");
+        }
+
+        int finalValue = Mathf.RoundToInt(baseValue * multiplier);
+        Debug.Log($"[CardExecution] Damage calculation: {baseValue} × {multiplier} = {finalValue}");
+
+        // Apply the card effect
+        CardEffect effect = cardBehavior.cardData.CardEffect;
+        if (effect == null)
+        {
+            Debug.LogError($"[CardExecution] ❌ No effect found for card {cardBehavior.cardData.CardName}.");
+            return;
+        }
+
+        Debug.Log($"[CardExecution] 🎯 {sourceCharacter.Name} ({sourceCharacter.Stats.CharacterClass}) played {cardBehavior.cardData.CardName} for {finalValue} damage");
+        effect.ApplyEffect(target, finalValue);
+
+        // Remove the card from hand
+        Destroy(gameObject);
+    }
+}
+
+
+
+
+
+// File: CardSelection.cs
+//===========================================
+using UnityEngine;
+using UnityEngine.EventSystems;
+using System;
+
+/// <summary>
+/// Handles selecting and deselecting a card.
+/// </summary>
+public class CardSelection : MonoBehaviour, IPointerClickHandler
+{
+    private static CardSelection currentlySelectedCard;
+    private bool isSelected = false;
+
+    [SerializeField] private GameObject selectionHighlight; // Highlight effect
+    public static event Action<CardSelection> OnCardSelected;
+    public static event Action<CardSelection> OnCardDeselected;
+
+    public bool IsSelected => isSelected;
+
+    private void Awake()
+    {
+        // Auto-assign selection highlight if null
+        if (selectionHighlight == null)
+        {
+            selectionHighlight = transform.Find("SelectionHighlight")?.gameObject;
+        }
+
+        DeselectCard(); // Ensure it's deselected initially
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (currentlySelectedCard != null && currentlySelectedCard != this)
+        {
+            currentlySelectedCard.DeselectCard();
+        }
+
+        if (!isSelected)
+        {
+            SelectCard();
+        }
+        else
+        {
+            DeselectCard();
+        }
+    }
+
+    private void SelectCard()
+    {
+        isSelected = true;
+        currentlySelectedCard = this;
+        selectionHighlight?.SetActive(true);
+        OnCardSelected?.Invoke(this);
+    }
+
+    private void DeselectCard()
+    {
+        isSelected = false;
+        selectionHighlight?.SetActive(false);
+        OnCardDeselected?.Invoke(this);
+
+        if (currentlySelectedCard == this)
+        {
+            currentlySelectedCard = null;
+        }
+    }
+
+    public static CardSelection GetSelectedCard()
+    {
+        return currentlySelectedCard;
+    }
+}
+
+
+
+

@@ -21,19 +21,19 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        if (cardBehavior == null || cardBehavior.cardData == null)
+        if (cardBehavior == null || cardBehavior.CardData == null)
         {
             Debug.LogError("[CardExecution] ❌ CardBehavior or CardData is missing.");
             return;
         }
 
         // Get card cost
-        int cost = cardBehavior.cardData.Cost;
+        int cost = cardBehavior.CardData.Cost;
         
         // Check if enough AP is available
         if (!APManager.Instance.SpendAP(cost))
         {
-            Debug.LogWarning($"[CardExecution] ❌ Not enough AP to play {cardBehavior.cardData.CardName}");
+            Debug.LogWarning($"[CardExecution] ❌ Not enough AP to play {cardBehavior.CardData.CardName}");
             return;
         }
 
@@ -46,14 +46,14 @@ public class CardExecution : MonoBehaviour
         }
 
         // Calculate effect value with class bonus
-        int baseValue = cardBehavior.cardData.EffectValue;
+        int baseValue = cardBehavior.CardData.EffectValue;
         float multiplier = 1.0f;
         
-        Debug.Log($"[CardExecution] Character Class: {sourceCharacter.Stats.CharacterClass}, Card Preferred Class: {cardBehavior.cardData.PreferredClass}");
+        Debug.Log($"[CardExecution] Character Class: {sourceCharacter.Stats.CharacterClass}, Card Preferred Class: {cardBehavior.CardData.PreferredClass}");
         
-        if (sourceCharacter.Stats.CharacterClass == cardBehavior.cardData.PreferredClass)
+        if (sourceCharacter.Stats.CharacterClass == cardBehavior.CardData.PreferredClass)
         {
-            multiplier = cardBehavior.cardData.ClassBonus;
+            multiplier = cardBehavior.CardData.ClassBonus;
             Debug.Log($"[CardExecution] ⚔️ Class bonus of {multiplier}x applied!");
         }
 
@@ -61,14 +61,14 @@ public class CardExecution : MonoBehaviour
         Debug.Log($"[CardExecution] Damage calculation: {baseValue} × {multiplier} = {finalValue}");
 
         // Apply the card effect
-        CardEffect effect = cardBehavior.cardData.CardEffect;
+        CardEffect effect = cardBehavior.CardData.CardEffect;
         if (effect == null)
         {
-            Debug.LogError($"[CardExecution] ❌ No effect found for card {cardBehavior.cardData.CardName}.");
+            Debug.LogError($"[CardExecution] ❌ No effect found for card {cardBehavior.CardData.CardName}.");
             return;
         }
 
-        Debug.Log($"[CardExecution] 🎯 {sourceCharacter.Name} ({sourceCharacter.Stats.CharacterClass}) played {cardBehavior.cardData.CardName} for {finalValue} damage");
+        Debug.Log($"[CardExecution] 🎯 {sourceCharacter.Name} ({sourceCharacter.Stats.CharacterClass}) played {cardBehavior.CardData.CardName} for {finalValue} damage");
         effect.ApplyEffect(target, finalValue);
 
         // Remove the card from hand
