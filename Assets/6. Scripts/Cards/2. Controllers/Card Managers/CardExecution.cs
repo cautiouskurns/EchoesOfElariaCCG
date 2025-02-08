@@ -46,13 +46,18 @@ public class CardExecution : MonoBehaviour
         Vector3 targetPosition = ((MonoBehaviour)target).transform.position;
         yield return StartCoroutine(animationController.PlayAttackSequence(targetPosition));
 
-        // Wait for the full sequence to complete before applying damage
-        yield return new WaitForSeconds(0.5f);
-
+        // Apply effect after animation
         int finalValue = GetFinalEffectValue(sourceCharacter);
         ApplyCardEffect(target, finalValue);
-    }
 
+        // Remove card from hand and destroy it
+        HandManager handManager = FindAnyObjectByType<HandManager>();
+        if (handManager != null)
+        {
+            handManager.DiscardCard(gameObject);
+            Debug.Log("[CardExecution] Card removed from hand and discarded");
+        }
+    }
 
     private bool ValidatePlayConditions()
     {
