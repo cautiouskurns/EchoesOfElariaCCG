@@ -15,29 +15,8 @@ public class CardExecution : MonoBehaviour
 
     public void PlayCard(IEffectTarget target)
     {
-        if (TurnManager.Instance.CurrentTurn != TurnManager.TurnState.PlayerTurn)
-        {
-            Debug.LogWarning("[CardExecution] ❌ Cannot play cards during enemy turn!");
-            return;
-        }
+        if (!ValidatePlayConditions()) return;
 
-        if (cardBehavior == null || cardBehavior.CardData == null)
-        {
-            Debug.LogError("[CardExecution] ❌ CardBehavior or CardData is missing.");
-            return;
-        }
-
-        // Get card cost
-        int cost = cardBehavior.CardData.Cost;
-        
-        // Check if enough AP is available
-        if (!APManager.Instance.SpendAP(cost))
-        {
-            Debug.LogWarning($"[CardExecution] ❌ Not enough AP to play {cardBehavior.CardData.CardName}");
-            return;
-        }
-
-        // Get selected character
         BaseCharacter sourceCharacter = BaseCharacter.GetSelectedCharacter();
         if (sourceCharacter == null)
         {
@@ -45,22 +24,59 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        // Calculate effect value with class bonus
-        int baseValue = cardBehavior.CardData.EffectValue;
-        float multiplier = 1.0f;
-        
-        Debug.Log($"[CardExecution] Character Class: {sourceCharacter.Stats.CharacterClass}, Card Preferred Class: {cardBehavior.CardData.PreferredClass}");
-        
-        if (sourceCharacter.Stats.CharacterClass == cardBehavior.CardData.PreferredClass)
+        int finalValue = GetFinalEffectValue(sourceCharacter);
+        ApplyCardEffect(target, finalValue);
+
+        // Remove the card from hand
+        Destroy(gameObject);
+    }
+
+    /// <summary>
+    /// ✅ Checks if the card can be played (AP, turn validation, and null checks).
+    /// </summary>
+    private bool ValidatePlayConditions()
+    {
+        if (TurnManager.Instance.CurrentTurn != TurnManager.TurnState.PlayerTurn)
         {
-            multiplier = cardBehavior.CardData.ClassBonus;
-            Debug.Log($"[CardExecution] ⚔️ Class bonus of {multiplier}x applied!");
+            Debug.LogWarning("[CardExecution] ❌ Cannot play cards during enemy turn!");
+            return false;
         }
+
+        if (cardBehavior == null || cardBehavior.CardData == null)
+        {
+            Debug.LogError("[CardExecution] ❌ CardBehavior or CardData is missing.");
+            return false;
+        }
+
+        if (!APManager.Instance.SpendAP(cardBehavior.CardData.Cost))
+        {
+            Debug.LogWarning($"[CardExecution] ❌ Not enough AP to play {cardBehavior.CardData.CardName}");
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// ✅ Calculates the final effect value, applying class bonuses if needed.
+    /// </summary>
+    private int GetFinalEffectValue(BaseCharacter sourceCharacter)
+    {
+        int baseValue = cardBehavior.CardData.EffectValue;
+        float multiplier = (sourceCharacter.Stats.CharacterClass == cardBehavior.CardData.PreferredClass)
+            ? cardBehavior.CardData.ClassBonus
+            : 1.0f;
 
         int finalValue = Mathf.RoundToInt(baseValue * multiplier);
         Debug.Log($"[CardExecution] Damage calculation: {baseValue} × {multiplier} = {finalValue}");
+        return finalValue;
+    }
 
-        // Apply the card effect
+    /// <summary>
+    /// ✅ Applies the card effect on the target.
+    /// </summary>
+    private void ApplyCardEffect(IEffectTarget target, int finalValue)
+    {
         CardEffect effect = cardBehavior.CardData.CardEffect;
         if (effect == null)
         {
@@ -68,11 +84,8 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[CardExecution] 🎯 {sourceCharacter.Name} ({sourceCharacter.Stats.CharacterClass}) played {cardBehavior.CardData.CardName} for {finalValue} damage");
+        Debug.Log($"[CardExecution] 🎯 {BaseCharacter.GetSelectedCharacter().Name} played {cardBehavior.CardData.CardName} for {finalValue} damage");
         effect.ApplyEffect(target, finalValue);
-
-        // Remove the card from hand
-        Destroy(gameObject);
     }
 }
 
