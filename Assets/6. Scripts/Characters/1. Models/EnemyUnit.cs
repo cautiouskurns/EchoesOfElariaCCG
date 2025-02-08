@@ -1,24 +1,39 @@
 using UnityEngine;
+using System.Collections;
 
-[RequireComponent(typeof(CharacterStats))]
-[RequireComponent(typeof(CharacterCombat))]
 public class EnemyUnit : BaseCharacter
 {
-    private CharacterStats stats;
-    private CharacterCombat combat;
+    private EnemyAnimationController animationController;
 
     protected override void Awake()
     {
         base.Awake();
         Name = "Enemy";
 
-        stats = GetComponent<CharacterStats>();  
-        combat = GetComponent<CharacterCombat>();
+        animationController = GetComponentInChildren<EnemyAnimationController>();
+
+        if (animationController == null)
+        {
+            Debug.LogError("[EnemyUnit] ❌ EnemyAnimationController not found!");
+        }
     }
 
-    public void PerformBasicAttack(ICharacter target)
+    public IEnumerator AttackPlayer(BaseCharacter player)
     {
-        Combat.ExecuteAttack(target, 5); // Example damage value
+        if (animationController == null)
+        {
+            Debug.LogError("[EnemyUnit] ❌ No Animation Controller found, skipping animation.");
+            yield break;
+        }
+
+        Debug.Log($"[EnemyUnit] ⚔️ Enemy is attacking {player.Name}!");
+
+        // ✅ Play enemy attack animation
+        yield return StartCoroutine(animationController.PlayAttackSequence(player.transform.position));
+
+        // ✅ Apply damage after attack animation
+        player.TakeDamage(5);
+        Debug.Log($"[EnemyUnit] 🔥 {player.Name} took 5 damage!");
     }
 }
 
