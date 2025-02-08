@@ -120,7 +120,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 649c69b8d3b4547df806b816f93afb95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectionHighlight: {fileID: 0}
 --- !u!114 &2265684309829472174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -136,6 +135,7 @@ MonoBehaviour:
   cardNameText: {fileID: 2789064361040517528}
   costText: {fileID: 258908557976746424}
   artworkImage: {fileID: 7307118914084450897}
+  selectionHighlight: {fileID: 7827176225076841770}
 --- !u!1 &5750885097636401060
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,7 +228,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8871020327020523181
 RectTransform:
   m_ObjectHideFlags: 0

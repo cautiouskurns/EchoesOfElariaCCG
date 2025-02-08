@@ -7,65 +7,75 @@ using System;
 /// </summary>
 public class CardSelection : MonoBehaviour, IPointerClickHandler
 {
-    private static CardSelection currentlySelectedCard;
+    private static CardBehavior currentlySelectedCard;
     private bool isSelected = false;
+    public static event Action<CardBehavior> OnCardSelected;
+    public static event Action<CardBehavior> OnCardDeselected;
 
-    [SerializeField] private GameObject selectionHighlight; // Highlight effect
-    public static event Action<CardSelection> OnCardSelected;
-    public static event Action<CardSelection> OnCardDeselected;
+    private CardBehavior cardBehavior;
+    private CardDisplay cardDisplay; // ✅ Reference to CardDisplay
 
     public bool IsSelected => isSelected;
 
     private void Awake()
     {
-        // Auto-assign selection highlight if null
-        if (selectionHighlight == null)
-        {
-            selectionHighlight = transform.Find("SelectionHighlight")?.gameObject;
-        }
+        cardBehavior = GetComponent<CardBehavior>();
+        cardDisplay = GetComponent<CardDisplay>(); // ✅ Get reference to display
 
         DeselectCard(); // Ensure it's deselected initially
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (currentlySelectedCard != null && currentlySelectedCard != this)
+        if (cardBehavior == null)
         {
-            currentlySelectedCard.DeselectCard();
+            Debug.LogError("[CardSelection] ❌ No CardBehavior found on this object!");
+            return;
         }
 
-        if (!isSelected)
+        if (currentlySelectedCard == cardBehavior)
         {
-            SelectCard();
+            DeselectCard();
         }
         else
         {
-            DeselectCard();
+            SelectCard();
         }
     }
 
     private void SelectCard()
     {
+        if (currentlySelectedCard != null)
+        {
+            currentlySelectedCard.GetComponent<CardSelection>().DeselectCard();
+        }
+
         isSelected = true;
-        currentlySelectedCard = this;
-        selectionHighlight?.SetActive(true);
-        OnCardSelected?.Invoke(this);
+        currentlySelectedCard = cardBehavior;
+
+        cardDisplay?.SetSelectionHighlight(true); // ✅ Notify CardDisplay
+
+        OnCardSelected?.Invoke(cardBehavior);
     }
 
     private void DeselectCard()
     {
-        isSelected = false;
-        selectionHighlight?.SetActive(false);
-        OnCardDeselected?.Invoke(this);
+        if (!isSelected) return;
 
-        if (currentlySelectedCard == this)
+        isSelected = false;
+        cardDisplay?.SetSelectionHighlight(false); // ✅ Notify CardDisplay
+
+        OnCardDeselected?.Invoke(cardBehavior);
+
+        if (currentlySelectedCard == cardBehavior)
         {
             currentlySelectedCard = null;
         }
     }
 
-    public static CardSelection GetSelectedCard()
+    public static CardBehavior GetSelectedCard()
     {
         return currentlySelectedCard;
     }
 }
+

@@ -22,7 +22,7 @@ public class EnemyUnitClickHandler : MonoBehaviour
         }
 
         // Check if a card is selected
-        CardSelection selectedCard = CardSelection.GetSelectedCard();
+        CardBehavior selectedCard = CardSelection.GetSelectedCard();
         CardExecution cardExecution = selectedCard?.GetComponent<CardExecution>();
         if (selectedCard != null)
         {
