@@ -192,7 +192,7 @@ MonoBehaviour:
   musicTracks:
   - name: Main Battle theme
     type: 3
-    clip: {fileID: 8300000, guid: 3c170c9096ba3bd4c8283600069713f5, type: 3}
+    clip: {fileID: 8300000, guid: dbce1f48a211b40ef9927bf30c8a613e, type: 3}
     volume: 0.7
     pitch: 0
     loop: 1
@@ -423,6 +423,10 @@ PrefabInstance:
     - target: {fileID: 20005129447786752, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
       propertyPath: m_Color.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2959274647902254422, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5012583950804850665, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1668,6 +1672,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: d5ad6a3efe5a14b39acc1c888ecda058, type: 3}
+    - target: {fileID: 711654044624189070, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8c5e48ed4d1be41d8a9bb295af93c960, type: 2}
     - target: {fileID: 1617323451148600755, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
       propertyPath: characterData
       value: 
@@ -1714,6 +1722,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5057166841061234289, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8998806460121368259, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9189689331450480431, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
