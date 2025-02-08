@@ -82,6 +82,7 @@ public class HandManager : MonoBehaviour
                 cardBehavior.Initialize(deckManager.deck[0]); // ✅ Assign card data + update UI
                 deckManager.deck.RemoveAt(0);
                 currentHand.Add(cardObject);
+                //AudioManager.Instance.PlaySound("CardDraw");
                 Debug.Log($"[HandManager] ✅ Added card: {cardBehavior.CardData.CardName}");
             }
         }
@@ -100,6 +101,7 @@ public class HandManager : MonoBehaviour
             }
             currentHand.Remove(card);
             Destroy(card);
+            //AudioManager.Instance.PlaySound("CardDiscard");
             Debug.Log("[HandManager] 🗑️ Card discarded to discard pile");
         }
     }
