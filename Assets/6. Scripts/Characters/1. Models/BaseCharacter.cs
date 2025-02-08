@@ -41,24 +41,27 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 
     public virtual void Select()
     {
-        if (isSelected) return;
-        
-        if (currentlySelectedCharacter != null)
+        // Deselect current character if one exists and it's not this one
+        if (currentlySelectedCharacter != null && currentlySelectedCharacter != this)
         {
             currentlySelectedCharacter.Deselect();
         }
-            
-        isSelected = true;
-        currentlySelectedCharacter = this;
-        Debug.Log($"[BaseCharacter] Selected character: {Name} (Class: {Stats.CharacterClass})");
+
+        // Only set as selected if not already selected
+        if (!IsSelected)
+        {
+            currentlySelectedCharacter = this;
+            isSelected = true;
+            Debug.Log($"[BaseCharacter] Selected character: {Name} (Class: {Stats.CharacterClass})");
+        }
     }
 
     public virtual void Deselect()
     {
-        isSelected = false;
-        if (currentlySelectedCharacter == this)
+        if (IsSelected)
         {
             currentlySelectedCharacter = null;
+            isSelected = false;
             Debug.Log($"[BaseCharacter] Deselected character: {Name}");
         }
     }

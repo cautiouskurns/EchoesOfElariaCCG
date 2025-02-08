@@ -217,7 +217,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2864523579904826387
 Transform:
   m_ObjectHideFlags: 0
@@ -916,7 +916,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59bca17ac11f14264a6c58058a5d2fb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectionSprite: {fileID: 2959274647902254422}
+  outlineMaterial: {fileID: 2100000, guid: 8c5e48ed4d1be41d8a9bb295af93c960, type: 2}
 --- !u!114 &3849004577806978974
 MonoBehaviour:
   m_ObjectHideFlags: 0
