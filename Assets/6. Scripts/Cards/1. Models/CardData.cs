@@ -31,6 +31,8 @@ public class CardData : ScriptableObject
             // Override sound based on card type
             if (cardType == CardType.Attack)
                 return CardSoundConfig.ATTACK_SLASH;
+            else if (cardType == CardType.Spell)
+                return CardSoundConfig.FIREBALL;
             // Add other type-specific sounds here
             return soundEffectName;
         }

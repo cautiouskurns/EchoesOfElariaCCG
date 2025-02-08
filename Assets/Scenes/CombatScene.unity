@@ -177,7 +177,7 @@ MonoBehaviour:
     loop: 0
   - name: FireballCast
     type: 1
-    clip: {fileID: 8300000, guid: acf94774fdc6c41b393ef07d1b3a6a5c, type: 3}
+    clip: {fileID: 8300000, guid: 2d07f03e8190b47f4b7863cb03ceeca0, type: 3}
     volume: 1
     pitch: 1
     loop: 0
