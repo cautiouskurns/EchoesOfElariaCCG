@@ -30,7 +30,7 @@ public class CharacterAnimationController : MonoBehaviour
     /// </summary>
     public IEnumerator MoveToTarget(Vector3 targetPosition)
     {
-        while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
+        while (Vector3.Distance(transform.position, targetPosition) > 10.0f)
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
             yield return null;
@@ -50,24 +50,33 @@ public class CharacterAnimationController : MonoBehaviour
 
         Vector3 startPosition = transform.position;
 
-        // ✅ Set Dash animation and move forward
+        // ✅ Trigger Dash animation
         animator.SetTrigger("Dash");
-        yield return StartCoroutine(MoveToTarget(enemyPosition));
 
-        // ✅ Ensure Dash finishes before triggering Attack
-        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+        // ✅ Move toward the enemy, but check distance dynamically
+        while (Vector3.Distance(transform.position, enemyPosition) > 1.5f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, enemyPosition, moveSpeed * Time.deltaTime);
+            yield return null;
+        }
 
-        // ✅ Set Attack animation
+        // ✅ Immediately trigger the attack once the character reaches the enemy
         animator.SetTrigger("AttackStrike");
+        Debug.Log("[CharacterAnimationController] ⚔️ Attack triggered as soon as character reached enemy!");
 
-        // ✅ Ensure Attack plays fully before next action
+        // ✅ Wait until the attack animation completes
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
 
         // ✅ Move back to the original position
-        yield return StartCoroutine(MoveToTarget(startPosition));
+        while (Vector3.Distance(transform.position, startPosition) > 0.1f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, startPosition, moveSpeed * Time.deltaTime);
+            yield return null;
+        }
 
-        // ✅ Ensure transition back to Idle after movement
+        // ✅ Reset to Idle
         animator.SetTrigger("Idle");
+        Debug.Log("[CharacterAnimationController] ✅ Returned to Idle.");
     }
 
 
