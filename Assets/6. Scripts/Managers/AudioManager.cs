@@ -148,7 +148,17 @@ public class AudioManager : MonoBehaviour
     {
         if (!soundDictionary.TryGetValue(soundName, out Sound sound))
         {
-            Debug.LogWarning($"[AudioManager] ❌ Sound not found: {soundName}");
+            Debug.LogWarning($"[AudioManager] ❌ Sound '{soundName}' not found in dictionary!");
+            return;
+        }
+        PlaySound(sound.clip);
+    }
+
+    public void PlaySound(AudioClip clip)
+    {
+        if (clip == null)
+        {
+            Debug.LogWarning("[AudioManager] ❌ Sound clip is null! Check the card's assigned sound.");
             return;
         }
 
@@ -156,14 +166,12 @@ public class AudioManager : MonoBehaviour
         AudioSource source = GetAvailableSFXSource();
         if (source != null)
         {
-            source.clip = sound.clip;
-            source.volume = sound.volume;
-            source.pitch = sound.pitch;
-            source.PlayOneShot(sound.clip); // Changed to PlayOneShot
-            Debug.Log($"[AudioManager] 🔊 Playing: {soundName}, Volume: {sound.volume}");
+            source.clip = clip;
+            source.PlayOneShot(clip);
+            Debug.Log($"[AudioManager] 🔊 Playing AudioClip: {clip.name}");
         }
     }
-
+    
     private AudioSource GetAvailableSFXSource()
     {
         foreach (AudioSource source in sfxSources)

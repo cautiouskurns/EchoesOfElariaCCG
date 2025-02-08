@@ -22,21 +22,8 @@ public class CardData : ScriptableObject
     [Header("Card Type")]
     [SerializeField] private CardType cardType;
 
-    [Header("Audio")]
-    [SerializeField] private string soundEffectName = CardSoundConfig.CARD_PLAY;
-    public string SoundEffectName
-    {
-        get
-        {
-            // Override sound based on card type
-            if (cardType == CardType.Attack)
-                return CardSoundConfig.ATTACK_SLASH;
-            else if (cardType == CardType.Spell)
-                return CardSoundConfig.FIREBALL;
-            // Add other type-specific sounds here
-            return soundEffectName;
-        }
-    }
+    [Header("Audio")]  
+    [SerializeField] private AudioClip soundEffect;  // 🔹 Store the actual AudioClip instead of a string
 
     // 🔹 Public Read-Only Properties
     public string CardName => cardName;
@@ -48,6 +35,7 @@ public class CardData : ScriptableObject
     public CharacterClass PreferredClass => preferredClass;
     public float ClassBonus => classBonus;
     public CardType CardType => cardType;
+    public AudioClip SoundEffect => soundEffect;  // 🔹 Getter for the AudioClip
 
     // 🔹 Validate in Editor to prevent missing data
     private void OnValidate()
@@ -58,4 +46,3 @@ public class CardData : ScriptableObject
         }
     }
 }
-

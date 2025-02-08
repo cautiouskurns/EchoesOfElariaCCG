@@ -21,3 +21,4 @@ MonoBehaviour:
   preferredClass: 3
   classBonus: 1.5
   cardType: 3
+  soundEffect: {fileID: 8300000, guid: cdfe15d5153084c5d9844b1b18487d86, type: 3}

@@ -2,25 +2,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using Cards;
 
-/// <summary>
-/// Core card behavior that delegates responsibilities to other components.
-/// </summary>
 public class CardBehavior : MonoBehaviour
 {
-    [SerializeField] private CardData cardData; // ScriptableObject data
-    [SerializeField] private Image cardBackground;  // Assign in inspector
-    public CardData CardData => cardData; // Read-only access to card data
+    [SerializeField] private CardData cardData;
+    [SerializeField] private Image cardBackground;
+    public CardData CardData => cardData;
 
     private void Awake()
     {
-        // Automatically find card background if not assigned
         if (cardBackground == null)
         {
             cardBackground = GetComponent<Image>();
-            if (cardBackground == null)
-            {
-                cardBackground = GetComponentInChildren<Image>();
-            }
         }
     }
 
@@ -37,57 +29,32 @@ public class CardBehavior : MonoBehaviour
 
     private void UpdateCardColor()
     {
-        if (cardBackground == null || cardData == null) 
-        {
-            Debug.LogWarning("[CardBehavior] Missing cardBackground or cardData!");
-            return;
-        }
+        if (cardBackground == null || cardData == null) return;
 
-        Color cardColor = GetColorForType(cardData.CardType);
-        cardBackground.color = cardColor;
-        Debug.Log($"[CardBehavior] Updated card color for type: {cardData.CardType}");
+        cardBackground.color = GetColorForType(cardData.CardType);
     }
 
     private Color GetColorForType(CardType type)
     {
-        switch (type)
+        return type switch
         {
-            case CardType.Attack:
-                return new Color(1f, 0.6f, 0.6f); // Light red
-            case CardType.Spell:
-                return new Color(0.6f, 0.6f, 1f); // Light blue
-            case CardType.Support:
-                return new Color(0.6f, 1f, 0.6f); // Light green
-            default:
-                return Color.white;
-        }
+            CardType.Attack => new Color(1f, 0.6f, 0.6f),  // Light red
+            CardType.Spell => new Color(0.6f, 0.6f, 1f),   // Light blue
+            CardType.Support => new Color(0.6f, 1f, 0.6f), // Light green
+            _ => Color.white
+        };
     }
 
     public void PlayCardSound()
     {
-        if (AudioManager.Instance != null && cardData != null)
+        if (AudioManager.Instance != null && cardData != null && cardData.SoundEffect != null)
         {
-            AudioManager.Instance.PlaySound(cardData.SoundEffectName);  // Changed from PlaySound to SoundEffectName
-            Debug.Log($"[CardBehavior] Playing sound: {cardData.SoundEffectName}");
+            AudioManager.Instance.PlaySound(cardData.SoundEffect);  
+            Debug.Log($"[CardBehavior] 🎵 Playing sound: {cardData.SoundEffect.name}");
         }
         else
         {
-            Debug.LogWarning("[CardBehavior] Cannot play sound - AudioManager or CardData is null!");
+            Debug.LogWarning("[CardBehavior] ❌ Cannot play sound - Missing AudioManager, CardData, or SoundEffect!");
         }
     }
-
-    public void PlayEffect()
-    {
-        PlayCardSound();
-        // Add your effect/animation code here
-    }
-
-    // Example method to play attack animation with sound
-    public void PlayAttackAnimation()
-    {
-        // Your existing animation code here
-        PlayCardSound();  // Uses the sound defined in cardData
-    }
 }
-
-
