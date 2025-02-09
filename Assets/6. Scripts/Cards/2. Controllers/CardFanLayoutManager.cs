@@ -1,6 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 using System.Collections.Generic;
+using System.Linq;
 
 public class CardFanLayoutManager : MonoBehaviour
 {
@@ -22,19 +23,32 @@ public class CardFanLayoutManager : MonoBehaviour
 
     public void ArrangeCards(List<GameObject> cards)
     {
+        // Clear old positions for removed cards
+        var keysToRemove = cardBasePositions.Keys
+            .Where(card => !cards.Contains(card))
+            .ToList();
+            
+        foreach (var key in keysToRemove)
+        {
+            cardBasePositions.Remove(key);
+            cardBaseRotations.Remove(key);
+        }
+
         int cardCount = cards.Count;
         if (cardCount == 0) return;
 
+        // Recalculate positions for remaining cards
         for (int i = 0; i < cardCount; i++)
         {
             GameObject card = cards[i];
             Vector3 position = CalculateCardPosition(i, cardCount, cards);
-            Quaternion rotation = cardBaseRotations[card];
+            Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Lerp(-fanAngle, fanAngle, (float)i / (cardCount - 1)));
 
-            // Store positions for hover
             cardBasePositions[card] = position;
+            cardBaseRotations[card] = rotation;
 
-            // Animate to position
+            // Animate to new position
+            card.transform.DOKill(); // Kill any existing tweens
             card.transform.DOLocalMove(position, 0.3f).SetEase(Ease.OutQuad);
             card.transform.DOLocalRotate(rotation.eulerAngles, 0.3f).SetEase(Ease.OutQuad);
         }

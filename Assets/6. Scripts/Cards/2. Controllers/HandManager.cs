@@ -105,8 +105,12 @@ public class HandManager : MonoBehaviour
             }
             currentHand.Remove(card);
             Destroy(card);
+            
+            // Rearrange remaining cards
+            fanLayout?.ArrangeCards(currentHand);
+            
             //AudioManager.Instance.PlaySound("CardDiscard");
-            Debug.Log("[HandManager] 🗑️ Card discarded to discard pile");
+            Debug.Log("[HandManager] 🗑️ Card discarded and hand rearranged");
         }
     }
 
