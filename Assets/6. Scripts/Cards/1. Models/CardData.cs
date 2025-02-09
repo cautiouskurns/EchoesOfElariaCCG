@@ -8,6 +8,8 @@ public class CardData : ScriptableObject
     [SerializeField] private string cardName;
     [SerializeField] private int cost;
     [SerializeField] private Sprite cardArt;
+    [SerializeField] private string cardCategory;
+
     [SerializeField] private string cardDescription;
 
     [Header("Card Effect")]
