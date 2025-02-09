@@ -1802,6 +1802,10 @@ PrefabInstance:
       propertyPath: characterData
       value: 
       objectReference: {fileID: 11400000, guid: 36ae098da56f24bd595e9ba80cf03ecd, type: 2}
+    - target: {fileID: 4214179945705952379, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
+      propertyPath: moveSpeed
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 7310873495642890280, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
       propertyPath: m_Controller
       value: 
@@ -1928,6 +1932,10 @@ PrefabInstance:
     - target: {fileID: 2581829989390881081, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
       propertyPath: m_Name
       value: EnemyUnit1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4214179945705952379, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
+      propertyPath: moveSpeed
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7310873495642890280, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
       propertyPath: m_Controller

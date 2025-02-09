@@ -11,10 +11,9 @@ public class EnemyAnimationController : MonoBehaviour
 
     private void Awake()
     {
-        // ✅ Automatically find the Animator if it's on a child
         if (animator == null)
         {
-            animator = GetComponentInChildren<Animator>();
+            animator = GetComponentInChildren<Animator>(); // Auto-find Animator in children
         }
 
         if (animator == null)
@@ -26,10 +25,15 @@ public class EnemyAnimationController : MonoBehaviour
     }
 
     /// <summary>
-    /// ✅ Moves the enemy to a target position.
+    /// ✅ Moves the enemy toward a target.
     /// </summary>
     public IEnumerator MoveToTarget(Vector3 targetPosition)
     {
+        if (animator != null)
+        {
+            animator.SetTrigger("Dash");  // ✅ Trigger Dash animation
+        }
+
         while (Vector3.Distance(transform.position, targetPosition) > 1.5f)
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
@@ -38,9 +42,9 @@ public class EnemyAnimationController : MonoBehaviour
     }
 
     /// <summary>
-    /// ✅ Plays the attack sequence: Move → Attack → Return.
+    /// ✅ Plays the attack sequence: Dash → Attack → Return.
     /// </summary>
-    public IEnumerator PlayAttackSequence(Vector3 playerPosition)
+    public IEnumerator PlayAttackSequence(Vector3 targetPosition)
     {
         if (animator == null)
         {
@@ -50,30 +54,20 @@ public class EnemyAnimationController : MonoBehaviour
 
         Vector3 startPosition = transform.position;
 
-        // ✅ Move toward the player
-        animator.SetTrigger("Dash");
+        // ✅ Move toward the enemy & play dash animation
+        yield return StartCoroutine(MoveToTarget(targetPosition));
 
-        while (Vector3.Distance(transform.position, playerPosition) > 1.5f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, playerPosition, moveSpeed * Time.deltaTime);
-            yield return null;
-        }
+        // ✅ Attack once enemy reaches target
+        animator.SetTrigger("AttackStrike");  
+        Debug.Log("[EnemyAnimationController] ⚔️ Attack triggered!");
 
-        // ✅ Attack as soon as enemy reaches player
-        animator.SetTrigger("AttackStrike");
-        Debug.Log("[EnemyAnimationController] ⚔️ Enemy Attack triggered!");
-
+        // ✅ Wait for the attack animation to complete
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
 
         // ✅ Move back to original position
-        while (Vector3.Distance(transform.position, startPosition) > 0.1f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, startPosition, moveSpeed * Time.deltaTime);
-            yield return null;
-        }
+        yield return StartCoroutine(MoveToTarget(startPosition));
 
-        // ✅ Reset to Idle
+        // ✅ Set to Idle once back at original position
         animator.SetTrigger("Idle");
-        Debug.Log("[EnemyAnimationController] ✅ Enemy returned to Idle.");
     }
 }
