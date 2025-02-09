@@ -33,7 +33,7 @@ public class EnemyIntentUI : MonoBehaviour
         intentText.text = $"Will use {card.CardName}";
 
         // Reset position before animating
-        transform.localPosition = Vector3.zero;
+        // transform.localPosition = Vector3.zero;
 
         // Animate
         transform.DOKill();
