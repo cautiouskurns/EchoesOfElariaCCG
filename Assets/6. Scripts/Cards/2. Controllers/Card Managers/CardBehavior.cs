@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
-using Cards;
 using UnityEngine.EventSystems;
+using Cards;
 
 public class CardBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -12,15 +12,43 @@ public class CardBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     private void Awake()
     {
+        // Setup components
         if (cardBackground == null)
         {
             cardBackground = GetComponent<Image>();
         }
+
+        // Setup UI interaction
+        var canvasGroup = GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.interactable = true;
+
+        foreach (var image in GetComponentsInChildren<Image>())
+        {
+            image.raycastTarget = true;
+        }
+
+        // Find HandManager in hierarchy
+        FindHandManager();
     }
 
-    private void Start()
+    private void FindHandManager()
     {
-        handManager = GetComponentInParent<HandManager>();
+        // First try to find HandManager in scene
+        handManager = FindFirstObjectByType<HandManager>();
+        
+        if (handManager == null)
+        {
+            Debug.LogError($"[CardBehavior] Could not find HandManager in scene! Make sure HandManager component exists.");
+        }
+        else
+        {
+            Debug.Log($"[CardBehavior] Found HandManager on {handManager.gameObject.name}");
+        }
     }
 
     public void Initialize(CardData newCardData)
@@ -67,11 +95,19 @@ public class CardBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        handManager?.OnCardHover(gameObject, true);
+        if (handManager == null)
+        {
+            FindHandManager();
+            if (handManager == null) return;
+        }
+        // Debug.Log($"[CardBehavior] Hover ENTER on {gameObject.name}");
+        handManager.OnCardHover(gameObject, true);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        handManager?.OnCardHover(gameObject, false);
+        if (handManager == null) return;
+        Debug.Log($"[CardBehavior] Hover EXIT on {gameObject.name}");
+        handManager.OnCardHover(gameObject, false);
     }
 }

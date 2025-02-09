@@ -78,20 +78,34 @@ public class CardFanLayoutManager : MonoBehaviour
 
     public void OnCardHover(GameObject card, bool isHovered)
     {
-        if (!cardBasePositions.ContainsKey(card)) return;
+        if (!cardBasePositions.ContainsKey(card))
+        {
+            Debug.LogError($"[CardFanLayout] Card {card.name} not found in positions dictionary!");
+            return;
+        }
+
+        // Kill any existing tweens on this card
+        card.transform.DOKill();
 
         if (isHovered)
         {
+            Debug.Log($"[CardFanLayout] Hovering card {card.name}");
             Vector3 hoverPosition = cardBasePositions[card] + Vector3.up * hoverLiftHeight;
-            card.transform.DOLocalMove(hoverPosition, hoverDuration).SetEase(hoverEase);
-            card.transform.DOScale(Vector3.one * hoverScale, hoverDuration).SetEase(hoverEase);
-            card.transform.DOLocalRotate(Vector3.zero, hoverDuration).SetEase(hoverEase);
+            
+            Sequence hoverSequence = DOTween.Sequence();
+            hoverSequence.Join(card.transform.DOLocalMove(hoverPosition, hoverDuration))
+                        .Join(card.transform.DOScale(Vector3.one * hoverScale, hoverDuration))
+                        .Join(card.transform.DOLocalRotate(Vector3.zero, hoverDuration))
+                        .SetEase(hoverEase);
         }
         else
         {
-            card.transform.DOLocalMove(cardBasePositions[card], hoverDuration).SetEase(hoverEase);
-            card.transform.DOScale(Vector3.one, hoverDuration).SetEase(hoverEase);
-            card.transform.DOLocalRotate(cardBaseRotations[card].eulerAngles, hoverDuration).SetEase(hoverEase);
+            Debug.Log($"[CardFanLayout] Unhovering card {card.name}");
+            Sequence unhoverSequence = DOTween.Sequence();
+            unhoverSequence.Join(card.transform.DOLocalMove(cardBasePositions[card], hoverDuration))
+                          .Join(card.transform.DOScale(Vector3.one, hoverDuration))
+                          .Join(card.transform.DOLocalRotate(cardBaseRotations[card].eulerAngles, hoverDuration))
+                          .SetEase(hoverEase);
         }
     }
 
