@@ -3,81 +3,84 @@ using System.Collections;
 
 public class CharacterAnimationController : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
-    [SerializeField] private float moveSpeed = 3f;
-    private Vector3 originalPosition;
+    [SerializeField] protected Animator animator;
+    [SerializeField] protected float moveSpeed = 3f;
+    [SerializeField] protected float attackDistance = 1.5f;
+    [SerializeField] protected float attackDuration = 1f;
 
-    public Vector3 OriginalPosition => originalPosition;
+    protected Vector3 originalPosition;
+    protected bool isAnimating = false;
 
-    private void Awake()
+    protected virtual void Awake()
     {
-        // ✅ Automatically find the Animator even if it's on a child object
         if (animator == null)
         {
             animator = GetComponentInChildren<Animator>();
         }
-
-        if (animator == null)
-        {
-            Debug.LogError($"[CharacterAnimationController] ❌ Animator not found on {gameObject.name} or its children!");
-        }
-
-        originalPosition = transform.position; // Store initial position
+        originalPosition = transform.position;
     }
 
-    /// <summary>
-    /// ✅ Moves the character to a target position.
-    /// </summary>
-    public IEnumerator MoveToTarget(Vector3 targetPosition)
+    public virtual IEnumerator MoveToTarget(Vector3 targetPosition, bool returnToStart = false)
     {
-        while (Vector3.Distance(transform.position, targetPosition) > 10.0f)
+        Vector3 startPos = transform.position;
+        Vector3 destination = targetPosition;
+
+        // Start movement animation
+        animator.SetBool("IsMoving", true);
+        
+        while (Vector3.Distance(transform.position, destination) > 0.1f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                destination,
+                moveSpeed * Time.deltaTime
+            );
             yield return null;
         }
+        
+        // Ensure exact position and stop movement animation
+        transform.position = destination;
+        animator.SetBool("IsMoving", false);
     }
 
-    /// <summary>
-    /// ✅ Plays the attack sequence: Dash → Attack → Return.
-    /// </summary>
-    public IEnumerator PlayAttackSequence(Vector3 enemyPosition)
+    public virtual IEnumerator PlayAttackSequence(Vector3 targetPosition)
     {
-        if (animator == null)
-        {
-            Debug.LogError("[CharacterAnimationController] ❌ No Animator found!");
-            yield break;
-        }
+        if (isAnimating) yield break;
+        isAnimating = true;
 
-        Vector3 startPosition = transform.position;
+        // Move to attack position
+        Vector3 attackPosition = Vector3.MoveTowards(targetPosition, transform.position, attackDistance);
+        yield return StartCoroutine(MoveToTarget(attackPosition));
 
-        // ✅ Trigger Dash animation
-        animator.SetTrigger("Dash");
+        // Wait a frame to ensure movement is complete
+        yield return null;
 
-        // ✅ Move toward the enemy, but check distance dynamically
-        while (Vector3.Distance(transform.position, enemyPosition) > 1.5f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, enemyPosition, moveSpeed * Time.deltaTime);
-            yield return null;
-        }
-
-        // ✅ Immediately trigger the attack once the character reaches the enemy
+        // Play attack animation
         animator.SetTrigger("AttackStrike");
-        Debug.Log("[CharacterAnimationController] ⚔️ Attack triggered as soon as character reached enemy!");
+        
+        // Wait for attack animation
+        float attackStateLength = GetAnimationLength("AttackStrike");
+        yield return new WaitForSeconds(attackStateLength);
 
-        // ✅ Wait until the attack animation completes
-        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
+        // Return to starting position
+        yield return StartCoroutine(MoveToTarget(originalPosition, true));
 
-        // ✅ Move back to the original position
-        while (Vector3.Distance(transform.position, startPosition) > 0.1f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, startPosition, moveSpeed * Time.deltaTime);
-            yield return null;
-        }
-
-        // ✅ Reset to Idle
+        // Reset to idle
         animator.SetTrigger("Idle");
-        Debug.Log("[CharacterAnimationController] ✅ Returned to Idle.");
+
+        isAnimating = false;
     }
 
+    protected float GetAnimationLength(string stateName)
+    {
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        return stateInfo.length;
+    }
 
+    protected virtual void OnValidate()
+    {
+        if (moveSpeed <= 0) moveSpeed = 3f;
+        if (attackDistance <= 0) attackDistance = 1.5f;
+        if (attackDuration <= 0) attackDuration = 1f;
+    }
 }

@@ -8,6 +8,7 @@ public class HandManager : MonoBehaviour
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private DeckManager deckManager;
     [SerializeField] private int maxHandSize = 5;  // Changed default to 5 cards
+    [SerializeField] private CardFanLayoutManager fanLayout;
 
     private List<GameObject> currentHand = new List<GameObject>();
 
@@ -88,6 +89,9 @@ public class HandManager : MonoBehaviour
         }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(handArea as RectTransform);
+        
+        // Arrange cards in fan layout
+        fanLayout?.ArrangeCards(currentHand);
     }
 
     public void DiscardCard(GameObject card)
@@ -151,5 +155,9 @@ public class HandManager : MonoBehaviour
         Debug.Log($"[HandManager] 🔄 Hand refreshed to {currentHand.Count}/{maxHandSize} cards");
     }
 
+    public void OnCardHover(GameObject card, bool isHovered)
+    {
+        fanLayout?.OnCardHover(card, isHovered);
+    }
 }
 

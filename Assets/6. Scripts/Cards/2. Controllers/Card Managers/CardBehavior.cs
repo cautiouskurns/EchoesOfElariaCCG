@@ -1,12 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Cards;
+using UnityEngine.EventSystems;
 
-public class CardBehavior : MonoBehaviour
+public class CardBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private CardData cardData;
     [SerializeField] private Image cardBackground;
     public CardData CardData => cardData;
+    private HandManager handManager;
 
     private void Awake()
     {
@@ -14,6 +16,11 @@ public class CardBehavior : MonoBehaviour
         {
             cardBackground = GetComponent<Image>();
         }
+    }
+
+    private void Start()
+    {
+        handManager = GetComponentInParent<HandManager>();
     }
 
     public void Initialize(CardData newCardData)
@@ -56,5 +63,15 @@ public class CardBehavior : MonoBehaviour
         {
             Debug.LogWarning("[CardBehavior] ❌ Cannot play sound - Missing AudioManager, CardData, or SoundEffect!");
         }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        handManager?.OnCardHover(gameObject, true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        handManager?.OnCardHover(gameObject, false);
     }
 }
