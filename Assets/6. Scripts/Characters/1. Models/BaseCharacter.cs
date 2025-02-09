@@ -6,10 +6,10 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public string Name { get; protected set; }
     public CharacterStats Stats { get; private set; }
 
-    private int health;
-    private int block;
-    private int strength;
-    private int energy;
+    [SerializeField] private int health;
+    [SerializeField] private int block;
+    [SerializeField] private int strength;
+    [SerializeField] private int energy;
 
     public CharacterCombat Combat { get; private set; }
 
