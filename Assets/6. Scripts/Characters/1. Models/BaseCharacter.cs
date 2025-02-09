@@ -118,7 +118,7 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
                 Debug.Log($"{Name} exhausted a card.");
                 break;
 
-            case EffectType.PowerEffect:
+            case EffectType.Power:
                 ApplyPowerEffect(value);
                 Debug.Log($"{Name} activated a persistent power.");
                 break;

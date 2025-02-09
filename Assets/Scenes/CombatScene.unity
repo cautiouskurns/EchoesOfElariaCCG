@@ -640,11 +640,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   allCards:
   - {fileID: 11400000, guid: 632e77373fa1e497abdd8a7e0400a78f, type: 2}
-  - {fileID: 11400000, guid: 632e77373fa1e497abdd8a7e0400a78f, type: 2}
   - {fileID: 11400000, guid: df45efbbe1c7b413b9404b8953746d87, type: 2}
   - {fileID: 11400000, guid: 989d75fc134004097b90953ee7d6537e, type: 2}
   - {fileID: 11400000, guid: 989d75fc134004097b90953ee7d6537e, type: 2}
-  - {fileID: 11400000, guid: 989d75fc134004097b90953ee7d6537e, type: 2}
+  - {fileID: 11400000, guid: 49a8b3b8ad97a499d9658d6134f863bd, type: 2}
+  - {fileID: 11400000, guid: 49a8b3b8ad97a499d9658d6134f863bd, type: 2}
+  - {fileID: 11400000, guid: 1e6dfbbb9239a4df2b806b280cf6270b, type: 2}
+  - {fileID: 11400000, guid: 1e6dfbbb9239a4df2b806b280cf6270b, type: 2}
+  - {fileID: 11400000, guid: b372e7f951fcd4cd0b60ddb971a0be60, type: 2}
+  - {fileID: 11400000, guid: b372e7f951fcd4cd0b60ddb971a0be60, type: 2}
+  - {fileID: 11400000, guid: fb28bf3a3ccbc457fb98079d5c4008e9, type: 2}
+  - {fileID: 11400000, guid: fb28bf3a3ccbc457fb98079d5c4008e9, type: 2}
+  - {fileID: 11400000, guid: aa360e42d8f38412895328f57b55a417, type: 2}
+  - {fileID: 11400000, guid: aa360e42d8f38412895328f57b55a417, type: 2}
   deckSize: 20
 --- !u!1 &565458002
 GameObject:
