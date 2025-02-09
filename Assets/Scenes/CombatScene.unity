@@ -654,6 +654,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: aa360e42d8f38412895328f57b55a417, type: 2}
   - {fileID: 11400000, guid: aa360e42d8f38412895328f57b55a417, type: 2}
   deckSize: 20
+  exhaustPile: []
 --- !u!1 &565458002
 GameObject:
   m_ObjectHideFlags: 0

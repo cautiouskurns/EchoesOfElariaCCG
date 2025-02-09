@@ -159,6 +159,41 @@ public class HandManager : MonoBehaviour
         Debug.Log($"[HandManager] 🔄 Hand refreshed to {currentHand.Count}/{maxHandSize} cards");
     }
 
+    public void ExhaustCard(GameObject card)
+    {
+        if (currentHand.Contains(card))
+        {
+            CardBehavior cardBehavior = card.GetComponent<CardBehavior>();
+            if (cardBehavior != null && cardBehavior.CardData != null)
+            {
+                // Move the card to the exhaust pile instead of discard
+                deckManager.ExhaustCard(cardBehavior.CardData);
+            }
+
+            // Remove from hand and destroy the card UI
+            currentHand.Remove(card);
+            Destroy(card);
+            
+            // Rearrange remaining cards
+            fanLayout?.ArrangeCards(currentHand);
+
+            Debug.Log($"[HandManager] 🚫 Exhausted card '{cardBehavior.CardData.CardName}'");
+        }
+    }
+
+    public void ExhaustRandomCard()
+    {
+        if (currentHand.Count == 0) return;
+
+        int randomIndex = Random.Range(0, currentHand.Count);
+        GameObject cardToExhaust = currentHand[randomIndex];
+
+        Debug.Log($"[HandManager] 🚫 Randomly exhausting '{cardToExhaust.GetComponent<CardBehavior>().CardData.CardName}'");
+        
+        ExhaustCard(cardToExhaust);
+    }
+
+
     public void OnCardHover(GameObject card, bool isHovered)
     {
         fanLayout?.OnCardHover(card, isHovered);

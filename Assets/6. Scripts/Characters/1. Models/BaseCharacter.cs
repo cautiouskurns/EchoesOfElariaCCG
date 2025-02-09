@@ -1,9 +1,16 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 {
     public string Name { get; protected set; }
     public CharacterStats Stats { get; private set; }
+
+    private int health;
+    private int block;
+    private int strength;
+    private int energy;
+
     public CharacterCombat Combat { get; private set; }
 
     private bool isSelected = false;
@@ -20,45 +27,45 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public virtual void Heal(int amount) => Stats.ModifyHealth(amount);
     public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
 
-    private int block;
-    private int strength;
-    private int energy;
+    public List<StatusEffects> statusEffects = new List<StatusEffects>();
 
     public void GainBlock(int amount)
     {
         block += amount;
+        Debug.Log($"{Name} gained {amount} Block.");
     }
 
     public void ModifyStrength(int amount)
     {
         strength += amount;
+        Debug.Log($"{Name} gained {amount} Strength.");
     }
 
     public void ApplyWeak(int turns)
     {
-        // Apply the "Weakened" status effect (reduces attack power)
-        //statusEffects.Add(new StatusEffect(StatusType.Weak, turns));
+        statusEffects.Add(new StatusEffects(StatusType.Weak, turns));
+        Debug.Log($"{Name} is weakened for {turns} turns.");
     }
 
     public void ApplyVulnerable(int turns)
     {
-        // Apply the "Vulnerable" status effect (increases damage taken)
-        //statusEffects.Add(new StatusEffect(StatusType.Vulnerable, turns));
+        statusEffects.Add(new StatusEffects(StatusType.Vulnerable, turns));
+        Debug.Log($"{Name} is vulnerable for {turns} turns.");
     }
-
     public void GainEnergy(int amount)
     {
         energy += amount;
+        Debug.Log($"{Name} gained {amount} Energy.");
     }
 
     public void DrawCards(int amount)
     {
-        //DeckManager.Instance.DrawCards(amount);
+        //DeckManager.DrawCards(amount);
     }
 
     public void ExhaustCard()
     {
-        //HandManager.Instance.ExhaustRandomCard();
+        //HandManager.ExhaustRandomCard();
     }
 
     public void ApplyPowerEffect(int value)

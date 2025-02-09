@@ -7,6 +7,8 @@ public class DeckManager : MonoBehaviour
     [SerializeField] private int deckSize = 20;  // Set fixed deck size
     public List<CardData> deck { get; private set; } = new List<CardData>();
     public List<CardData> discardPile { get; private set; } = new List<CardData>();
+    public List<CardData> exhaustPile = new List<CardData>(); // ✅ New Exhaust Pile
+
 
     private void Awake()
     {
@@ -54,6 +56,15 @@ public class DeckManager : MonoBehaviour
         discardPile.Clear();
         ShuffleDeck();
         Debug.Log($"[DeckManager] 🔄 Deck reshuffled. New size: {deck.Count}");
+    }
+
+    public void ExhaustCard(CardData card)
+    {
+        if (card != null)
+        {
+            exhaustPile.Add(card);
+            Debug.Log($"[DeckManager] 🚫 Card '{card.CardName}' has been exhausted.");
+        }
     }
 }
 
