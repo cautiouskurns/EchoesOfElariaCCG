@@ -3,6 +3,7 @@ using System.Collections;
 
 public class EnemyUnit : BaseCharacter
 {
+    [SerializeField] private EnemyIntentUI intentUI;
     private EnemyAnimationController animationController;
 
     protected override void Awake()
@@ -10,12 +11,37 @@ public class EnemyUnit : BaseCharacter
         base.Awake();
         Name = "Enemy";
 
-        animationController = GetComponentInChildren<EnemyAnimationController>();
+        // Get or find intent UI
+        if (intentUI == null)
+        {
+            intentUI = GetComponentInChildren<EnemyIntentUI>(true); // Include inactive objects
+        }
+        if (intentUI == null)
+        {
+            Debug.LogError("[EnemyUnit] ❌ EnemyIntentUI not found!");
+        }
+        else
+        {
+            // Ensure it starts hidden but initialized
+            intentUI.gameObject.SetActive(true);
+            intentUI.HideIntent();
+        }
 
+        animationController = GetComponentInChildren<EnemyAnimationController>();
         if (animationController == null)
         {
             Debug.LogError("[EnemyUnit] ❌ EnemyAnimationController not found!");
         }
+    }
+
+    public void ShowIntent(CardData card)
+    {
+        intentUI?.ShowIntent(card);
+    }
+
+    public void HideIntent()
+    {
+        intentUI?.HideIntent();
     }
 
     public IEnumerator AttackPlayer(BaseCharacter player)
@@ -34,6 +60,18 @@ public class EnemyUnit : BaseCharacter
         // ✅ Apply damage after attack animation
         player.TakeDamage(5);
         Debug.Log($"[EnemyUnit] 🔥 {player.Name} took 5 damage!");
+    }
+
+    private void OnValidate()
+    {
+        if (intentUI == null)
+        {
+            intentUI = GetComponentInChildren<EnemyIntentUI>();
+            if (intentUI == null)
+            {
+                Debug.LogWarning("[EnemyUnit] ⚠️ EnemyIntentUI component needs to be assigned!");
+            }
+        }
     }
 }
 

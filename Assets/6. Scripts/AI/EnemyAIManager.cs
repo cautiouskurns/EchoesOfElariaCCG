@@ -88,8 +88,12 @@ public class EnemyAIManager : MonoBehaviour
     {
         Debug.Log($"[EnemyAI] 🎯 {enemy.Name} is attacking {target.Name} with {action.CardName}");
 
-        EnemyAnimationController animationController = enemy.GetComponentInChildren<EnemyAnimationController>();
+        // Show intent
+        enemy.ShowIntent(action);
+        yield return new WaitForSeconds(1f);
 
+        // Perform attack
+        EnemyAnimationController animationController = enemy.GetComponentInChildren<EnemyAnimationController>();
         if (animationController == null)
         {
             Debug.LogError($"[EnemyAI] ❌ No EnemyAnimationController found on {enemy.Name}");
@@ -111,5 +115,8 @@ public class EnemyAIManager : MonoBehaviour
 
         // ✅ Return to original position after attack
         yield return StartCoroutine(animationController.MoveToTarget(animationController.OriginalPosition));
+
+        // Hide intent after attack
+        enemy.HideIntent();
     }
 }
