@@ -5,6 +5,6 @@ public class WeakEffect : CardEffect
 {
     public override void ApplyEffect(IEffectTarget target, int value)
     {
-        target.ApplyEffect(value, EffectType.Weak);
+        //target.ApplyEffect(value, EffectType.Weak);
     }
 }

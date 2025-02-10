@@ -5,6 +5,6 @@ public class StatusEffect : CardEffect
 {
     public override void ApplyEffect(IEffectTarget target, int value)
     {
-        target.ApplyEffect(value, EffectType.Status);
+        //target.ApplyEffect(value, EffectType.Status);
     }
 }

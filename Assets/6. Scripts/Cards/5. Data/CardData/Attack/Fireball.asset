@@ -15,9 +15,12 @@ MonoBehaviour:
   cardName: Fireball
   cost: 2
   cardArt: {fileID: 21300000, guid: dd3885098198d104888439be4c590aba, type: 3}
+  cardCategory: 
   cardDescription: Burns stuff
   effectValue: 15
   cardEffect: {fileID: 11400000, guid: a8281e157f41848b5985ec1d98005bda, type: 2}
+  statusEffects:
+  - {fileID: 11400000, guid: 5a167af5f69c244d082c5df1ba354a4e, type: 2}
   preferredClass: 2
   classBonus: 1.5
   cardType: 2

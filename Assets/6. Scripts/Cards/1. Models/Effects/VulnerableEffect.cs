@@ -5,6 +5,6 @@ public class VulnerableEffect : CardEffect
 {
     public override void ApplyEffect(IEffectTarget target, int value)
     {
-        target.ApplyEffect(value, EffectType.Vulnerable);
+        //target.ApplyEffect(value, EffectType.Vulnerable);
     }
 }

@@ -15,9 +15,12 @@ MonoBehaviour:
   cardName: Heal
   cost: 2
   cardArt: {fileID: 21300000, guid: c46d83f2b73aaa141bd5015819342d81, type: 3}
+  cardCategory: 
   cardDescription: Heals stuff
   effectValue: 10
   cardEffect: {fileID: 11400000, guid: 9dbd9adbc8fb840a2879a5aa1620e101, type: 2}
+  statusEffects:
+  - {fileID: 11400000, guid: 5a167af5f69c244d082c5df1ba354a4e, type: 2}
   preferredClass: 3
   classBonus: 1.5
   cardType: 3

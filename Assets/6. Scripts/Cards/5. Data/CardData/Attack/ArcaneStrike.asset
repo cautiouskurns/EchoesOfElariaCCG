@@ -17,8 +17,10 @@ MonoBehaviour:
   cardArt: {fileID: -569623924025852018, guid: 1176fa2b8f908474c9692c46c3761336, type: 3}
   cardCategory: Attack
   cardDescription: "Deal 6(9) damage.\t"
-  effectValue: 6
+  effectValue: 5
   cardEffect: {fileID: 11400000, guid: cadff9f51fa714ccea1aa240fe6f8827, type: 2}
+  statusEffects:
+  - {fileID: 11400000, guid: 5a167af5f69c244d082c5df1ba354a4e, type: 2}
   preferredClass: 0
   classBonus: 1.5
   cardType: 1

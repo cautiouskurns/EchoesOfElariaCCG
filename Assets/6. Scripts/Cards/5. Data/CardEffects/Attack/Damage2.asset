@@ -9,7 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17a0faefddad14928b72e5af193b58f9, type: 3}
-  m_Name: StrikeEffect
+  m_Script: {fileID: 11500000, guid: b006039b856c54e16b77eeaffbe2f195, type: 3}
+  m_Name: Damage2
   m_EditorClassIdentifier: 
-  effectData: {fileID: 11400000, guid: 7be0a041f3c05405fb05a2f014177ead, type: 2}
+  effectName: Strike
+  effectType: 0
+  baseValue: 10
+  effectSound: {fileID: 0}
+  statusEffectData: {fileID: 0}

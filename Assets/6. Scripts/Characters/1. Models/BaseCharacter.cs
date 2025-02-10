@@ -28,12 +28,10 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
 
     public List<StatusEffects> statusEffects = new List<StatusEffects>();
+    public List<ActiveStatusEffect> activeEffects = new List<ActiveStatusEffect>();
 
-    public void GainBlock(int amount)
-    {
-        block += amount;
-        Debug.Log($"{Name} gained {amount} Block.");
-    }
+    public delegate void OnEffectUpdated();
+    public event OnEffectUpdated EffectUpdated;  // ✅ Triggers UI update when effects change
 
     public void ModifyStrength(int amount)
     {
@@ -41,17 +39,6 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         Debug.Log($"{Name} gained {amount} Strength.");
     }
 
-    public void ApplyWeak(int turns)
-    {
-        statusEffects.Add(new StatusEffects(StatusType.Weak, turns));
-        Debug.Log($"{Name} is weakened for {turns} turns.");
-    }
-
-    public void ApplyVulnerable(int turns)
-    {
-        statusEffects.Add(new StatusEffects(StatusType.Vulnerable, turns));
-        Debug.Log($"{Name} is vulnerable for {turns} turns.");
-    }
     public void GainEnergy(int amount)
     {
         energy += amount;
@@ -74,8 +61,45 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         //PowerManager.Instance.ApplyPowerEffect(this, value);
     }
 
+    // ✅ Apply Status Effects
+    public void ApplyStatusEffect(StatusEffectData effect, int duration)
+    {
+        ActiveStatusEffect existingEffect = activeEffects.Find(e => e.effectData == effect);
+        if (existingEffect != null)
+        {
+            existingEffect.duration = Mathf.Max(existingEffect.duration, duration);
+        }
+        else
+        {
+            activeEffects.Add(new ActiveStatusEffect(effect, duration));
+        }
 
-    // ✅ Apply correct effect type
+        if (effect.effectSound != null)
+        {
+            AudioSource.PlayClipAtPoint(effect.effectSound, transform.position);
+        }
+
+        Debug.Log($"{Name} gained {effect.effectName} for {duration} turns.");
+        EffectUpdated?.Invoke();
+    }
+
+
+    public void RemoveEffect(StatusEffectData effect)
+    {
+        activeEffects.RemoveAll(e => e.effectData == effect);
+        EffectUpdated?.Invoke();
+    }
+
+    // ✅ Reduce Status Effect Durations (Call at end of turn)
+    public void ProcessEndOfTurnEffects()
+    {
+        foreach (var effect in activeEffects)
+        {
+            effect.duration--;
+        }
+        activeEffects.RemoveAll(e => e.duration <= 0);
+        EffectUpdated?.Invoke();
+    }
     public void ApplyEffect(int value, EffectType type)
     {
         switch (type)
@@ -88,26 +112,6 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
             case EffectType.Heal:
                 Heal(value);
                 Debug.Log($"{Name} healed {value} HP.");
-                break;
-
-            case EffectType.Block:
-                GainBlock(value);
-                Debug.Log($"{Name} gained {value} Block.");
-                break;
-
-            case EffectType.Strength:
-                ModifyStrength(value);
-                Debug.Log($"{Name} gained {value} Strength.");
-                break;
-
-            case EffectType.Weak:
-                ApplyWeak(value);
-                Debug.Log($"{Name} is weakened for {value} turns.");
-                break;
-
-            case EffectType.Vulnerable:
-                ApplyVulnerable(value);
-                Debug.Log($"{Name} is vulnerable for {value} turns.");
                 break;
 
             case EffectType.Energy:
@@ -128,10 +132,6 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
             case EffectType.Power:
                 ApplyPowerEffect(value);
                 Debug.Log($"{Name} activated a persistent power.");
-                break;
-
-            default:
-                Debug.LogWarning($"[BaseCharacter] Unknown effect type: {type}");
                 break;
         }
     }
@@ -167,3 +167,17 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
 }
 
+
+// ✅ Helper class to store effect data + duration
+[System.Serializable]
+public class ActiveStatusEffect
+{
+    public StatusEffectData effectData;
+    public int duration;
+
+    public ActiveStatusEffect(StatusEffectData data, int dur)
+    {
+        effectData = data;
+        duration = dur;
+    }
+}

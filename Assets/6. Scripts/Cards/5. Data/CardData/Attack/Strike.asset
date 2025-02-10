@@ -15,9 +15,12 @@ MonoBehaviour:
   cardName: Strike
   cost: 1
   cardArt: {fileID: 21300000, guid: 917871e5c6d34ed4b93dfafad1277db5, type: 3}
+  cardCategory: 
   cardDescription: Hits stuff
   effectValue: 10
   cardEffect: {fileID: 11400000, guid: 812a4ba9b87f24baba61593e5b6a5e75, type: 2}
+  statusEffects:
+  - {fileID: 11400000, guid: 5a167af5f69c244d082c5df1ba354a4e, type: 2}
   preferredClass: 1
   classBonus: 1.5
   cardType: 1

@@ -1190,7 +1190,7 @@ public class Sensor_HeroKnight : MonoBehaviour {
 // File: CardData.cs
 //===========================================
 using UnityEngine;
-using Cards;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "NewCard", menuName = "Cards/Card Data")]
 public class CardData : ScriptableObject
@@ -1199,12 +1199,16 @@ public class CardData : ScriptableObject
     [SerializeField] private string cardName;
     [SerializeField] private int cost;
     [SerializeField] private Sprite cardArt;
+    [SerializeField] private string cardCategory;
     [SerializeField] private string cardDescription;
 
     [Header("Card Effect")]
     [SerializeField] private int effectValue;  
     [SerializeField, Tooltip("Assign a ScriptableObject that defines the effect. Required!")] 
     private CardEffect cardEffect;
+
+    [Header("Status Effects (Optional)")]  
+    [SerializeField] private List<StatusEffectData> statusEffects;  // ✅ NEW: Cards can now apply multiple status effects
 
     [Header("Class Bonuses")]
     [SerializeField] private CharacterClass preferredClass;
@@ -1214,7 +1218,7 @@ public class CardData : ScriptableObject
     [SerializeField] private CardType cardType;
 
     [Header("Audio")]  
-    [SerializeField] private AudioClip soundEffect;  // 🔹 Store the actual AudioClip instead of a string
+    [SerializeField] private AudioClip soundEffect;  
 
     // 🔹 Public Read-Only Properties
     public string CardName => cardName;
@@ -1223,10 +1227,11 @@ public class CardData : ScriptableObject
     public string CardDescription => cardDescription;
     public int EffectValue => effectValue;
     public CardEffect CardEffect => cardEffect;
+    public List<StatusEffectData> StatusEffects => statusEffects;  // ✅ Getter for status effects
     public CharacterClass PreferredClass => preferredClass;
     public float ClassBonus => classBonus;
     public CardType CardType => cardType;
-    public AudioClip SoundEffect => soundEffect;  // 🔹 Getter for the AudioClip
+    public AudioClip SoundEffect => soundEffect;
 
     // 🔹 Validate in Editor to prevent missing data
     private void OnValidate()
@@ -1241,6 +1246,7 @@ public class CardData : ScriptableObject
 
 
 
+
 // File: CardEffect.cs
 //===========================================
 using UnityEngine;
@@ -1248,10 +1254,30 @@ using UnityEngine;
 // ✅ Abstract class for all card effects
 public abstract class CardEffect : ScriptableObject
 {
+    public CardEffectData effectData; // ✅ Reference to effect data
     public abstract void ApplyEffect(IEffectTarget target, int value);
 }
 
 
+
+
+
+
+// File: CardEffectData.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "New Card Effect", menuName = "Game/Card Effect")]
+public class CardEffectData : ScriptableObject
+{
+    public string effectName;
+    public EffectType effectType;  // ✅ Now correctly references effect type
+    public int baseValue;          // Default value of the effect (e.g., 8 for Damage)
+    public AudioClip effectSound;  // ✅ Sound effect when applied
+
+    [Header("Status Effect (Optional)")]
+    public StatusEffectData statusEffectData;  // ✅ Added reference to status effects
+}
 
 
 
@@ -1279,8 +1305,35 @@ using UnityEngine;
 
 public enum EffectType
 {
-    Damage,
-    Heal
+    Damage,       // Deals damage to an enemy
+    Heal,         // Restores health
+    //Block,        // Grants temporary protection from damage
+    Strength,     // Increases attack power
+    //Weak,         // Reduces attack power
+    //Vulnerable,   // Increases damage taken
+    Energy,       // Grants extra energy
+    CardDraw,     // Draws extra cards
+    Exhaust,      // Removes a card from play for the rest of combat
+    Power  // Applies a persistent effect
+    //Status  // Generic category for unique effects
+}
+
+
+
+
+// File: StatusEffectData.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "New Status Effect", menuName = "Game/Status Effect")]
+public class StatusEffectData : ScriptableObject
+{
+    public string effectName;
+    public Sprite effectIcon;
+    public string description;
+    public StatusType statusType;   // ✅ Uses the StatusType enum
+    public int maxDuration;
+    public AudioClip effectSound;
 }
 
 
@@ -1475,6 +1528,8 @@ public class DeckManager : MonoBehaviour
     [SerializeField] private int deckSize = 20;  // Set fixed deck size
     public List<CardData> deck { get; private set; } = new List<CardData>();
     public List<CardData> discardPile { get; private set; } = new List<CardData>();
+    public List<CardData> exhaustPile = new List<CardData>(); // ✅ New Exhaust Pile
+
 
     private void Awake()
     {
@@ -1522,6 +1577,15 @@ public class DeckManager : MonoBehaviour
         discardPile.Clear();
         ShuffleDeck();
         Debug.Log($"[DeckManager] 🔄 Deck reshuffled. New size: {deck.Count}");
+    }
+
+    public void ExhaustCard(CardData card)
+    {
+        if (card != null)
+        {
+            exhaustPile.Add(card);
+            Debug.Log($"[DeckManager] 🚫 Card '{card.CardName}' has been exhausted.");
+        }
     }
 }
 
@@ -1693,6 +1757,41 @@ public class HandManager : MonoBehaviour
         Debug.Log($"[HandManager] 🔄 Hand refreshed to {currentHand.Count}/{maxHandSize} cards");
     }
 
+    public void ExhaustCard(GameObject card)
+    {
+        if (currentHand.Contains(card))
+        {
+            CardBehavior cardBehavior = card.GetComponent<CardBehavior>();
+            if (cardBehavior != null && cardBehavior.CardData != null)
+            {
+                // Move the card to the exhaust pile instead of discard
+                deckManager.ExhaustCard(cardBehavior.CardData);
+            }
+
+            // Remove from hand and destroy the card UI
+            currentHand.Remove(card);
+            Destroy(card);
+            
+            // Rearrange remaining cards
+            fanLayout?.ArrangeCards(currentHand);
+
+            Debug.Log($"[HandManager] 🚫 Exhausted card '{cardBehavior.CardData.CardName}'");
+        }
+    }
+
+    public void ExhaustRandomCard()
+    {
+        if (currentHand.Count == 0) return;
+
+        int randomIndex = Random.Range(0, currentHand.Count);
+        GameObject cardToExhaust = currentHand[randomIndex];
+
+        Debug.Log($"[HandManager] 🚫 Randomly exhausting '{cardToExhaust.GetComponent<CardBehavior>().CardData.CardName}'");
+        
+        ExhaustCard(cardToExhaust);
+    }
+
+
     public void OnCardHover(GameObject card, bool isHovered)
     {
         fanLayout?.OnCardHover(card, isHovered);
@@ -1796,7 +1895,7 @@ public class CardDisplay : MonoBehaviour
 //===========================================
 public interface IEffectTarget
 {
-    void ApplyEffect(int value, EffectType type);
+    void ApplyEffect(int value, EffectType type); //, StatusEffectData effectData = null);
 }
 
 
@@ -1822,11 +1921,18 @@ namespace Cards
 // File: BaseCharacter.cs
 //===========================================
 using UnityEngine;
+using System.Collections.Generic;
 
 public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 {
     public string Name { get; protected set; }
     public CharacterStats Stats { get; private set; }
+
+    [SerializeField] private int health;
+    [SerializeField] private int block;
+    [SerializeField] private int strength;
+    [SerializeField] private int energy;
+
     public CharacterCombat Combat { get; private set; }
 
     private bool isSelected = false;
@@ -1843,7 +1949,79 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public virtual void Heal(int amount) => Stats.ModifyHealth(amount);
     public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
 
-    // ✅ Apply correct effect type
+    public List<StatusEffects> statusEffects = new List<StatusEffects>();
+    public List<ActiveStatusEffect> activeEffects = new List<ActiveStatusEffect>();
+
+    public delegate void OnEffectUpdated();
+    public event OnEffectUpdated EffectUpdated;  // ✅ Triggers UI update when effects change
+
+    public void ModifyStrength(int amount)
+    {
+        strength += amount;
+        Debug.Log($"{Name} gained {amount} Strength.");
+    }
+
+    public void GainEnergy(int amount)
+    {
+        energy += amount;
+        Debug.Log($"{Name} gained {amount} Energy.");
+    }
+
+    public void DrawCards(int amount)
+    {
+        //DeckManager.DrawCards(amount);
+    }
+
+    public void ExhaustCard()
+    {
+        //HandManager.ExhaustRandomCard();
+    }
+
+    public void ApplyPowerEffect(int value)
+    {
+        // Powers are persistent effects. You can implement them here.
+        //PowerManager.Instance.ApplyPowerEffect(this, value);
+    }
+
+    // ✅ Apply Status Effects
+    public void ApplyStatusEffect(StatusEffectData effect, int duration)
+    {
+        ActiveStatusEffect existingEffect = activeEffects.Find(e => e.effectData == effect);
+        if (existingEffect != null)
+        {
+            existingEffect.duration = Mathf.Max(existingEffect.duration, duration);
+        }
+        else
+        {
+            activeEffects.Add(new ActiveStatusEffect(effect, duration));
+        }
+
+        if (effect.effectSound != null)
+        {
+            AudioSource.PlayClipAtPoint(effect.effectSound, transform.position);
+        }
+
+        Debug.Log($"{Name} gained {effect.effectName} for {duration} turns.");
+        EffectUpdated?.Invoke();
+    }
+
+
+    public void RemoveEffect(StatusEffectData effect)
+    {
+        activeEffects.RemoveAll(e => e.effectData == effect);
+        EffectUpdated?.Invoke();
+    }
+
+    // ✅ Reduce Status Effect Durations (Call at end of turn)
+    public void ProcessEndOfTurnEffects()
+    {
+        foreach (var effect in activeEffects)
+        {
+            effect.duration--;
+        }
+        activeEffects.RemoveAll(e => e.duration <= 0);
+        EffectUpdated?.Invoke();
+    }
     public void ApplyEffect(int value, EffectType type)
     {
         switch (type)
@@ -1852,15 +2030,34 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
                 TakeDamage(value);
                 Debug.Log($"{Name} took {value} damage.");
                 break;
+
             case EffectType.Heal:
                 Heal(value);
                 Debug.Log($"{Name} healed {value} HP.");
                 break;
-            default:
-                Debug.LogWarning($"[BaseCharacter] Unknown effect type: {type}");
+
+            case EffectType.Energy:
+                GainEnergy(value);
+                Debug.Log($"{Name} gained {value} energy.");
+                break;
+
+            case EffectType.CardDraw:
+                DrawCards(value);
+                Debug.Log($"{Name} drew {value} cards.");
+                break;
+
+            case EffectType.Exhaust:
+                ExhaustCard();
+                Debug.Log($"{Name} exhausted a card.");
+                break;
+
+            case EffectType.Power:
+                ApplyPowerEffect(value);
+                Debug.Log($"{Name} activated a persistent power.");
                 break;
         }
     }
+
 
     public virtual void Select()
     {
@@ -1893,6 +2090,19 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 }
 
 
+// ✅ Helper class to store effect data + duration
+[System.Serializable]
+public class ActiveStatusEffect
+{
+    public StatusEffectData effectData;
+    public int duration;
+
+    public ActiveStatusEffect(StatusEffectData data, int dur)
+    {
+        effectData = data;
+        duration = dur;
+    }
+}
 
 
 
@@ -2082,6 +2292,35 @@ public class PlayerUnit : BaseCharacter
     }
 }
 
+
+
+
+
+// File: StatusEffect.cs
+//===========================================
+using UnityEngine;
+
+public enum StatusType
+{
+    Weak,
+    Vulnerable,
+    Poison,
+    StrengthBuff,
+    Destabilized,
+    Exhausted
+}
+
+public class StatusEffects
+{
+    public StatusType Type;
+    public int Duration;
+
+    public StatusEffects(StatusType type, int duration)
+    {
+        Type = type;
+        Duration = duration;
+    }
+}
 
 
 
@@ -2476,6 +2715,7 @@ public class CharacterData : ScriptableObject
     [Header("Base Stats")]
     [SerializeField] public int maxHealth = 100;
     [SerializeField] public int startingActionPoints = 3;
+    
 
     [Header("Character Info")]
     [SerializeField] public string characterName;
@@ -2800,6 +3040,38 @@ public class EndTurnButton : MonoBehaviour
 
 
 
+// File: BlockEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "BlockEffect", menuName = "Cards/Effects/Block")]
+public class BlockEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        //target.ApplyEffect(value, EffectType.Block);
+    }
+}
+
+
+
+
+// File: CardDrawEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "CardDrawEffect", menuName = "Cards/Effects/CardDraw")]
+public class CardDrawEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        target.ApplyEffect(value, EffectType.CardDraw);
+    }
+}
+
+
+
+
 // File: DamageEffect.cs
 //===========================================
 using UnityEngine;
@@ -2816,6 +3088,38 @@ public class DamageEffect : CardEffect
 
 
 
+// File: EnergyEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "EnergyEffect", menuName = "Cards/Effects/Energy")]
+public class EnergyEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        target.ApplyEffect(value, EffectType.Energy);
+    }
+}
+
+
+
+
+// File: ExhaustEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "ExhaustEffect", menuName = "Cards/Effects/Exhaust")]
+public class ExhaustEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        target.ApplyEffect(value, EffectType.Exhaust);
+    }
+}
+
+
+
+
 // File: HealEffect.cs
 //===========================================
 using UnityEngine;
@@ -2826,6 +3130,86 @@ public class HealEffect : CardEffect
     public override void ApplyEffect(IEffectTarget target, int value)
     {
         target.ApplyEffect(value, EffectType.Heal);
+    }
+}
+
+
+
+
+// File: PowerEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "PowerEffect", menuName = "Cards/Effects/Power")]
+public class PowerEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        target.ApplyEffect(value, EffectType.Power);
+    }
+}
+
+
+
+
+// File: StatusEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "StatusEffect", menuName = "Cards/Effects/Status")]
+public class StatusEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        //target.ApplyEffect(value, EffectType.Status);
+    }
+}
+
+
+
+
+// File: StrengthEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "StrengthEffect", menuName = "Cards/Effects/Strength")]
+public class StrengthEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        target.ApplyEffect(value, EffectType.Strength);
+    }
+}
+
+
+
+
+// File: VulnerableEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "VulnerableEffect", menuName = "Cards/Effects/Vulnerable")]
+public class VulnerableEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        //target.ApplyEffect(value, EffectType.Vulnerable);
+    }
+}
+
+
+
+
+// File: WeakEffect.cs
+//===========================================
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "WeakEffect", menuName = "Cards/Effects/Weak")]
+public class WeakEffect : CardEffect
+{
+    public override void ApplyEffect(IEffectTarget target, int value)
+    {
+        //target.ApplyEffect(value, EffectType.Weak);
     }
 }
 
@@ -3076,9 +3460,22 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[CardExecution] 🎯 {BaseCharacter.GetSelectedCharacter().Name} played {cardBehavior.CardData.CardName} for {finalValue} damage");
-        effect.ApplyEffect(target, finalValue);
+        BaseCharacter targetCharacter = target as BaseCharacter;
+        if (targetCharacter == null) return;
+
+        Debug.Log($"[CardExecution] 🎯 {BaseCharacter.GetSelectedCharacter().Name} played {cardBehavior.CardData.CardName}");
+
+        // ✅ Apply the primary effect (damage, block, etc.)
+        targetCharacter.ApplyEffect(finalValue, effect.effectType);
+
+        // ✅ Apply any status effects attached to the card
+        foreach (var statusEffect in cardBehavior.CardData.StatusEffects)
+        {
+            targetCharacter.ApplyStatusEffect(statusEffect, statusEffect.maxDuration);
+        }
     }
+
+
 }
 
 
