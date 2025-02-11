@@ -7,42 +7,46 @@ public class StatusEffectUI : MonoBehaviour
     public GameObject statusEffectPrefab;  
     public Transform statusEffectContainer;  
 
-    private Dictionary<StatusType, GameObject> activeStatusIcons = new Dictionary<StatusType, GameObject>();
+    // private Dictionary<StatusType, GameObject> activeStatusIcons = new Dictionary<StatusType, GameObject>();
+    private List<GameObject> activeStatusIcons = new List<GameObject>();
+
 
     public void UpdateStatusEffects(List<StatusEffect> effects)
     {
-        // Clear previous status effects
-        foreach (Transform child in statusEffectContainer)
+        Debug.Log($"[StatusEffectUI] Updating UI. Total effects: {effects.Count}");
+
+        // ✅ Remove old icons
+        foreach (GameObject icon in activeStatusIcons)
         {
-            Destroy(child.gameObject);
+            Destroy(icon);
         }
         activeStatusIcons.Clear();
 
-        // Add new status effects
+        // ✅ Add new icons for each effect
         foreach (StatusEffect effect in effects)
         {
             if (effect.Duration > 0)
             {
+                Debug.Log($"[StatusEffectUI] Adding effect: {effect.Type} - Duration: {effect.Duration}");
+
                 GameObject newEffectIcon = Instantiate(statusEffectPrefab, statusEffectContainer);
                 Image effectImage = newEffectIcon.GetComponent<Image>();
                 Text effectText = newEffectIcon.GetComponentInChildren<Text>();
 
-                // ✅ Fix: Use EffectData instead of effectData
                 if (effect.EffectData != null)  
                 {
-                    effectImage.sprite = effect.EffectData.effectIcon;  // ✅ Correct reference
+                    effectImage.sprite = effect.EffectData.effectIcon;
                 }
                 else
                 {
-                    Debug.LogWarning($"StatusEffect {effect.Type} has no EffectData assigned!");
+                    Debug.LogWarning($"[StatusEffectUI] ❌ EffectData is null for {effect.Type}");
                 }
 
                 effectText.text = effect.Duration.ToString();
-
-                // ✅ Fix: Use EffectData.statusType instead of effectData.statusType
-                activeStatusIcons[effect.EffectData.statusType] = newEffectIcon;
+                activeStatusIcons.Add(newEffectIcon);  // ✅ Store multiple effect icons
             }
         }
     }
+
 }
 
