@@ -10,14 +10,26 @@ public enum StatusType
     Exhausted
 }
 
-public class StatusEffects
+public class StatusEffect
 {
-    public StatusType Type;
-    public int Duration;
+    public StatusType Type { get; private set; }  
+    public int Duration { get; set; }     
+    public StatusEffectData EffectData { get; private set; }  // ✅ Added reference to effect data
 
-    public StatusEffects(StatusType type, int duration)
+    public StatusEffect(StatusType type, int duration, StatusEffectData effectData)
     {
-        Type = type;
-        Duration = duration;
+        this.Type = type;
+        this.Duration = duration;
+        this.EffectData = effectData;  // ✅ Store effect data reference
+    }
+
+    public void ReduceDuration()
+    {
+        Duration--;
+    }
+
+    public bool IsExpired()
+    {
+        return Duration <= 0;
     }
 }

@@ -20,7 +20,6 @@ MonoBehaviour:
   effectValue: 10
   cardEffect: {fileID: 11400000, guid: cadff9f51fa714ccea1aa240fe6f8827, type: 2}
   statusEffects:
-  - {fileID: 11400000, guid: 5a167af5f69c244d082c5df1ba354a4e, type: 2}
   - {fileID: 11400000, guid: 537c87c772fa24ea6ba60f0d47084076, type: 2}
   preferredClass: 1
   classBonus: 1.5

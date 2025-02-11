@@ -27,7 +27,7 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public virtual void Heal(int amount) => Stats.ModifyHealth(amount);
     public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
 
-    public List<StatusEffects> statusEffects = new List<StatusEffects>();
+    public List<StatusEffect> statusEffects = new List<StatusEffect>();
     public List<ActiveStatusEffect> activeEffects = new List<ActiveStatusEffect>();
 
     public delegate void OnEffectUpdated();
@@ -64,6 +64,8 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     // ✅ Apply Status Effects
     public void ApplyStatusEffect(StatusEffectData effect, int duration)
     {
+        Debug.Log($"[BaseCharacter] Applying status effect: {effect.effectName} ({effect.statusType}) for {duration} turns.");
+
         ActiveStatusEffect existingEffect = activeEffects.Find(e => e.effectData == effect);
         if (existingEffect != null)
         {
@@ -79,11 +81,10 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
             AudioSource.PlayClipAtPoint(effect.effectSound, transform.position);
         }
 
-        Debug.Log($"{Name} gained {effect.effectName} for {duration} turns.");
-        EffectUpdated?.Invoke();
-
-        // ✅ Debug active effects
         DebugStatusEffects();
+        
+        // ✅ Directly call UpdateStatusUI
+        UpdateStatusUI(); 
     }
 
 
@@ -202,6 +203,22 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 
         // ✅ Log updated effects
         DebugStatusEffects();
+    }
+
+    public void UpdateStatusUI()
+    {
+        StatusEffectUI statusUI = GetComponentInChildren<StatusEffectUI>();
+        if (statusUI != null)
+        {
+            List<StatusEffect> statusList = new List<StatusEffect>();
+
+            foreach (var effect in activeEffects)
+            {
+                statusList.Add(new StatusEffect(effect.effectData.statusType, effect.duration, effect.effectData));
+            }
+
+            statusUI.UpdateStatusEffects(statusList);  // ✅ Now passing a compatible list
+        }
     }
 
 }

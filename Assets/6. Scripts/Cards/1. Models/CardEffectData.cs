@@ -10,4 +10,7 @@ public class CardEffectData : ScriptableObject
 
     [Header("Status Effect (Optional)")]
     public StatusEffectData statusEffectData;  // ✅ Added reference to status effects
+
+    [Header("UI Representation")]
+    public Sprite effectIcon;
 }

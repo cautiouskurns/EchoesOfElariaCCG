@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Weak
   m_EditorClassIdentifier: 
   effectName: Weak
-  effectIcon: {fileID: 0}
+  effectIcon: {fileID: -4733039052000751752, guid: d3e286cbd6d3a4b31ad84668f461f9cb, type: 3}
   description: Weken
   statusType: 0
   maxDuration: 2

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Vulnerable
   m_EditorClassIdentifier: 
   effectName: Vulnerable
-  effectIcon: {fileID: 7482667652216324306, guid: f111bab86489749d49150f9b47e1069b, type: 3}
+  effectIcon: {fileID: -9023002539764390441, guid: 1aed488dbce3346e291d68888bb73d81, type: 3}
   description: Blocks
   statusType: 1
   maxDuration: 3
