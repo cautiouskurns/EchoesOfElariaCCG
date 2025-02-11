@@ -9,7 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17a0faefddad14928b72e5af193b58f9, type: 3}
-  m_Name: DamageEffect
+  m_Script: {fileID: 11500000, guid: cd29ab90524af49f9a288e8d64217061, type: 3}
+  m_Name: Weak
   m_EditorClassIdentifier: 
-  effectData: {fileID: 11400000, guid: 7be0a041f3c05405fb05a2f014177ead, type: 2}
+  effectName: Weak
+  effectIcon: {fileID: 0}
+  description: Weken
+  statusType: 0
+  maxDuration: 2
+  effectSound: {fileID: 0}

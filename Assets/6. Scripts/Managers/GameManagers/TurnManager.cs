@@ -59,6 +59,18 @@ public class TurnManager : MonoBehaviour
         Debug.Log("[TurnManager] Enemy turn ended");
         CurrentTurn = TurnState.PlayerTurn;
         OnTurnChanged?.Invoke(CurrentTurn);
+
+        Debug.Log("[TurnManager] Ending turn...");
+
+        // ✅ Find all characters and process their end-turn status effects
+        BaseCharacter[] allCharacters = FindObjectsByType<BaseCharacter>(FindObjectsSortMode.None);
+        foreach (BaseCharacter character in allCharacters)
+        {
+            character.EndTurn();
+        }
+
+        Debug.Log("[TurnManager] --- Turn Ended ---");
+
         StartPlayerTurn();
     }
 

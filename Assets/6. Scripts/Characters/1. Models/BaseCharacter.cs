@@ -81,6 +81,9 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 
         Debug.Log($"{Name} gained {effect.effectName} for {duration} turns.");
         EffectUpdated?.Invoke();
+
+        // ✅ Debug active effects
+        DebugStatusEffects();
     }
 
 
@@ -165,6 +168,42 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     }
 
     public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
+
+    public void DebugStatusEffects()
+    {
+        Debug.Log($"[BaseCharacter] {Name} Status Effects:");
+
+        if (statusEffects.Count == 0)
+        {
+            Debug.Log(" - No active status effects.");
+            return;
+        }
+
+        foreach (var effect in statusEffects)
+        {
+            Debug.Log($" - {effect.Type} (Duration: {effect.Duration} turns)");
+        }
+    }
+
+    public void EndTurn()
+    {
+        Debug.Log($"[BaseCharacter] {Name} ending turn...");
+
+        for (int i = statusEffects.Count - 1; i >= 0; i--)
+        {
+            statusEffects[i].Duration--;
+
+            if (statusEffects[i].Duration <= 0)
+            {
+                Debug.Log($"{Name} lost {statusEffects[i].Type} effect.");
+                statusEffects.RemoveAt(i);
+            }
+        }
+
+        // ✅ Log updated effects
+        DebugStatusEffects();
+    }
+
 }
 
 

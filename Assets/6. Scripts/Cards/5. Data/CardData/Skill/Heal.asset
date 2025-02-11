@@ -18,7 +18,7 @@ MonoBehaviour:
   cardCategory: 
   cardDescription: Heals stuff
   effectValue: 10
-  cardEffect: {fileID: 11400000, guid: 9dbd9adbc8fb840a2879a5aa1620e101, type: 2}
+  cardEffect: {fileID: 11400000, guid: cadff9f51fa714ccea1aa240fe6f8827, type: 2}
   statusEffects:
   - {fileID: 11400000, guid: 5a167af5f69c244d082c5df1ba354a4e, type: 2}
   preferredClass: 3

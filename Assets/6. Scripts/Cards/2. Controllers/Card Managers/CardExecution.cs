@@ -163,11 +163,6 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        if (effect.effectData.effectType == null)
-        {
-            Debug.LogError($"[CardExecution] ❌ EffectType is NULL in {effect.effectData.name}");
-            return;
-        }
 
         BaseCharacter targetCharacter = target as BaseCharacter;
         if (targetCharacter == null)

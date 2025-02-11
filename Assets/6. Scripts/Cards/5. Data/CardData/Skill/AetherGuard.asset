@@ -18,7 +18,7 @@ MonoBehaviour:
   cardCategory: Skill
   cardDescription: "Gain 5(8) Barrier (Prevents damage this turn).\t"
   effectValue: 5
-  cardEffect: {fileID: 11400000, guid: f3287711b79ac412489a321d7886d617, type: 2}
+  cardEffect: {fileID: 11400000, guid: cadff9f51fa714ccea1aa240fe6f8827, type: 2}
   statusEffects:
   - {fileID: 11400000, guid: 5a167af5f69c244d082c5df1ba354a4e, type: 2}
   preferredClass: 0

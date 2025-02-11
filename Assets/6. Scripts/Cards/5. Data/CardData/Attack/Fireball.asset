@@ -18,7 +18,7 @@ MonoBehaviour:
   cardCategory: 
   cardDescription: Burns stuff
   effectValue: 15
-  cardEffect: {fileID: 11400000, guid: a8281e157f41848b5985ec1d98005bda, type: 2}
+  cardEffect: {fileID: 11400000, guid: cadff9f51fa714ccea1aa240fe6f8827, type: 2}
   statusEffects:
   - {fileID: 11400000, guid: 5a167af5f69c244d082c5df1ba354a4e, type: 2}
   preferredClass: 2
