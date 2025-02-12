@@ -265,7 +265,7 @@ Transform:
   m_GameObject: {fileID: 4888515469344758664}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.17, z: 0}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -315,15 +315,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 5906c2055da3a4a59891946e0f6a37bd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.5, y: 1.5}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!95 &7310873495642890280
@@ -336,7 +336,7 @@ Animator:
   m_GameObject: {fileID: 4888515469344758664}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4e245d30a71334190a0505d7f93aff85, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -711,7 +711,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3693110005393970471, guid: f363edc1ffeb241e0a6bf9cfa4f913a2, type: 3}
       propertyPath: floatHeight
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7628076840316953590, guid: f363edc1ffeb241e0a6bf9cfa4f913a2, type: 3}
       propertyPath: m_Pivot.x
@@ -815,7 +815,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9042797834405537673, guid: f363edc1ffeb241e0a6bf9cfa4f913a2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -880,15 +880,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9075944210996780126, guid: 0adfcfdbd8319403eb8c079e183d9b42, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 9075944210996780126, guid: 0adfcfdbd8319403eb8c079e183d9b42, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 9075944210996780126, guid: 0adfcfdbd8319403eb8c079e183d9b42, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 9075944210996780126, guid: 0adfcfdbd8319403eb8c079e183d9b42, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1015,6 +1015,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
-  moveSpeed: 1
+  moveSpeed: 10
   attackDistance: 1.5
   attackDuration: 1
