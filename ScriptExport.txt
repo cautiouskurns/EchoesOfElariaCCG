@@ -542,6 +542,64 @@ public class EnemyIntentUI : MonoBehaviour
 
 
 
+// File: StatusEffectUI.cs
+//===========================================
+using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+
+public class StatusEffectUI : MonoBehaviour
+{
+    public GameObject statusEffectPrefab;  
+    public Transform statusEffectContainer;  
+
+    // private Dictionary<StatusType, GameObject> activeStatusIcons = new Dictionary<StatusType, GameObject>();
+    private List<GameObject> activeStatusIcons = new List<GameObject>();
+
+
+    public void UpdateStatusEffects(List<StatusEffect> effects)
+    {
+        Debug.Log($"[StatusEffectUI] Updating UI. Total effects: {effects.Count}");
+
+        // ✅ Remove old icons
+        foreach (GameObject icon in activeStatusIcons)
+        {
+            Destroy(icon);
+        }
+        activeStatusIcons.Clear();
+
+        // ✅ Add new icons for each effect
+        foreach (StatusEffect effect in effects)
+        {
+            if (effect.Duration > 0)
+            {
+                Debug.Log($"[StatusEffectUI] Adding effect: {effect.Type} - Duration: {effect.Duration}");
+
+                GameObject newEffectIcon = Instantiate(statusEffectPrefab, statusEffectContainer);
+                Image effectImage = newEffectIcon.GetComponent<Image>();
+                Text effectText = newEffectIcon.GetComponentInChildren<Text>();
+
+                if (effect.EffectData != null)  
+                {
+                    effectImage.sprite = effect.EffectData.effectIcon;
+                }
+                else
+                {
+                    Debug.LogWarning($"[StatusEffectUI] ❌ EffectData is null for {effect.Type}");
+                }
+
+                effectText.text = effect.Duration.ToString();
+                activeStatusIcons.Add(newEffectIcon);  // ✅ Store multiple effect icons
+            }
+        }
+    }
+
+}
+
+
+
+
+
 // File: ReadOnlyAttribute.cs
 //===========================================
 
@@ -1287,6 +1345,9 @@ public class CardEffectData : ScriptableObject
 
     [Header("Status Effect (Optional)")]
     public StatusEffectData statusEffectData;  // ✅ Added reference to status effects
+
+    [Header("UI Representation")]
+    public Sprite effectIcon;
 }
 
 
@@ -1959,7 +2020,7 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public virtual void Heal(int amount) => Stats.ModifyHealth(amount);
     public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
 
-    public List<StatusEffects> statusEffects = new List<StatusEffects>();
+    public List<StatusEffect> statusEffects = new List<StatusEffect>();
     public List<ActiveStatusEffect> activeEffects = new List<ActiveStatusEffect>();
 
     public delegate void OnEffectUpdated();
@@ -1996,6 +2057,8 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     // ✅ Apply Status Effects
     public void ApplyStatusEffect(StatusEffectData effect, int duration)
     {
+        Debug.Log($"[BaseCharacter] Applying status effect: {effect.effectName} ({effect.statusType}) for {duration} turns.");
+
         ActiveStatusEffect existingEffect = activeEffects.Find(e => e.effectData == effect);
         if (existingEffect != null)
         {
@@ -2011,11 +2074,10 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
             AudioSource.PlayClipAtPoint(effect.effectSound, transform.position);
         }
 
-        Debug.Log($"{Name} gained {effect.effectName} for {duration} turns.");
-        EffectUpdated?.Invoke();
-
-        // ✅ Debug active effects
         DebugStatusEffects();
+        
+        // ✅ Directly call UpdateStatusUI
+        UpdateStatusUI(); 
     }
 
 
@@ -2134,6 +2196,22 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 
         // ✅ Log updated effects
         DebugStatusEffects();
+    }
+
+    public void UpdateStatusUI()
+    {
+        StatusEffectUI statusUI = GetComponentInChildren<StatusEffectUI>();
+        if (statusUI != null)
+        {
+            List<StatusEffect> statusList = new List<StatusEffect>();
+
+            foreach (var effect in activeEffects)
+            {
+                statusList.Add(new StatusEffect(effect.effectData.statusType, effect.duration, effect.effectData));
+            }
+
+            statusUI.UpdateStatusEffects(statusList);  // ✅ Now passing a compatible list
+        }
     }
 
 }
@@ -2359,15 +2437,27 @@ public enum StatusType
     Exhausted
 }
 
-public class StatusEffects
+public class StatusEffect
 {
-    public StatusType Type;
-    public int Duration;
+    public StatusType Type { get; private set; }  
+    public int Duration { get; set; }     
+    public StatusEffectData EffectData { get; private set; }  // ✅ Added reference to effect data
 
-    public StatusEffects(StatusType type, int duration)
+    public StatusEffect(StatusType type, int duration, StatusEffectData effectData)
     {
-        Type = type;
-        Duration = duration;
+        this.Type = type;
+        this.Duration = duration;
+        this.EffectData = effectData;  // ✅ Store effect data reference
+    }
+
+    public void ReduceDuration()
+    {
+        Duration--;
+    }
+
+    public bool IsExpired()
+    {
+        return Duration <= 0;
     }
 }
 
@@ -3217,14 +3307,14 @@ public class PowerEffect : CardEffect
 //===========================================
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "StatusEffect", menuName = "Cards/Effects/Status")]
-public class StatusEffect : CardEffect
-{
-    public override void ApplyEffect(IEffectTarget target, int value)
-    {
-        //target.ApplyEffect(value, EffectType.Status);
-    }
-}
+// [CreateAssetMenu(fileName = "StatusEffect", menuName = "Cards/Effects/Status")]
+// public class StatusEffect : CardEffect
+// {
+//     public override void ApplyEffect(IEffectTarget target, int value)
+//     {
+//         //target.ApplyEffect(value, EffectType.Status);
+//     }
+// }
 
 
 
