@@ -177,7 +177,7 @@ public class CardExecution : MonoBehaviour
         try
         {
             Debug.Log($"🔹 Applying {effect.GetType().Name} effect to {targetCharacter.Name}");
-            targetCharacter.ApplyEffect(finalValue, effect.EffectType);
+            targetCharacter.ReceiveEffect(finalValue, effect.EffectType);
         }
         catch (System.Exception e)
         {

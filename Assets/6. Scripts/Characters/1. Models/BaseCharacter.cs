@@ -104,7 +104,7 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         activeEffects.RemoveAll(e => e.duration <= 0);
         EffectUpdated?.Invoke();
     }
-    public void ApplyEffect(int value, EffectType type)
+    public void ReceiveEffect(int value, EffectType type)
     {
         switch (type)
         {
@@ -220,6 +220,18 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
             statusUI.UpdateStatusEffects(statusList);  // ✅ Now passing a compatible list
         }
     }
+
+    public void ReceiveStatusEffect(IStatusEffect effect, int duration)
+    {
+        Debug.Log($"{Name} is receiving status effect: {effect}");
+    }
+
+    public void RemoveStatusEffect(IStatusEffect effect)
+    {
+        Debug.Log($"{Name} is removing status effect: {effect}");
+    }
+
+
 
 }
 

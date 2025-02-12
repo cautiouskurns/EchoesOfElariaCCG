@@ -5,6 +5,6 @@ public class CardDrawEffect : CardEffect
 {
     public override void ApplyEffect(IEffectTarget target, int value)
     {
-        target.ApplyEffect(value, EffectType.CardDraw);
+        target.ReceiveEffect(value, EffectType.CardDraw); // This will call the ReceiveEffect method in the target
     }
 }

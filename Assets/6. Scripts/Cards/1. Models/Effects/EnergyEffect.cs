@@ -5,6 +5,6 @@ public class EnergyEffect : CardEffect
 {
     public override void ApplyEffect(IEffectTarget target, int value)
     {
-        target.ApplyEffect(value, EffectType.Energy);
+        target.ReceiveEffect(value, EffectType.Energy);
     }
 }

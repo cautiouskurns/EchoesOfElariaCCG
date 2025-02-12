@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "DamageEffect", menuName = "Cards/Effects/Damage")]
-public class DamageEffect : CardEffect
+[CreateAssetMenu(fileName = "New Damage Effect", menuName = "Effects/Damage")]
+public class TestEffect : BaseEffect
 {
     public override void ApplyEffect(IEffectTarget target, int value)
     {

@@ -5,6 +5,6 @@ public class StrengthEffect : CardEffect
 {
     public override void ApplyEffect(IEffectTarget target, int value)
     {
-        target.ApplyEffect(value, EffectType.Strength);
+        target.ReceiveEffect(value, EffectType.Strength);
     }
 }
