@@ -18,5 +18,5 @@ MonoBehaviour:
   description: Poison strike
   cardType: 1
   soundEffect: {fileID: 8300000, guid: acf94774fdc6c41b393ef07d1b3a6a5c, type: 3}
-  effectTypes: 00000000
-  statusTypes: 00000000
+  effectTypes: 
+  statusTypes: 0000000001000000

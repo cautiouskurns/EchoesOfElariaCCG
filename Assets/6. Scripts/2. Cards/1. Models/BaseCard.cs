@@ -22,15 +22,6 @@ public class BaseCard : ScriptableObject, ICard
     public IReadOnlyList<EffectType> EffectTypes => effectTypes;
     public IReadOnlyList<StatusEffectTypes> StatusTypes => statusTypes;
 
-    private void EnsureFactoriesInitialized()
-    {
-        if (effectFactory == null)
-            effectFactory = FindFirstObjectByType<EffectFactory>();
-
-        if (statusEffectFactory == null)
-            statusEffectFactory = FindFirstObjectByType<StatusEffectFactory>();
-    }
-
     public string CardName => cardName;
     public int Cost => cost;
     public Sprite CardArt => cardArt;

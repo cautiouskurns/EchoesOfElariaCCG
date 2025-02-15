@@ -915,7 +915,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   statusEffectDatabase:
-  - {fileID: 11400000, guid: 3e26dae318e0f4eca817da5a1743a741, type: 2}
+  - {fileID: 0}
 --- !u!1 &710377434
 GameObject:
   m_ObjectHideFlags: 0
@@ -1201,7 +1201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effectDatabase:
-  - {fileID: 11400000, guid: 08f01ee4fe6844461983d5be0997ce16, type: 2}
+  - {fileID: 0}
 --- !u!1001 &853742750
 PrefabInstance:
   m_ObjectHideFlags: 0
