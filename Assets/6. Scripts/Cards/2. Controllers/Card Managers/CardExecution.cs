@@ -25,27 +25,23 @@ public class CardExecution : MonoBehaviour
             return;
         }
 
-        int finalValue = GetFinalEffectValue(sourceCharacter);
-        
+        Debug.Log($"[CardExecution] 🎴 Playing {cardBehavior.CardData.CardName}");
+
         // ✅ Play sound before applying effect
-        if (cardBehavior != null)
-        {
-            cardBehavior.PlayCardSound();
-        }
+        cardBehavior?.PlayCardSound();
 
         // ✅ Play attack animation before applying effect
-        StartCoroutine(PerformAttackSequence(target, finalValue));
+        StartCoroutine(PerformAttackSequence(target));
     }
 
-
     /// <summary>
-    /// ✅ Moves the character, plays animation, then applies effect.
+    /// ✅ Moves the character, plays animation, then resolves the card effects.
     /// </summary>
-    private IEnumerator PerformAttackSequence(IEffectTarget target, int finalValue)
+    private IEnumerator PerformAttackSequence(IEffectTarget target)
     {
         if (target == null)
         {
-            Debug.LogError("Target is null in PerformAttackSequence");
+            Debug.LogError("[CardExecution] ❌ Target is null in PerformAttackSequence");
             yield break;
         }
 
@@ -65,29 +61,30 @@ public class CardExecution : MonoBehaviour
             yield break;
         }
 
-        // ✅ Move forward and perform attack
+        // ✅ Move forward and perform attack animation
         Vector3 targetPosition = ((MonoBehaviour)target).transform.position;
         yield return StartCoroutine(animationController.PlayAttackSequence(targetPosition));
 
-        // ✅ Apply effect after animation completes
-        try
+        // ✅ Pass card execution to `CardManager`
+        if (CardManager.Instance != null)
         {
-            ApplyCardEffect(target, finalValue);
+            CardManager.Instance.PlayCard(cardBehavior.CardData, target);
         }
-        catch (System.Exception e)
+        else
         {
-            Debug.LogError($"Error in PerformAttackSequence: {e.Message}");
+            Debug.LogError("[CardExecution] ❌ CardManager instance is missing!");
         }
 
-        // ✅ Remove card from hand and destroy it
-        HandManager handManager = FindAnyObjectByType<HandManager>();
-        if (handManager != null)
+        // ✅ Remove the card from the player's hand
+        if (HandManager.Instance != null)
         {
-            handManager.DiscardCard(gameObject);
-            Debug.Log("[CardExecution] Card removed from hand and discarded");
+            HandManager.Instance.DiscardCard(gameObject);
+        }
+        else
+        {
+            Debug.LogError("[CardExecution] ❌ HandManager instance is missing!");
         }
     }
-
 
     private bool ValidatePlayConditions()
     {
@@ -111,104 +108,5 @@ public class CardExecution : MonoBehaviour
 
         return true;
     }
-
-    private int GetFinalEffectValue(BaseCharacter sourceCharacter)
-    {
-        int baseValue = cardBehavior.CardData.EffectValue;
-        float multiplier = (sourceCharacter.Stats.CharacterClass == cardBehavior.CardData.PreferredClass)
-            ? cardBehavior.CardData.ClassBonus
-            : 1.0f;
-
-        int finalValue = Mathf.RoundToInt(baseValue * multiplier);
-        Debug.Log($"[CardExecution] Damage calculation: {baseValue} × {multiplier} = {finalValue}");
-        return finalValue;
-    }
-
-    private void ApplyCardEffect(IEffectTarget target, int finalValue)
-    {
-        if (target == null)
-        {
-            Debug.LogError("[CardExecution] ❌ Target is NULL in ApplyCardEffect");
-            return;
-        }
-
-        if (cardBehavior == null)
-        {
-            Debug.LogError("[CardExecution] ❌ cardBehavior is NULL in ApplyCardEffect");
-            return;
-        }
-
-        if (cardBehavior.CardData == null)
-        {
-            Debug.LogError($"[CardExecution] ❌ CardData is NULL in {cardBehavior.name}");
-            return;
-        }
-
-        if (cardBehavior.CardData.CardEffect == null)
-        {
-            Debug.LogError($"[CardExecution] ❌ CardEffect is NULL in {cardBehavior.CardData.CardName}");
-            return;
-        }
-
-        CardEffect effect = cardBehavior.CardData.CardEffect;
-        if (effect == null)
-        {
-            Debug.LogError($"[CardExecution] ❌ effect is NULL in {cardBehavior.CardData.CardName}");
-            return;
-        }
-
-        if (effect.effectData == null)
-        {
-            Debug.LogError($"[CardExecution] ❌ effectData is NULL in {effect.name}");
-            return;
-        }
-
-
-        BaseCharacter targetCharacter = target as BaseCharacter;
-        if (targetCharacter == null)
-        {
-            Debug.LogError("[CardExecution] ❌ Target is not a valid BaseCharacter");
-            return;
-        }
-
-        Debug.Log($"✅ [CardExecution] {BaseCharacter.GetSelectedCharacter()?.Name} played {cardBehavior.CardData.CardName}");
-
-        // ✅ Apply the main card effect (damage, block, etc.)
-        try
-        {
-            Debug.Log($"🔹 Applying {effect.GetType().Name} effect to {targetCharacter.Name}");
-            targetCharacter.ReceiveEffect(finalValue, effect.EffectType);
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"❌ Error applying primary effect: {e.Message}\nStack trace: {e.StackTrace}");
-        }
-
-        // ✅ Apply any status effects attached to the card
-        if (cardBehavior.CardData.StatusEffects != null && cardBehavior.CardData.StatusEffects.Count > 0)
-        {
-            foreach (var statusEffect in cardBehavior.CardData.StatusEffects)
-            {
-                if (statusEffect == null)
-                {
-                    Debug.LogError($"❌ Null status effect detected in {cardBehavior.CardData.CardName}");
-                    continue;
-                }
-
-                if (statusEffect.maxDuration <= 0)
-                {
-                    Debug.LogError($"❌ Invalid duration for {statusEffect.name}: {statusEffect.maxDuration}");
-                    continue;
-                }
-
-                Debug.Log($"🔹 Applying status effect {statusEffect.effectName} to {targetCharacter.Name}");
-                targetCharacter.ApplyStatusEffect(statusEffect, statusEffect.maxDuration);
-            }
-        }
-        else
-        {
-            Debug.Log($"🔹 No status effects found for {cardBehavior.CardData.CardName}");
-        }
-    }
-
 }
+

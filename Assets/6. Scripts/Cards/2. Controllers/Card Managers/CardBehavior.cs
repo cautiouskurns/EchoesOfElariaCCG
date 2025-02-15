@@ -5,20 +5,20 @@ using Cards;
 
 public class CardBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private CardData cardData;
+    [SerializeField] private BaseCard cardData;  // ✅ Now uses `BaseCard`
     [SerializeField] private Image cardBackground;
-    public CardData CardData => cardData;
+    
+    public BaseCard CardData => cardData;  // ✅ Exposes `BaseCard` to other scripts
     private HandManager handManager;
 
     private void Awake()
     {
-        // Setup components
         if (cardBackground == null)
         {
             cardBackground = GetComponent<Image>();
         }
 
-        // Setup UI interaction
+        // Ensure UI interaction is enabled
         var canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
         {
@@ -32,29 +32,32 @@ public class CardBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             image.raycastTarget = true;
         }
 
-        // Find HandManager in hierarchy
+        // Locate HandManager in scene
         FindHandManager();
     }
 
     private void FindHandManager()
     {
-        // First try to find HandManager in scene
         handManager = FindFirstObjectByType<HandManager>();
         
         if (handManager == null)
         {
-            Debug.LogError($"[CardBehavior] Could not find HandManager in scene! Make sure HandManager component exists.");
+            Debug.LogError($"[CardBehavior] ❌ Could not find HandManager in scene! Make sure HandManager component exists.");
         }
         else
         {
-            Debug.Log($"[CardBehavior] Found HandManager on {handManager.gameObject.name}");
+            Debug.Log($"[CardBehavior] ✅ Found HandManager on {handManager.gameObject.name}");
         }
     }
 
-    public void Initialize(CardData newCardData)
+    /// <summary>
+    /// ✅ Assigns new card data and updates UI accordingly.
+    /// </summary>
+    public void Initialize(BaseCard newCardData)
     {
         cardData = newCardData;
         UpdateCardColor();
+        
         CardDisplay display = GetComponent<CardDisplay>();
         if (display != null)
         {
@@ -62,13 +65,18 @@ public class CardBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         }
     }
 
+    /// <summary>
+    /// ✅ Updates card color based on card type.
+    /// </summary>
     private void UpdateCardColor()
     {
         if (cardBackground == null || cardData == null) return;
-
         cardBackground.color = GetColorForType(cardData.CardType);
     }
 
+    /// <summary>
+    /// ✅ Returns appropriate color based on card type.
+    /// </summary>
     private Color GetColorForType(CardType type)
     {
         return type switch
@@ -80,6 +88,9 @@ public class CardBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         };
     }
 
+    /// <summary>
+    /// ✅ Plays sound when a card is played.
+    /// </summary>
     public void PlayCardSound()
     {
         if (AudioManager.Instance != null && cardData != null && cardData.SoundEffect != null)
@@ -93,6 +104,9 @@ public class CardBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         }
     }
 
+    /// <summary>
+    /// ✅ Handles when the player hovers over the card.
+    /// </summary>
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (handManager == null)
@@ -100,14 +114,16 @@ public class CardBehavior : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             FindHandManager();
             if (handManager == null) return;
         }
-        // Debug.Log($"[CardBehavior] Hover ENTER on {gameObject.name}");
         handManager.OnCardHover(gameObject, true);
     }
 
+    /// <summary>
+    /// ✅ Handles when the player stops hovering over the card.
+    /// </summary>
     public void OnPointerExit(PointerEventData eventData)
     {
         if (handManager == null) return;
-        Debug.Log($"[CardBehavior] Hover EXIT on {gameObject.name}");
         handManager.OnCardHover(gameObject, false);
     }
 }
+

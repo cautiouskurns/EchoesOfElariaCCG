@@ -4,151 +4,134 @@ using UnityEngine.UI;
 
 public class HandManager : MonoBehaviour
 {
+    public static HandManager Instance { get; private set; }
+
     [SerializeField] private Transform handArea;
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private DeckManager deckManager;
-    [SerializeField] private int maxHandSize = 5;  // Changed default to 5 cards
+    [SerializeField] private int maxHandSize = 5;
     [SerializeField] private CardFanLayoutManager fanLayout;
 
-    private List<GameObject> currentHand = new List<GameObject>();
+    private List<BaseCard> currentHand = new List<BaseCard>();
+    private List<GameObject> cardObjects = new List<GameObject>(); // Tracks UI instances
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
 
     private void Start()
     {
         if (!ValidateSetup()) return;
-        
-        // Ensure hand area has proper layout
-        if (handArea.GetComponent<HorizontalLayoutGroup>() == null)
-        {
-            HorizontalLayoutGroup layout = handArea.gameObject.AddComponent<HorizontalLayoutGroup>();
-            layout.spacing = 10f;
-            layout.childAlignment = TextAnchor.MiddleCenter;
-            layout.childForceExpandWidth = false;
-            layout.childForceExpandHeight = false;
-        }
-        
         DrawCards(maxHandSize);
     }
 
     private bool ValidateSetup()
     {
-        if (handArea == null)
+        if (handArea == null || cardPrefab == null || deckManager == null)
         {
-            Debug.LogError("[HandManager] ❌ Hand Area not assigned!");
+            Debug.LogError("[HandManager] ❌ Missing references!");
             return false;
         }
-        if (cardPrefab == null)
-        {
-            Debug.LogError("[HandManager] ❌ Card Prefab not assigned!");
-            return false;
-        }
-        if (deckManager == null)
-        {
-            Debug.LogError("[HandManager] ❌ DeckManager not assigned!");
-            return false;
-        }
-        if (deckManager.deck == null || deckManager.deck.Count == 0)
-        {
-            Debug.LogError("[HandManager] ❌ Deck is empty or null!");
-            return false;
-        }
-        Debug.Log("[HandManager] ✅ Setup validated successfully");
         return true;
+    }
+
+    /// <summary>
+    /// ✅ Called when a card is played.
+    /// </summary>
+    public void PlayCard(GameObject cardObject, IEffectTarget target)
+    {
+        if (!cardObjects.Contains(cardObject))
+        {
+            Debug.LogError($"[HandManager] ❌ Card not in hand: {cardObject.name}");
+            return;
+        }
+
+        CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
+        if (cardBehavior == null || cardBehavior.CardData == null)
+        {
+            Debug.LogError("[HandManager] ❌ Invalid CardBehavior or BaseCard!");
+            return;
+        }
+
+        BaseCard card = cardBehavior.CardData;
+        Debug.Log($"[HandManager] Playing {card.CardName}");
+
+        // ✅ Call `CardManager` to execute the card
+        CardManager.Instance?.PlayCard(card, target);
+
+        // ✅ Remove the card from the player's hand
+        RemoveCardFromHand(card, cardObject);
     }
 
     public void DrawCards(int number)
     {
         int desiredCards = Mathf.Min(number, maxHandSize - currentHand.Count);
-        Debug.Log($"[HandManager] Drawing {desiredCards} cards. Current hand: {currentHand.Count}");
-
-        // Reshuffle if needed before drawing
-        if (deckManager.deck.Count < desiredCards)
-        {
-            deckManager.ReshuffleDeck();
-        }
+        if (deckManager.deck.Count < desiredCards) deckManager.ReshuffleDeck();
 
         for (int i = 0; i < desiredCards && deckManager.deck.Count > 0; i++)
         {
+            BaseCard drawnCard = (BaseCard)deckManager.deck[0];
+            deckManager.deck.RemoveAt(0);
+
             GameObject cardObject = Instantiate(cardPrefab, handArea);
             CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
-            
-            // if (cardBehavior != null)
-            // {
-            //     cardBehavior.cardData = deckManager.deck[0];
-            //     cardBehavior.UpdateCardDisplay();
-            //     deckManager.deck.RemoveAt(0);
-            //     currentHand.Add(cardObject);
-            // }
+
             if (cardBehavior != null)
             {
-                cardBehavior.Initialize(deckManager.deck[0]); // ✅ Assign card data + update UI
-                deckManager.deck.RemoveAt(0);
-                currentHand.Add(cardObject);
-                //AudioManager.Instance.PlaySound("CardDraw");
-                Debug.Log($"[HandManager] ✅ Added card: {cardBehavior.CardData.CardName}");
+                cardBehavior.Initialize(drawnCard);
+                currentHand.Add(drawnCard);
+                cardObjects.Add(cardObject);
+                Debug.Log($"[HandManager] ✅ Added card: {drawnCard.CardName}");
             }
         }
 
-        LayoutRebuilder.ForceRebuildLayoutImmediate(handArea as RectTransform);
-        
-        // Arrange cards in fan layout
-        fanLayout?.ArrangeCards(currentHand);
+        fanLayout?.ArrangeCards(cardObjects);
     }
 
-    public void DiscardCard(GameObject card)
+    private void RemoveCardFromHand(BaseCard card, GameObject cardObject)
     {
         if (currentHand.Contains(card))
         {
-            CardBehavior cardBehavior = card.GetComponent<CardBehavior>();
-            if (cardBehavior != null && cardBehavior.CardData != null)
-            {
-                deckManager.discardPile.Add(cardBehavior.CardData);
-            }
             currentHand.Remove(card);
-            Destroy(card);
-            
-            // Rearrange remaining cards
-            fanLayout?.ArrangeCards(currentHand);
-            
-            //AudioManager.Instance.PlaySound("CardDiscard");
-            Debug.Log("[HandManager] 🗑️ Card discarded and hand rearranged");
+            cardObjects.Remove(cardObject);
+            Destroy(cardObject);
+            Debug.Log($"[HandManager] 🗑️ Removed {card.CardName} from hand.");
         }
+        else
+        {
+            Debug.LogWarning($"[HandManager] ⚠️ Tried to remove {card.CardName}, but it's not in hand.");
+        }
+
+        fanLayout?.ArrangeCards(cardObjects);
+    }
+
+    public void DiscardCard(GameObject cardObject)
+    {
+        CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
+        if (cardBehavior == null || cardBehavior.CardData == null) return;
+
+        deckManager.discardPile.Add(cardBehavior.CardData);
+        RemoveCardFromHand(cardBehavior.CardData, cardObject);
     }
 
     public void ClearHand()
     {
-        // Create a temporary list to store cards to be discarded
-        List<CardData> cardsToDiscard = new List<CardData>();
-        
-        // First, collect all card data
-        foreach (GameObject card in currentHand)
+        foreach (var card in cardObjects)
         {
-            if (card != null)
-            {
-                CardBehavior cardBehavior = card.GetComponent<CardBehavior>();
-                if (cardBehavior != null && cardBehavior.CardData != null)
-                {
-                    cardsToDiscard.Add(cardBehavior.CardData);
-                }
-            }
+            Destroy(card);
         }
 
-        // Then destroy the game objects
-        foreach (GameObject card in currentHand)
-        {
-            if (card != null)
-            {
-                Destroy(card);
-            }
-        }
-
-        // Add collected cards to discard pile
-        foreach (CardData cardData in cardsToDiscard)
-        {
-            deckManager.discardPile.Add(cardData);
-        }
-
+        deckManager.discardPile.AddRange(currentHand);
         currentHand.Clear();
-        Debug.Log($"[HandManager] 🧹 Hand cleared, added {cardsToDiscard.Count} cards to discard pile");
+        cardObjects.Clear();
+
+        Debug.Log($"[HandManager] 🧹 Hand cleared, all cards moved to discard pile.");
     }
 
     public void RefreshHand()
@@ -156,47 +139,32 @@ public class HandManager : MonoBehaviour
         ClearHand();
         deckManager.ReshuffleDeck();
         DrawCards(maxHandSize);
-        Debug.Log($"[HandManager] 🔄 Hand refreshed to {currentHand.Count}/{maxHandSize} cards");
     }
 
-    public void ExhaustCard(GameObject card)
+    public void ExhaustCard(GameObject cardObject)
     {
-        if (currentHand.Contains(card))
-        {
-            CardBehavior cardBehavior = card.GetComponent<CardBehavior>();
-            if (cardBehavior != null && cardBehavior.CardData != null)
-            {
-                // Move the card to the exhaust pile instead of discard
-                deckManager.ExhaustCard(cardBehavior.CardData);
-            }
+        CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
+        if (cardBehavior == null || cardBehavior.CardData == null) return;
 
-            // Remove from hand and destroy the card UI
-            currentHand.Remove(card);
-            Destroy(card);
-            
-            // Rearrange remaining cards
-            fanLayout?.ArrangeCards(currentHand);
+        deckManager.ExhaustCard(cardBehavior.CardData);
+        RemoveCardFromHand(cardBehavior.CardData, cardObject);
 
-            Debug.Log($"[HandManager] 🚫 Exhausted card '{cardBehavior.CardData.CardName}'");
-        }
+        Debug.Log($"[HandManager] 🚫 Exhausted card '{cardBehavior.CardData.CardName}'");
     }
 
     public void ExhaustRandomCard()
     {
         if (currentHand.Count == 0) return;
 
-        int randomIndex = Random.Range(0, currentHand.Count);
-        GameObject cardToExhaust = currentHand[randomIndex];
-
-        Debug.Log($"[HandManager] 🚫 Randomly exhausting '{cardToExhaust.GetComponent<CardBehavior>().CardData.CardName}'");
-        
-        ExhaustCard(cardToExhaust);
+        int randomIndex = Random.Range(0, cardObjects.Count);
+        ExhaustCard(cardObjects[randomIndex]);
     }
-
 
     public void OnCardHover(GameObject card, bool isHovered)
     {
         fanLayout?.OnCardHover(card, isHovered);
     }
 }
+
+
 

@@ -1,24 +1,39 @@
 using UnityEngine;
 using Cards;
-using System.Collections.Generic;
 
 public class CardManager : MonoBehaviour
 {
     public static CardManager Instance { get; private set; }
 
-    [SerializeField] private EffectManager effectManager;
-    [SerializeField] private StatusEffectManager statusEffectManager;
+    [SerializeField] private EffectManager effectManager;  // ✅ Now exposed in Inspector
+    [SerializeField] private StatusEffectManager statusEffectManager;  // ✅ Now exposed in Inspector
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        // If not assigned in the Inspector, try to find them automatically
+        if (effectManager == null)
+            effectManager = FindAnyObjectByType<EffectManager>();
+
+        if (statusEffectManager == null)
+            statusEffectManager = FindAnyObjectByType<StatusEffectManager>();
+
+        if (effectManager == null || statusEffectManager == null)
+        {
+            Debug.LogError("[CardManager] ❌ Missing EffectManager or StatusEffectManager!");
+        }
     }
 
     /// <summary>
-    /// Resolves a card's effects before passing them to EffectManager and StatusEffectManager.
+    /// ✅ Executes the effects of a card.
     /// </summary>
-    public void ResolveCard(BaseCard card, IEffectTarget target)
+    public void PlayCard(BaseCard card, IEffectTarget target)
     {
         if (card == null || target == null)
         {
@@ -26,18 +41,26 @@ public class CardManager : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[CardManager] Resolving card: {card.CardName} on {target}");
+        Debug.Log($"[CardManager] 🎴 Executing {card.CardName} on {target}");
 
-        // ✅ Apply Main Effects via EffectManager
-        foreach (EffectType effectType in card.EffectTypes)
+        // ✅ Play Sound
+        if (card.SoundEffect != null)
         {
-            effectManager.ApplyEffect(effectType, target);
+            AudioManager.Instance?.PlaySound(card.SoundEffect);
         }
 
-        // ✅ Apply Status Effects via StatusEffectManager
-        foreach (StatusType statusType in card.StatusTypes)
+        // ✅ Apply Main Effects
+        foreach (EffectType effectType in card.GetEffects())  // ✅ Now using GetEffects()
         {
-            statusEffectManager.ApplyStatusEffect(statusType, target);
+            effectManager?.ApplyEffect(effectType, target);
+        }
+
+        // ✅ Apply Status Effects
+        foreach (StatusType statusType in card.GetStatusEffects())  // ✅ Now using GetStatusEffects()
+        {
+            statusEffectManager?.ApplyStatusEffect(statusType, target);
         }
     }
 }
+
+

@@ -7,11 +7,9 @@ public class StatusEffectUI : MonoBehaviour
     public GameObject statusEffectPrefab;  
     public Transform statusEffectContainer;  
 
-    // private Dictionary<StatusType, GameObject> activeStatusIcons = new Dictionary<StatusType, GameObject>();
     private List<GameObject> activeStatusIcons = new List<GameObject>();
 
-
-    public void UpdateStatusEffects(List<StatusEffect> effects)
+    public void UpdateStatusEffects(List<BaseStatusEffect> effects)
     {
         Debug.Log($"[StatusEffectUI] Updating UI. Total effects: {effects.Count}");
 
@@ -23,30 +21,33 @@ public class StatusEffectUI : MonoBehaviour
         activeStatusIcons.Clear();
 
         // ✅ Add new icons for each effect
-        foreach (StatusEffect effect in effects)
+        foreach (BaseStatusEffect effect in effects)
         {
-            if (effect.Duration > 0)
+            if (effect.MaxDuration > 0)  // ✅ Use `MaxDuration` instead of `Duration`
             {
-                Debug.Log($"[StatusEffectUI] Adding effect: {effect.Type} - Duration: {effect.Duration}");
+                Debug.Log($"[StatusEffectUI] Adding effect: {effect.StatusType} - Duration: {effect.MaxDuration}");
 
                 GameObject newEffectIcon = Instantiate(statusEffectPrefab, statusEffectContainer);
                 Image effectImage = newEffectIcon.GetComponent<Image>();
                 Text effectText = newEffectIcon.GetComponentInChildren<Text>();
 
-                if (effect.EffectData != null)  
+                // ✅ Set the status effect icon if available
+                if (effect.Icon != null)
                 {
-                    effectImage.sprite = effect.EffectData.effectIcon;
+                    effectImage.sprite = effect.Icon;
                 }
                 else
                 {
-                    Debug.LogWarning($"[StatusEffectUI] ❌ EffectData is null for {effect.Type}");
+                    Debug.LogWarning($"[StatusEffectUI] ❌ No icon assigned for {effect.StatusType}");
                 }
 
-                effectText.text = effect.Duration.ToString();
-                activeStatusIcons.Add(newEffectIcon);  // ✅ Store multiple effect icons
+                // ✅ Display duration as text
+                effectText.text = effect.MaxDuration.ToString();
+
+                // ✅ Store active effect icons
+                activeStatusIcons.Add(newEffectIcon);
             }
         }
     }
-
 }
 

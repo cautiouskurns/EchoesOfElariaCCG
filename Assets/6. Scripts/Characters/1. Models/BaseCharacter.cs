@@ -23,87 +23,25 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         Combat = GetComponent<CharacterCombat>();
     }
 
-    public virtual void TakeDamage(int damage) => Stats.ModifyHealth(-damage);
-    public virtual void Heal(int amount) => Stats.ModifyHealth(amount);
-    public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
-
-    public List<StatusEffect> statusEffects = new List<StatusEffect>();
+    /// ✅ Effect Tracking
     public List<ActiveStatusEffect> activeEffects = new List<ActiveStatusEffect>();
 
     public delegate void OnEffectUpdated();
     public event OnEffectUpdated EffectUpdated;  // ✅ Triggers UI update when effects change
 
-    public void ModifyStrength(int amount)
-    {
-        strength += amount;
-        Debug.Log($"{Name} gained {amount} Strength.");
-    }
+    // ✅ Stat Modifiers
+    public virtual void TakeDamage(int damage) => Stats.ModifyHealth(-damage);
+    public virtual void Heal(int amount) => Stats.ModifyHealth(amount);
+    public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
+    public void ModifyStrength(int amount) => strength += amount;
+    public void GainEnergy(int amount) => energy += amount;
 
-    public void GainEnergy(int amount)
-    {
-        energy += amount;
-        Debug.Log($"{Name} gained {amount} Energy.");
-    }
+    // ✅ Card & Power System Hooks
+    public void DrawCards(int amount) => HandManager.Instance.DrawCards(amount);
+    public void ExhaustCard() => HandManager.Instance.ExhaustRandomCard();
+    public void ApplyPowerEffect(int value) => Debug.Log($"[BaseCharacter] {Name} applied Power Effect!");
 
-    public void DrawCards(int amount)
-    {
-        //DeckManager.DrawCards(amount);
-    }
-
-    public void ExhaustCard()
-    {
-        //HandManager.ExhaustRandomCard();
-    }
-
-    public void ApplyPowerEffect(int value)
-    {
-        // Powers are persistent effects. You can implement them here.
-        //PowerManager.Instance.ApplyPowerEffect(this, value);
-    }
-
-    // ✅ Apply Status Effects
-    public void ApplyStatusEffect(StatusEffectData effect, int duration)
-    {
-        Debug.Log($"[BaseCharacter] Applying status effect: {effect.effectName} ({effect.statusType}) for {duration} turns.");
-
-        ActiveStatusEffect existingEffect = activeEffects.Find(e => e.effectData == effect);
-        if (existingEffect != null)
-        {
-            existingEffect.duration = Mathf.Max(existingEffect.duration, duration);
-        }
-        else
-        {
-            activeEffects.Add(new ActiveStatusEffect(effect, duration));
-        }
-
-        if (effect.effectSound != null)
-        {
-            AudioSource.PlayClipAtPoint(effect.effectSound, transform.position);
-        }
-
-        DebugStatusEffects();
-        
-        // ✅ Directly call UpdateStatusUI
-        UpdateStatusUI(); 
-    }
-
-
-    public void RemoveEffect(StatusEffectData effect)
-    {
-        activeEffects.RemoveAll(e => e.effectData == effect);
-        EffectUpdated?.Invoke();
-    }
-
-    // ✅ Reduce Status Effect Durations (Call at end of turn)
-    public void ProcessEndOfTurnEffects()
-    {
-        foreach (var effect in activeEffects)
-        {
-            effect.duration--;
-        }
-        activeEffects.RemoveAll(e => e.duration <= 0);
-        EffectUpdated?.Invoke();
-    }
+    /// ✅ Handles Receiving Direct Effects
     public void ReceiveEffect(int value, EffectType type)
     {
         switch (type)
@@ -140,21 +78,68 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         }
     }
 
+    /// ✅ Handles Receiving Status Effects
+    public void ReceiveStatusEffect(IStatusEffect effect, int duration)
+    {
+        BaseStatusEffect statusEffect = effect as BaseStatusEffect;
+        if (statusEffect == null) return;
 
+        Debug.Log($"[BaseCharacter] Applying status effect: {statusEffect.EffectName} ({statusEffect.StatusType}) for {duration} turns.");
+
+        ActiveStatusEffect existingEffect = activeEffects.Find(e => e.EffectData == statusEffect);
+        if (existingEffect != null)
+        {
+            existingEffect.Duration = Mathf.Max(existingEffect.Duration, duration);
+        }
+        else
+        {
+            activeEffects.Add(new ActiveStatusEffect(statusEffect, duration));
+        }
+
+        if (statusEffect.EffectSound != null)
+        {
+            AudioSource.PlayClipAtPoint(statusEffect.EffectSound, transform.position);
+        }
+
+        DebugStatusEffects();
+        UpdateStatusUI();
+    }
+
+    /// ✅ Handles Removing Status Effects
+    public void RemoveStatusEffect(IStatusEffect effect)
+    {
+        BaseStatusEffect statusEffect = effect as BaseStatusEffect;
+        if (statusEffect == null) return;
+
+        activeEffects.RemoveAll(e => e.EffectData == statusEffect);
+        EffectUpdated?.Invoke();
+    }
+
+    /// ✅ Processes End of Turn Effects
+    public void ProcessEndOfTurnEffects()
+    {
+        foreach (var effect in activeEffects)
+        {
+            effect.Duration--;
+        }
+
+        activeEffects.RemoveAll(e => e.Duration <= 0);
+        EffectUpdated?.Invoke();
+    }
+
+    // ✅ Selection & UI Management
     public virtual void Select()
     {
-        // Deselect current character if one exists and it's not this one
         if (currentlySelectedCharacter != null && currentlySelectedCharacter != this)
         {
             currentlySelectedCharacter.Deselect();
         }
 
-        // Only set as selected if not already selected
         if (!IsSelected)
         {
             currentlySelectedCharacter = this;
             isSelected = true;
-            Debug.Log($"[BaseCharacter] Selected character: {Name} (Class: {Stats.CharacterClass})");
+            Debug.Log($"[BaseCharacter] Selected character: {Name}");
         }
     }
 
@@ -168,36 +153,18 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         }
     }
 
-    public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
-
-    public void DebugStatusEffects()
-    {
-        Debug.Log($"[BaseCharacter] {Name} Status Effects:");
-
-        if (statusEffects.Count == 0)
-        {
-            Debug.Log(" - No active status effects.");
-            return;
-        }
-
-        foreach (var effect in statusEffects)
-        {
-            Debug.Log($" - {effect.Type} (Duration: {effect.Duration} turns)");
-        }
-    }
-
     public void EndTurn()
     {
         Debug.Log($"[BaseCharacter] {Name} ending turn...");
 
-        for (int i = statusEffects.Count - 1; i >= 0; i--)
+        for (int i = activeEffects.Count - 1; i >= 0; i--)
         {
-            statusEffects[i].Duration--;
+            activeEffects[i].ReduceDuration();  // ✅ Reduce duration
 
-            if (statusEffects[i].Duration <= 0)
+            if (activeEffects[i].Duration <= 0)
             {
-                Debug.Log($"{Name} lost {statusEffects[i].Type} effect.");
-                statusEffects.RemoveAt(i);
+                Debug.Log($"{Name} lost {activeEffects[i].EffectData.StatusType} effect.");
+                activeEffects.RemoveAt(i);
             }
         }
 
@@ -205,47 +172,65 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         DebugStatusEffects();
     }
 
+
+    public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
+
+    public void DebugStatusEffects()
+    {
+        Debug.Log($"[BaseCharacter] {Name} Status Effects:");
+
+        if (activeEffects.Count == 0)
+        {
+            Debug.Log(" - No active status effects.");
+            return;
+        }
+
+        foreach (var effect in activeEffects)
+        {
+            Debug.Log($" - {effect.EffectData.EffectName} ({effect.Duration} turns)");
+        }
+    }
+
     public void UpdateStatusUI()
     {
         StatusEffectUI statusUI = GetComponentInChildren<StatusEffectUI>();
         if (statusUI != null)
         {
-            List<StatusEffect> statusList = new List<StatusEffect>();
+            List<BaseStatusEffect> statusList = new List<BaseStatusEffect>();
 
             foreach (var effect in activeEffects)
             {
-                statusList.Add(new StatusEffect(effect.effectData.statusType, effect.duration, effect.effectData));
+                if (effect.EffectData != null)  // ✅ Ensure it's not null
+                {
+                    statusList.Add(effect.EffectData);  // ✅ Directly add `BaseStatusEffect`
+                }
             }
 
-            statusUI.UpdateStatusEffects(statusList);  // ✅ Now passing a compatible list
+            statusUI.UpdateStatusEffects(statusList);  // ✅ Passes `List<BaseStatusEffect>`
         }
     }
 
-    public void ReceiveStatusEffect(IStatusEffect effect, int duration)
-    {
-        Debug.Log($"{Name} is receiving status effect: {effect}");
-    }
-
-    public void RemoveStatusEffect(IStatusEffect effect)
-    {
-        Debug.Log($"{Name} is removing status effect: {effect}");
-    }
-
-
 
 }
-
 
 // ✅ Helper class to store effect data + duration
 [System.Serializable]
 public class ActiveStatusEffect
 {
-    public StatusEffectData effectData;
-    public int duration;
+    public BaseStatusEffect EffectData { get; private set; }
+    public int Duration { get; set; }
 
-    public ActiveStatusEffect(StatusEffectData data, int dur)
+    public ActiveStatusEffect(BaseStatusEffect effect, int duration)
     {
-        effectData = data;
-        duration = dur;
+        EffectData = effect;
+        Duration = duration;
+    }
+
+    public void ReduceDuration()
+    {
+        Duration--;
     }
 }
+
+
+

@@ -10,21 +10,25 @@ public class BaseCard : ScriptableObject, ICard
     [SerializeField] private Sprite cardArt;
     [SerializeField] private string description;
     [SerializeField] private CardType cardType;
+    [SerializeField] private AudioClip soundEffect; 
 
-    [SerializeField] private List<EffectType> effectTypes = new List<EffectType>();  // ✅ Store effect types instead of effect objects
-    [SerializeField] private List<StatusType> statusTypes = new List<StatusType>();  // ✅ Store status effect types instead of effect objects
 
-    // Add public properties to access the lists
-    public IReadOnlyList<EffectType> EffectTypes => effectTypes;
-    public IReadOnlyList<StatusType> StatusTypes => statusTypes;
+    [SerializeField] private List<EffectType> effectTypes;
+    [SerializeField] private List<StatusType> statusTypes;
 
     private EffectFactory effectFactory;
     private StatusEffectFactory statusEffectFactory;
 
-    private void Awake()
+    public IReadOnlyList<EffectType> EffectTypes => effectTypes;
+    public IReadOnlyList<StatusType> StatusTypes => statusTypes;
+
+    private void EnsureFactoriesInitialized()
     {
-        effectFactory = FindFirstObjectByType<EffectFactory>();
-        statusEffectFactory = FindFirstObjectByType<StatusEffectFactory>();
+        if (effectFactory == null)
+            effectFactory = FindFirstObjectByType<EffectFactory>();
+
+        if (statusEffectFactory == null)
+            statusEffectFactory = FindFirstObjectByType<StatusEffectFactory>();
     }
 
     public string CardName => cardName;
@@ -32,28 +36,10 @@ public class BaseCard : ScriptableObject, ICard
     public Sprite CardArt => cardArt;
     public string Description => description;
     public CardType CardType => cardType;
+    public AudioClip SoundEffect => soundEffect; 
 
-    public void Play(IEffectTarget target)
-    {
-        // ✅ Apply main effects
-        foreach (var type in effectTypes)
-        {
-            BaseEffect effect = effectFactory.CreateEffect(type);
-            if (effect != null)
-            {
-                effect.ApplyEffect(target, effect.BaseValue);
-            }
-        }
-
-        // ✅ Apply status effects
-        foreach (var statusType in statusTypes)
-        {
-            BaseStatusEffect statusEffect = statusEffectFactory.CreateStatusEffect(statusType);
-            if (statusEffect != null)
-            {
-                statusEffect.ApplyStatus(target, statusEffect.MaxDuration);
-            }
-        }
-    }
+    public List<EffectType> GetEffects() => effectTypes;
+    public List<StatusType> GetStatusEffects() => statusTypes;
 }
+
 

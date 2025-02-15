@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class DeckManager : MonoBehaviour
 {
-    [SerializeField] private List<CardData> allCards;
-    [SerializeField] private int deckSize = 20;  // Set fixed deck size
-    public List<CardData> deck { get; private set; } = new List<CardData>();
-    public List<CardData> discardPile { get; private set; } = new List<CardData>();
-    public List<CardData> exhaustPile = new List<CardData>(); // ✅ New Exhaust Pile
-
+    [SerializeField] private List<BaseCard> allCards; // ✅ Changed from `CardData` to `BaseCard`
+    [SerializeField] private int deckSize = 20;
+    
+    public List<BaseCard> deck { get; private set; } = new List<BaseCard>();  // ✅ Now using `BaseCard`
+    public List<BaseCard> discardPile { get; private set; } = new List<BaseCard>(); 
+    public List<BaseCard> exhaustPile = new List<BaseCard>(); 
 
     private void Awake()
     {
@@ -26,11 +26,10 @@ public class DeckManager : MonoBehaviour
         deck.Clear();
         discardPile.Clear();
 
-        // Fill deck up to deckSize, repeating cards if necessary
         for (int i = 0; i < deckSize; i++)
         {
             int randomIndex = Random.Range(0, allCards.Count);
-            deck.Add(allCards[randomIndex]);
+            deck.Add(allCards[randomIndex]);  // ✅ Uses `BaseCard`
         }
 
         ShuffleDeck();
@@ -39,7 +38,6 @@ public class DeckManager : MonoBehaviour
 
     public void ShuffleDeck()
     {
-        // Fisher-Yates shuffle
         for (int i = deck.Count - 1; i > 0; i--)
         {
             int j = Random.Range(0, i + 1);
@@ -58,7 +56,7 @@ public class DeckManager : MonoBehaviour
         Debug.Log($"[DeckManager] 🔄 Deck reshuffled. New size: {deck.Count}");
     }
 
-    public void ExhaustCard(CardData card)
+    public void ExhaustCard(BaseCard card) // ✅ Changed parameter from `CardData` to `BaseCard`
     {
         if (card != null)
         {

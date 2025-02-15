@@ -8,5 +8,8 @@ public abstract class BaseEffect : ScriptableObject, IEffect
     public EffectType EffectType => effectType;
     public int BaseValue => baseValue;
 
-    public abstract void ApplyEffect(IEffectTarget target, int value);
+    public virtual void ApplyEffect(IEffectTarget target, int value)
+    {
+        Debug.Log($"Applying {effectType} effect with value {value} to {target}.");
+    }
 }
