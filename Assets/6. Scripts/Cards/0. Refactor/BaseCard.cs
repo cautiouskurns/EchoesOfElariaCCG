@@ -11,8 +11,12 @@ public class BaseCard : ScriptableObject, ICard
     [SerializeField] private string description;
     [SerializeField] private CardType cardType;
 
-    [SerializeField] private List<EffectType> effectTypes;  // ✅ Store effect types instead of effect objects
-    [SerializeField] private List<StatusType> statusTypes;  // ✅ Store status effect types instead of effect objects
+    [SerializeField] private List<EffectType> effectTypes = new List<EffectType>();  // ✅ Store effect types instead of effect objects
+    [SerializeField] private List<StatusType> statusTypes = new List<StatusType>();  // ✅ Store status effect types instead of effect objects
+
+    // Add public properties to access the lists
+    public IReadOnlyList<EffectType> EffectTypes => effectTypes;
+    public IReadOnlyList<StatusType> StatusTypes => statusTypes;
 
     private EffectFactory effectFactory;
     private StatusEffectFactory statusEffectFactory;
