@@ -21,7 +21,7 @@ public class EnemyIntentUI : MonoBehaviour
         HideInstant();
     }
 
-    public void ShowIntent(CardData card)
+    public void ShowIntent(BaseCard card)
     {
         if (card == null) return;
 

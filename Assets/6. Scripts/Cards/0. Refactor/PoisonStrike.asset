@@ -15,8 +15,8 @@ MonoBehaviour:
   cardName: Poison Stike
   cost: 2
   cardArt: {fileID: 21300000, guid: 3925691c2a021aa429c1dc89712a1253, type: 3}
-  description: 
+  description: Poison strike
   cardType: 1
-  soundEffect: {fileID: 0}
+  soundEffect: {fileID: 8300000, guid: acf94774fdc6c41b393ef07d1b3a6a5c, type: 3}
   effectTypes: 00000000
   statusTypes: 00000000

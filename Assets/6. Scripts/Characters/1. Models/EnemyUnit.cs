@@ -34,7 +34,7 @@ public class EnemyUnit : BaseCharacter
         }
     }
 
-    public void ShowIntent(CardData card)
+    public void ShowIntent(BaseCard card)
     {
         intentUI?.ShowIntent(card);
     }

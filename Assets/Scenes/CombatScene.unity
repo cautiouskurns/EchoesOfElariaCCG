@@ -804,9 +804,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyActions:
-  - {fileID: 11400000, guid: 632e77373fa1e497abdd8a7e0400a78f, type: 2}
-  - {fileID: 11400000, guid: 989d75fc134004097b90953ee7d6537e, type: 2}
-  - {fileID: 11400000, guid: 632e77373fa1e497abdd8a7e0400a78f, type: 2}
+  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
+  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
+  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
   actionDelay: 3
 --- !u!1001 &658967961
 PrefabInstance:

@@ -6,7 +6,7 @@ public class EnemyAIManager : MonoBehaviour
 {
     public static EnemyAIManager Instance { get; private set; }
 
-    [SerializeField] private List<CardData> enemyActions;
+    [SerializeField] private List<BaseCard> enemyActions;
     [SerializeField] private float actionDelay = 1.5f;
 
     private void Awake()
@@ -66,7 +66,7 @@ public class EnemyAIManager : MonoBehaviour
     /// <summary>
     /// ✅ Selects a random action from the enemy's available actions.
     /// </summary>
-    private CardData SelectRandomAction(EnemyUnit enemy)
+    private BaseCard SelectRandomAction(EnemyUnit enemy)
     {
         if (enemyActions.Count == 0) return null;
         return enemyActions[Random.Range(0, enemyActions.Count)];
@@ -84,7 +84,10 @@ public class EnemyAIManager : MonoBehaviour
     /// <summary>
     /// ✅ Moves the enemy, plays attack animation, and applies effect.
     /// </summary>
-    private IEnumerator PerformEnemyAttack(EnemyUnit enemy, PlayerUnit target, CardData action)
+    /// <summary>
+    /// ✅ Moves the enemy, plays attack animation, and applies effect.
+    /// </summary>
+    private IEnumerator PerformEnemyAttack(EnemyUnit enemy, PlayerUnit target, BaseCard action)
     {
         Debug.Log($"[EnemyAI] 🎯 {enemy.Name} is attacking {target.Name} with {action.CardName}");
 
@@ -92,7 +95,7 @@ public class EnemyAIManager : MonoBehaviour
         enemy.ShowIntent(action);
         yield return new WaitForSeconds(1f);
 
-        // Perform attack
+        // Perform attack animation
         EnemyAnimationController animationController = enemy.GetComponentInChildren<EnemyAnimationController>();
         if (animationController == null)
         {
@@ -102,16 +105,16 @@ public class EnemyAIManager : MonoBehaviour
 
         Vector3 targetPosition = target.transform.position;
 
-        // ✅ Move toward the player (Dash)
+        // ✅ Move toward the player
         yield return StartCoroutine(animationController.PlayAttackSequence(targetPosition));
 
-        // ✅ Calculate final effect value
-        float multiplier = enemy.Stats.CharacterClass == action.PreferredClass ? action.ClassBonus : 1f;
-        int finalValue = Mathf.RoundToInt(action.EffectValue * multiplier);
+        // ✅ Apply all effects from `BaseCard`
+        foreach (EffectType effectType in action.GetEffects()) 
+        {
+            EffectManager.Instance.ApplyEffect(effectType, target);
+        }
 
-        // ✅ Apply the card effect
-        action.CardEffect.ApplyEffect(target, finalValue);
-        Debug.Log($"[EnemyAI] 🔥 {target.Name} took {finalValue} damage from {enemy.Name}!");
+        Debug.Log($"[EnemyAI] 🔥 {target.Name} was hit by {enemy.Name}'s {action.CardName}!");
 
         // ✅ Return to original position after attack
         yield return StartCoroutine(animationController.MoveToTarget(animationController.OriginalPosition));
@@ -119,4 +122,5 @@ public class EnemyAIManager : MonoBehaviour
         // Hide intent after attack
         enemy.HideIntent();
     }
+
 }
