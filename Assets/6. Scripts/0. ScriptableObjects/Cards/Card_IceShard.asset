@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 630f675fb96884f62b83dac420e1cd6b, type: 3}
+  m_Name: Card_IceShard
+  m_EditorClassIdentifier: 
+  cardName: Ice Shard
+  cost: 1
+  cardArt: {fileID: 886557183449407133, guid: 80e4fa70c2dd14e90853ae9f274867e1, type: 3}
+  description: Deals 6 damage and applies 1 turn of Weak
+  cardType: 2
+  soundEffect: {fileID: 0}
+  effectTypes: 00000000
+  effectValues: 06000000
+  statusTypes: 00000000

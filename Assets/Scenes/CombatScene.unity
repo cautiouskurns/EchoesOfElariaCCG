@@ -674,14 +674,17 @@ MonoBehaviour:
   allCards:
   - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
   - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
-  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
-  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
-  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: c0a0e896b12f24bacb09531aea0bc51d, type: 2}
+  - {fileID: 11400000, guid: c0a0e896b12f24bacb09531aea0bc51d, type: 2}
+  - {fileID: 11400000, guid: df2529ad615e345a2b9077d610ef559a, type: 2}
+  - {fileID: 11400000, guid: df2529ad615e345a2b9077d610ef559a, type: 2}
   - {fileID: 11400000, guid: f5fddb891056742bc9fb64d28149de55, type: 2}
   - {fileID: 11400000, guid: f5fddb891056742bc9fb64d28149de55, type: 2}
-  - {fileID: 11400000, guid: f5fddb891056742bc9fb64d28149de55, type: 2}
-  - {fileID: 11400000, guid: f5fddb891056742bc9fb64d28149de55, type: 2}
-  deckSize: 9
+  - {fileID: 11400000, guid: 278641997c67d430d932f13223b6502d, type: 2}
+  - {fileID: 11400000, guid: 278641997c67d430d932f13223b6502d, type: 2}
+  deckSize: 12
   exhaustPile: []
 --- !u!1 &565458002
 GameObject:
