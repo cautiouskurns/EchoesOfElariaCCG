@@ -3,12 +3,17 @@ using UnityEngine;
 
 public class DeckManager : MonoBehaviour
 {
-    [SerializeField] private List<BaseCard> allCards; // ✅ Changed from `CardData` to `BaseCard`
+    [SerializeField] private List<BaseCard> allCards;
     [SerializeField] private int deckSize = 20;
-    
-    public List<BaseCard> deck { get; private set; } = new List<BaseCard>();  // ✅ Now using `BaseCard`
-    public List<BaseCard> discardPile { get; private set; } = new List<BaseCard>(); 
-    public List<BaseCard> exhaustPile = new List<BaseCard>(); 
+
+    [Header("Card Piles (Visible in Inspector)")]
+    [SerializeField] public List<BaseCard> drawPile = new List<BaseCard>();  
+    [SerializeField] public List<BaseCard> discardPile = new List<BaseCard>();
+    [SerializeField] public List<BaseCard> exhaustPile = new List<BaseCard>();
+
+    public IReadOnlyList<BaseCard> DrawPile => drawPile;  // Read-only access
+    public IReadOnlyList<BaseCard> DiscardPile => discardPile;
+    public IReadOnlyList<BaseCard> ExhaustPile => exhaustPile;
 
     private void Awake()
     {
@@ -17,53 +22,81 @@ public class DeckManager : MonoBehaviour
             Debug.LogError("[DeckManager] ❌ No cards assigned to allCards!");
             return;
         }
-        
+
         InitializeDeck();
     }
 
     private void InitializeDeck()
     {
-        deck.Clear();
+        drawPile.Clear();
         discardPile.Clear();
+        exhaustPile.Clear();
 
         for (int i = 0; i < deckSize; i++)
         {
             int randomIndex = Random.Range(0, allCards.Count);
-            deck.Add(allCards[randomIndex]);  // ✅ Uses `BaseCard`
+            drawPile.Add(allCards[randomIndex]);
         }
 
         ShuffleDeck();
-        Debug.Log($"[DeckManager] ✅ Deck initialized with {deck.Count} cards");
+        Debug.Log($"[DeckManager] ✅ Deck initialized with {drawPile.Count} cards");
     }
 
     public void ShuffleDeck()
     {
-        for (int i = deck.Count - 1; i > 0; i--)
+        for (int i = drawPile.Count - 1; i > 0; i--)
         {
             int j = Random.Range(0, i + 1);
-            var temp = deck[i];
-            deck[i] = deck[j];
-            deck[j] = temp;
+            (drawPile[i], drawPile[j]) = (drawPile[j], drawPile[i]);
         }
     }
 
     public void ReshuffleDeck()
     {
-        Debug.Log($"[DeckManager] Reshuffling. Deck: {deck.Count}, Discard: {discardPile.Count}");
-        deck.AddRange(discardPile);
+        Debug.Log($"[DeckManager] Reshuffling. Draw Pile: {drawPile.Count}, Discard: {discardPile.Count}");
+        if (discardPile.Count == 0) return;
+
+        drawPile.AddRange(discardPile);
         discardPile.Clear();
         ShuffleDeck();
-        Debug.Log($"[DeckManager] 🔄 Deck reshuffled. New size: {deck.Count}");
+        Debug.Log($"[DeckManager] 🔄 Deck reshuffled. New size: {drawPile.Count}");
     }
 
-    public void ExhaustCard(BaseCard card) // ✅ Changed parameter from `CardData` to `BaseCard`
+    public BaseCard DrawCard()
+    {
+        if (drawPile.Count == 0)
+        {
+            ReshuffleDeck();
+            if (drawPile.Count == 0)
+            {
+                Debug.Log("[DeckManager] ❌ No cards left to draw!");
+                return null;
+            }
+        }
+
+        BaseCard drawnCard = drawPile[0];
+        drawPile.RemoveAt(0);
+        return drawnCard;
+    }
+
+    public void AddToDiscardPile(BaseCard card)
+    {
+        discardPile.Add(card);
+        Debug.Log($"[DeckManager] 🗑️ {card.CardName} moved to discard pile.");
+    }
+
+    public void ExhaustCard(BaseCard card)
     {
         if (card != null)
         {
             exhaustPile.Add(card);
-            Debug.Log($"[DeckManager] 🚫 Card '{card.CardName}' has been exhausted.");
+            Debug.Log($"[DeckManager] 🚫 {card.CardName} has been exhausted.");
         }
     }
+
+    public int GetDrawPileCount() => drawPile.Count;
+    public int GetDiscardPileCount() => discardPile.Count;
 }
+
 
 

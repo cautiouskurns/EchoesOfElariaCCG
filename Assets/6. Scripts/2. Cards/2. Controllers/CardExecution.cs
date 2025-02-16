@@ -63,7 +63,7 @@ public class CardExecution : MonoBehaviour
 
         // ✅ Move forward and perform attack animation
         Vector3 targetPosition = ((MonoBehaviour)target).transform.position;
-        yield return StartCoroutine(animationController.PlayAttackSequence(targetPosition));
+        yield return StartCoroutine(animationController.PlayAttackSequence(targetPosition, cardBehavior.CardData.CardType));
 
         // ✅ Pass card execution to `CardManager`
         if (CardManager.Instance != null)

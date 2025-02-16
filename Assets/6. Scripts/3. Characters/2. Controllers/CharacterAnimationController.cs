@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections;
-
+using Cards;
 public class CharacterAnimationController : MonoBehaviour
 {
     [SerializeField] protected Animator animator;
@@ -20,50 +20,61 @@ public class CharacterAnimationController : MonoBehaviour
         originalPosition = transform.position;
     }
 
+    /// <summary>
+    /// Moves the character to the specified target position.
+    /// </summary>
     public virtual IEnumerator MoveToTarget(Vector3 targetPosition, bool returnToStart = false)
     {
         Vector3 startPos = transform.position;
-        Vector3 destination = targetPosition;
 
         // Start movement animation
         animator.SetBool("IsMoving", true);
-        
-        while (Vector3.Distance(transform.position, destination) > 0.1f)
+
+        while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
         {
             transform.position = Vector3.MoveTowards(
                 transform.position,
-                destination,
+                targetPosition,
                 moveSpeed * Time.deltaTime
             );
             yield return null;
         }
-        
+
         // Ensure exact position and stop movement animation
-        transform.position = destination;
+        transform.position = targetPosition;
         animator.SetBool("IsMoving", false);
     }
 
-    public virtual IEnumerator PlayAttackSequence(Vector3 targetPosition)
+    /// <summary>
+    /// Plays the attack sequence, conditionally moving if the card type is Attack.
+    /// </summary>
+    public virtual IEnumerator PlayAttackSequence(Vector3 targetPosition, CardType cardType)
     {
         if (isAnimating) yield break;
         isAnimating = true;
 
-        // Move to attack position
-        Vector3 attackPosition = Vector3.MoveTowards(targetPosition, transform.position, attackDistance);
-        yield return StartCoroutine(MoveToTarget(attackPosition));
+        if (cardType == CardType.Attack)
+        {
+            // Move to attack position if card is an attack type
+            Vector3 attackPosition = Vector3.MoveTowards(targetPosition, transform.position, attackDistance);
+            yield return StartCoroutine(MoveToTarget(attackPosition));
+        }
 
         // Wait a frame to ensure movement is complete
         yield return null;
 
         // Play attack animation
         animator.SetTrigger("AttackStrike");
-        
+
         // Wait for attack animation
         float attackStateLength = GetAnimationLength("AttackStrike");
         yield return new WaitForSeconds(attackStateLength);
 
-        // Return to starting position
-        yield return StartCoroutine(MoveToTarget(originalPosition, true));
+        if (cardType == CardType.Attack)
+        {
+            // Return to starting position
+            yield return StartCoroutine(MoveToTarget(originalPosition, true));
+        }
 
         // Reset to idle
         animator.SetTrigger("Idle");

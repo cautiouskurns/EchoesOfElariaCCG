@@ -41,58 +41,56 @@ public class HandManager : MonoBehaviour
         return true;
     }
 
-    /// <summary>
-    /// ✅ Called when a card is played.
-    /// </summary>
-    public void PlayCard(GameObject cardObject, IEffectTarget target)
+public void PlayCard(GameObject cardObject, IEffectTarget target)
+{
+    if (!cardObjects.Contains(cardObject))
     {
-        if (!cardObjects.Contains(cardObject))
-        {
-            Debug.LogError($"[HandManager] ❌ Card not in hand: {cardObject.name}");
-            return;
-        }
+        Debug.LogError($"[HandManager] ❌ Card not in hand: {cardObject.name}");
+        return;
+    }
 
+    CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
+    if (cardBehavior == null || cardBehavior.CardData == null)
+    {
+        Debug.LogError("[HandManager] ❌ Invalid CardBehavior or BaseCard!");
+        return;
+    }
+
+    BaseCard card = cardBehavior.CardData;
+    Debug.Log($"[HandManager] Playing {card.CardName}");
+
+    // ✅ Call `CardManager` to execute the card
+    CardManager.Instance?.PlayCard(card, target);
+
+    // ✅ Move card to discard pile AFTER playing
+    deckManager.AddToDiscardPile(card);
+    RemoveCardFromHand(card, cardObject);
+}
+
+public void DrawCards(int number)
+{
+    int desiredCards = Mathf.Min(number, maxHandSize - currentHand.Count);
+
+    for (int i = 0; i < desiredCards; i++)
+    {
+        BaseCard drawnCard = deckManager.DrawCard();
+        if (drawnCard == null) break; // No more cards to draw
+
+        GameObject cardObject = Instantiate(cardPrefab, handArea);
         CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
-        if (cardBehavior == null || cardBehavior.CardData == null)
+
+        if (cardBehavior != null)
         {
-            Debug.LogError("[HandManager] ❌ Invalid CardBehavior or BaseCard!");
-            return;
+            cardBehavior.Initialize(drawnCard);
+            currentHand.Add(drawnCard);
+            cardObjects.Add(cardObject);
+            Debug.Log($"[HandManager] ✅ Added card: {drawnCard.CardName}");
         }
-
-        BaseCard card = cardBehavior.CardData;
-        Debug.Log($"[HandManager] Playing {card.CardName}");
-
-        // ✅ Call `CardManager` to execute the card
-        CardManager.Instance?.PlayCard(card, target);
-
-        // ✅ Remove the card from the player's hand
-        RemoveCardFromHand(card, cardObject);
     }
 
-    public void DrawCards(int number)
-    {
-        int desiredCards = Mathf.Min(number, maxHandSize - currentHand.Count);
-        if (deckManager.deck.Count < desiredCards) deckManager.ReshuffleDeck();
+    fanLayout?.ArrangeCards(cardObjects);
+}
 
-        for (int i = 0; i < desiredCards && deckManager.deck.Count > 0; i++)
-        {
-            BaseCard drawnCard = (BaseCard)deckManager.deck[0];
-            deckManager.deck.RemoveAt(0);
-
-            GameObject cardObject = Instantiate(cardPrefab, handArea);
-            CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
-
-            if (cardBehavior != null)
-            {
-                cardBehavior.Initialize(drawnCard);
-                currentHand.Add(drawnCard);
-                cardObjects.Add(cardObject);
-                Debug.Log($"[HandManager] ✅ Added card: {drawnCard.CardName}");
-            }
-        }
-
-        fanLayout?.ArrangeCards(cardObjects);
-    }
 
     private void RemoveCardFromHand(BaseCard card, GameObject cardObject)
     {
@@ -116,7 +114,7 @@ public class HandManager : MonoBehaviour
         CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
         if (cardBehavior == null || cardBehavior.CardData == null) return;
 
-        deckManager.discardPile.Add(cardBehavior.CardData);
+        deckManager.AddToDiscardPile(cardBehavior.CardData);
         RemoveCardFromHand(cardBehavior.CardData, cardObject);
     }
 
@@ -165,6 +163,7 @@ public class HandManager : MonoBehaviour
         fanLayout?.OnCardHover(card, isHovered);
     }
 }
+
 
 
 
