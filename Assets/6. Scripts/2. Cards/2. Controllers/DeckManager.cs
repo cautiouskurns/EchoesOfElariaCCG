@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class DeckManager : MonoBehaviour
 {
-    [SerializeField] private List<BaseCard> allCards;
-    [SerializeField] private int deckSize = 20;
+    [SerializeField] private List<BaseCard> allCards;  
+    [SerializeField] private int deckSize = 20;  
 
     [Header("Card Piles (Visible in Inspector)")]
-    [SerializeField] public List<BaseCard> drawPile = new List<BaseCard>();  
-    [SerializeField] public List<BaseCard> discardPile = new List<BaseCard>();
-    [SerializeField] public List<BaseCard> exhaustPile = new List<BaseCard>();
+    [SerializeField] private List<BaseCard> drawPile = new List<BaseCard>();  
+    [SerializeField] private List<BaseCard> discardPile = new List<BaseCard>();
+    [SerializeField] private List<BaseCard> exhaustPile = new List<BaseCard>();
 
-    public IReadOnlyList<BaseCard> DrawPile => drawPile;  // Read-only access
+    public IReadOnlyList<BaseCard> DrawPile => drawPile;  
     public IReadOnlyList<BaseCard> DiscardPile => discardPile;
     public IReadOnlyList<BaseCard> ExhaustPile => exhaustPile;
 
@@ -28,18 +28,23 @@ public class DeckManager : MonoBehaviour
 
     private void InitializeDeck()
     {
+        Debug.Log($"[DeckManager] Initializing deck. Target deck size: {deckSize}");
+
         drawPile.Clear();
         discardPile.Clear();
         exhaustPile.Clear();
 
-        for (int i = 0; i < deckSize; i++)
+        if (allCards.Count < deckSize)
         {
-            int randomIndex = Random.Range(0, allCards.Count);
-            drawPile.Add(allCards[randomIndex]);
+            Debug.LogWarning("[DeckManager] ❌ Not enough cards in allCards list! Adjusting deck size.");
+            deckSize = allCards.Count;
         }
 
-        ShuffleDeck();
-        Debug.Log($"[DeckManager] ✅ Deck initialized with {drawPile.Count} cards");
+        // ✅ Use the first `deckSize` cards from `allCards`
+        drawPile.AddRange(allCards.GetRange(0, deckSize));
+
+        ShuffleDeck(); // ✅ Ensures randomness at game start
+        Debug.Log($"[DeckManager] ✅ Draw pile initialized with {drawPile.Count} cards.");
     }
 
     public void ShuffleDeck()
@@ -51,38 +56,48 @@ public class DeckManager : MonoBehaviour
         }
     }
 
-    public void ReshuffleDeck()
-    {
-        Debug.Log($"[DeckManager] Reshuffling. Draw Pile: {drawPile.Count}, Discard: {discardPile.Count}");
-        if (discardPile.Count == 0) return;
-
-        drawPile.AddRange(discardPile);
-        discardPile.Clear();
-        ShuffleDeck();
-        Debug.Log($"[DeckManager] 🔄 Deck reshuffled. New size: {drawPile.Count}");
-    }
-
     public BaseCard DrawCard()
     {
         if (drawPile.Count == 0)
         {
-            ReshuffleDeck();
-            if (drawPile.Count == 0)
+            if (discardPile.Count > 0)
             {
-                Debug.Log("[DeckManager] ❌ No cards left to draw!");
+                ReshuffleDiscardIntoDeck();
+            }
+            else
+            {
+                Debug.Log("[DeckManager] ❌ No cards left in either pile!");
                 return null;
             }
         }
 
         BaseCard drawnCard = drawPile[0];
         drawPile.RemoveAt(0);
+        Debug.Log($"[DeckManager] 🃏 Drew '{drawnCard.CardName}'. Draw pile: {drawPile.Count}, Discard pile: {discardPile.Count}");
         return drawnCard;
+    }
+
+    public void ReshuffleDiscardIntoDeck()
+    {
+        if (discardPile.Count == 0)
+        {
+            Debug.Log("[DeckManager] ❌ No cards in discard pile to reshuffle.");
+            return;
+        }
+
+        drawPile.AddRange(discardPile);
+        discardPile.Clear();
+        ShuffleDeck();
+        Debug.Log($"[DeckManager] 🔄 Deck reshuffled. New deck size: {drawPile.Count}");
     }
 
     public void AddToDiscardPile(BaseCard card)
     {
-        discardPile.Add(card);
-        Debug.Log($"[DeckManager] 🗑️ {card.CardName} moved to discard pile.");
+        if (card != null)
+        {
+            discardPile.Add(card);
+            Debug.Log($"[DeckManager] 🗑️ Added {card.CardName} to discard pile. Discard pile size: {discardPile.Count}");
+        }
     }
 
     public void ExhaustCard(BaseCard card)

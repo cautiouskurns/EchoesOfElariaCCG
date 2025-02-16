@@ -82,8 +82,9 @@ public class TurnManager : MonoBehaviour
         
         if (handManager != null)
         {
-            handManager.RefreshHand(); // Use RefreshHand instead of just drawing
-            Debug.Log("[TurnManager] 🎴 Hand refreshed for turn start");
+            // Draw new cards at the start of turn
+            handManager.RefreshHand();
+            Debug.Log("[TurnManager] 🎴 Hand refreshed for new turn");
         }
         else
         {

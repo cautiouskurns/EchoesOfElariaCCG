@@ -41,56 +41,53 @@ public class HandManager : MonoBehaviour
         return true;
     }
 
-public void PlayCard(GameObject cardObject, IEffectTarget target)
-{
-    if (!cardObjects.Contains(cardObject))
+    public void PlayCard(GameObject cardObject, IEffectTarget target)
     {
-        Debug.LogError($"[HandManager] ❌ Card not in hand: {cardObject.name}");
-        return;
-    }
-
-    CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
-    if (cardBehavior == null || cardBehavior.CardData == null)
-    {
-        Debug.LogError("[HandManager] ❌ Invalid CardBehavior or BaseCard!");
-        return;
-    }
-
-    BaseCard card = cardBehavior.CardData;
-    Debug.Log($"[HandManager] Playing {card.CardName}");
-
-    // ✅ Call `CardManager` to execute the card
-    CardManager.Instance?.PlayCard(card, target);
-
-    // ✅ Move card to discard pile AFTER playing
-    deckManager.AddToDiscardPile(card);
-    RemoveCardFromHand(card, cardObject);
-}
-
-public void DrawCards(int number)
-{
-    int desiredCards = Mathf.Min(number, maxHandSize - currentHand.Count);
-
-    for (int i = 0; i < desiredCards; i++)
-    {
-        BaseCard drawnCard = deckManager.DrawCard();
-        if (drawnCard == null) break; // No more cards to draw
-
-        GameObject cardObject = Instantiate(cardPrefab, handArea);
-        CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
-
-        if (cardBehavior != null)
+        if (!cardObjects.Contains(cardObject))
         {
-            cardBehavior.Initialize(drawnCard);
-            currentHand.Add(drawnCard);
-            cardObjects.Add(cardObject);
-            Debug.Log($"[HandManager] ✅ Added card: {drawnCard.CardName}");
+            Debug.LogError($"[HandManager] Card not in hand: {cardObject.name}");
+            return;
         }
+
+        CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
+        if (cardBehavior == null || cardBehavior.CardData == null) return;
+
+        BaseCard card = cardBehavior.CardData;
+
+        // Execute card effect
+        CardManager.Instance?.PlayCard(card, target);
+
+        // Move to discard pile and remove from hand
+        deckManager.AddToDiscardPile(card);
+        RemoveCardFromHand(card, cardObject);
+        
+        // Don't automatically draw new cards after playing
+        Debug.Log($"[HandManager] '{card.CardName}' played and moved to discard. Hand size: {currentHand.Count}");
     }
 
-    fanLayout?.ArrangeCards(cardObjects);
-}
+    public void DrawCards(int number)
+    {
+        int desiredCards = Mathf.Min(number, maxHandSize - currentHand.Count);
 
+        for (int i = 0; i < desiredCards; i++)
+        {
+            BaseCard drawnCard = deckManager.DrawCard();
+            if (drawnCard == null) break; // No more cards to draw
+
+            GameObject cardObject = Instantiate(cardPrefab, handArea);
+            CardBehavior cardBehavior = cardObject.GetComponent<CardBehavior>();
+
+            if (cardBehavior != null)
+            {
+                cardBehavior.Initialize(drawnCard);
+                currentHand.Add(drawnCard);
+                cardObjects.Add(cardObject);
+                Debug.Log($"[HandManager] ✅ Added card: {drawnCard.CardName}");
+            }
+        }
+
+        fanLayout?.ArrangeCards(cardObjects);
+    }
 
     private void RemoveCardFromHand(BaseCard card, GameObject cardObject)
     {
@@ -99,11 +96,6 @@ public void DrawCards(int number)
             currentHand.Remove(card);
             cardObjects.Remove(cardObject);
             Destroy(cardObject);
-            Debug.Log($"[HandManager] 🗑️ Removed {card.CardName} from hand.");
-        }
-        else
-        {
-            Debug.LogWarning($"[HandManager] ⚠️ Tried to remove {card.CardName}, but it's not in hand.");
         }
 
         fanLayout?.ArrangeCards(cardObjects);
@@ -118,25 +110,15 @@ public void DrawCards(int number)
         RemoveCardFromHand(cardBehavior.CardData, cardObject);
     }
 
-    public void ClearHand()
-    {
-        foreach (var card in cardObjects)
-        {
-            Destroy(card);
-        }
-
-        deckManager.discardPile.AddRange(currentHand);
-        currentHand.Clear();
-        cardObjects.Clear();
-
-        Debug.Log($"[HandManager] 🧹 Hand cleared, all cards moved to discard pile.");
-    }
-
     public void RefreshHand()
     {
-        ClearHand();
-        deckManager.ReshuffleDeck();
-        DrawCards(maxHandSize);
+        // Draw up to max hand size at start of turn
+        int cardsNeeded = maxHandSize - currentHand.Count;
+        if (cardsNeeded > 0)
+        {
+            DrawCards(cardsNeeded);
+            Debug.Log($"[HandManager] Drew {cardsNeeded} cards at turn start. Hand size: {currentHand.Count}");
+        }
     }
 
     public void ExhaustCard(GameObject cardObject)
