@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using System.Collections.Generic;
 
 public class StatusEffectUI : MonoBehaviour
@@ -21,16 +22,24 @@ public class StatusEffectUI : MonoBehaviour
 
             if (activeStatusIcons.TryGetValue(effect.EffectData.StatusType, out GameObject existingIcon))
             {
-                // ✅ Update the duration text of the existing UI element
-                Text effectText = existingIcon.GetComponentInChildren<Text>();
-                effectText.text = effect.Duration.ToString();
+                // Updated to use TextMeshProUGUI instead of Text
+                TextMeshProUGUI effectText = existingIcon.transform.Find("StatusDurationText")?.GetComponent<TextMeshProUGUI>();
+                if (effectText != null)
+                {
+                    effectText.text = effect.Duration.ToString();
+                }
+                else
+                {
+                    Debug.LogError("[StatusEffectUI] Could not find TextMeshProUGUI component");
+                }
             }
             else
             {
                 // ✅ If it's a new effect, create a UI icon for it
                 GameObject newEffectIcon = Instantiate(statusEffectPrefab, statusEffectContainer);
                 Image effectImage = newEffectIcon.GetComponent<Image>();
-                Text effectText = newEffectIcon.GetComponentInChildren<Text>();
+                // Updated to use TextMeshProUGUI
+                TextMeshProUGUI effectText = newEffectIcon.GetComponentInChildren<TextMeshProUGUI>();
 
                 // ✅ Set the icon if available
                 if (effect.EffectData.Icon != null)

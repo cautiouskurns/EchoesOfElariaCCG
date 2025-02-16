@@ -199,25 +199,6 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         }
     }
 
-    // public void UpdateStatusUI()
-    // {
-    //     StatusEffectUI statusUI = GetComponentInChildren<StatusEffectUI>();
-    //     if (statusUI != null)
-    //     {
-    //         List<BaseStatusEffect> statusList = new List<BaseStatusEffect>();
-
-    //         foreach (var effect in activeEffects)
-    //         {
-    //             if (effect.EffectData != null)  // ✅ Ensure it's not null
-    //             {
-    //                 statusList.Add(effect.EffectData);  // ✅ Directly add `BaseStatusEffect`
-    //             }
-    //         }
-
-    //         statusUI.UpdateStatusEffects(statusList);  // ✅ Passes `List<BaseStatusEffect>`
-    //     }
-    // }
-
     public void UpdateStatusUI()
     {
         StatusEffectUI statusUI = GetComponentInChildren<StatusEffectUI>();
@@ -230,9 +211,6 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 
         statusUI.UpdateStatusEffects(activeEffects);
     }
-
-
-
 
 }
 
