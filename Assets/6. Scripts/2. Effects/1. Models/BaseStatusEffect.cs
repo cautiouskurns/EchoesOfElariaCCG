@@ -8,16 +8,7 @@ public abstract class BaseStatusEffect : ScriptableObject, IStatusEffect
     public Sprite Icon;
     public AudioClip EffectSound;
 
-    public virtual void ApplyStatus(IEffectTarget target, int duration)
-    {
-        target.ReceiveStatusEffect(this, duration);
-        Debug.Log($"{target} gained {EffectName} for {duration} turns.");
-    }
-
-    public virtual void RemoveStatus(IEffectTarget target)
-    {
-        target.RemoveStatusEffect(this);
-        Debug.Log($"{target} lost {EffectName}.");
-    }
+    public abstract void ApplyStatus(IEffectTarget target, int duration);
+    public abstract void RemoveStatus(IEffectTarget target);
 }
 

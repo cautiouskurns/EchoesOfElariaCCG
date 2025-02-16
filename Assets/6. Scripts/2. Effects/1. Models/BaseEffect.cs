@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public abstract class BaseEffect : ScriptableObject, IEffect
+[CreateAssetMenu(fileName = "New Effect", menuName = "Effects/Effect")]
+public abstract class BaseEffect : ScriptableObject, IEffect  // ✅ Marked as abstract
 {
     [SerializeField] private EffectType effectType;
     [SerializeField] private int baseValue;
@@ -8,8 +9,5 @@ public abstract class BaseEffect : ScriptableObject, IEffect
     public EffectType EffectType => effectType;
     public int BaseValue => baseValue;
 
-    public virtual void ApplyEffect(IEffectTarget target, int value)
-    {
-        Debug.Log($"Applying {effectType} effect with value {value} to {target}.");
-    }
+    public abstract void ApplyEffect(IEffectTarget target, int value);  // ✅ Abstract method
 }
