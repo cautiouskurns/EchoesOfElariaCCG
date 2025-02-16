@@ -67,6 +67,7 @@ public class TurnManager : MonoBehaviour
         foreach (BaseCharacter character in allCharacters)
         {
             character.EndTurn();
+            character.ProcessEndOfTurnEffects();
         }
 
         Debug.Log("[TurnManager] --- Turn Ended ---");

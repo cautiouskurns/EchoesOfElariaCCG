@@ -115,16 +115,24 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         EffectUpdated?.Invoke();
     }
 
-    /// ✅ Processes End of Turn Effects
+
+    /// ✅ Tick Down Status Effects at End of Turn
     public void ProcessEndOfTurnEffects()
     {
-        foreach (var effect in activeEffects)
+        Debug.Log($"[BaseCharacter] {Name} processing end-of-turn effects...");
+
+        for (int i = activeEffects.Count - 1; i >= 0; i--)
         {
-            effect.Duration--;
+            activeEffects[i].ReduceDuration();
+
+            if (activeEffects[i].Duration <= 0)
+            {
+                Debug.Log($"[BaseCharacter] ❌ Lost status effect: {activeEffects[i].EffectData.EffectName}");
+                activeEffects.RemoveAt(i);
+            }
         }
 
-        activeEffects.RemoveAll(e => e.Duration <= 0);
-        EffectUpdated?.Invoke();
+        UpdateStatusUI();  // ✅ Make sure the UI updates after modifying status effects
     }
 
     // ✅ Selection & UI Management
@@ -191,24 +199,39 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         }
     }
 
+    // public void UpdateStatusUI()
+    // {
+    //     StatusEffectUI statusUI = GetComponentInChildren<StatusEffectUI>();
+    //     if (statusUI != null)
+    //     {
+    //         List<BaseStatusEffect> statusList = new List<BaseStatusEffect>();
+
+    //         foreach (var effect in activeEffects)
+    //         {
+    //             if (effect.EffectData != null)  // ✅ Ensure it's not null
+    //             {
+    //                 statusList.Add(effect.EffectData);  // ✅ Directly add `BaseStatusEffect`
+    //             }
+    //         }
+
+    //         statusUI.UpdateStatusEffects(statusList);  // ✅ Passes `List<BaseStatusEffect>`
+    //     }
+    // }
+
     public void UpdateStatusUI()
     {
         StatusEffectUI statusUI = GetComponentInChildren<StatusEffectUI>();
-        if (statusUI != null)
+        
+        if (statusUI == null)
         {
-            List<BaseStatusEffect> statusList = new List<BaseStatusEffect>();
-
-            foreach (var effect in activeEffects)
-            {
-                if (effect.EffectData != null)  // ✅ Ensure it's not null
-                {
-                    statusList.Add(effect.EffectData);  // ✅ Directly add `BaseStatusEffect`
-                }
-            }
-
-            statusUI.UpdateStatusEffects(statusList);  // ✅ Passes `List<BaseStatusEffect>`
+            Debug.LogError($"[BaseCharacter] ❌ No StatusEffectUI found for {Name}");
+            return;
         }
+
+        statusUI.UpdateStatusEffects(activeEffects);
     }
+
+
 
 
 }
