@@ -133,6 +133,7 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         }
 
         UpdateStatusUI();  // ✅ Make sure the UI updates after modifying status effects
+        DebugStatusEffects();
     }
 
     // ✅ Selection & UI Management
@@ -161,24 +162,11 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         }
     }
 
-    public void EndTurn()
-    {
-        Debug.Log($"[BaseCharacter] {Name} ending turn...");
-
-        for (int i = activeEffects.Count - 1; i >= 0; i--)
-        {
-            activeEffects[i].ReduceDuration();  // ✅ Reduce duration
-
-            if (activeEffects[i].Duration <= 0)
-            {
-                Debug.Log($"{Name} lost {activeEffects[i].EffectData.StatusType} effect.");
-                activeEffects.RemoveAt(i);
-            }
-        }
-
-        // ✅ Log updated effects
-        DebugStatusEffects();
-    }
+    // public void EndTurn()
+    // {
+    //     Debug.Log($"[BaseCharacter] {Name} ending turn...");
+    //     ProcessEndOfTurnEffects();  // Only process effects once
+    // }
 
 
     public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;

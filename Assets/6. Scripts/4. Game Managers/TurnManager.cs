@@ -66,7 +66,7 @@ public class TurnManager : MonoBehaviour
         BaseCharacter[] allCharacters = FindObjectsByType<BaseCharacter>(FindObjectsSortMode.None);
         foreach (BaseCharacter character in allCharacters)
         {
-            character.EndTurn();
+            //character.EndTurn();
             character.ProcessEndOfTurnEffects();
         }
 
