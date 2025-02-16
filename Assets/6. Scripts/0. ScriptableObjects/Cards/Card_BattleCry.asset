@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 630f675fb96884f62b83dac420e1cd6b, type: 3}
+  m_Name: Card_BattleCry
+  m_EditorClassIdentifier: 
+  cardName: Battle Cry
+  cost: 1
+  cardArt: {fileID: -9111485395560466003, guid: 98562d0e1c4d1491788e0731f5c021f2, type: 3}
+  description: Grants +2 Strength to yourself and allies for 2 turns
+  cardType: 3
+  soundEffect: {fileID: 0}
+  effectTypes: 
+  effectValues: 
+  statusTypes: 03000000

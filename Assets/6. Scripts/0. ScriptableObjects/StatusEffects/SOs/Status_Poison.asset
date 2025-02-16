@@ -15,5 +15,6 @@ MonoBehaviour:
   EffectName: Poison
   StatusType: 2
   MaxDuration: 3
-  Icon: {fileID: -4733039052000751752, guid: d3e286cbd6d3a4b31ad84668f461f9cb, type: 3}
+  MaxAmount: 3
+  Icon: {fileID: -4320913970512475346, guid: 6d315527c7e684ec39d38c24650c06db, type: 3}
   EffectSound: {fileID: 0}

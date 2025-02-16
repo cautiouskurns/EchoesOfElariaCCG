@@ -15,5 +15,6 @@ MonoBehaviour:
   EffectName: Weak
   StatusType: 0
   MaxDuration: 3
-  Icon: {fileID: -9023002539764390441, guid: 1aed488dbce3346e291d68888bb73d81, type: 3}
+  MaxAmount: 0
+  Icon: {fileID: -2908920752090814125, guid: e509f189b831a4fb5800236f2ef87316, type: 3}
   EffectSound: {fileID: 0}

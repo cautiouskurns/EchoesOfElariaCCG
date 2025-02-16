@@ -60,6 +60,30 @@ public class CardManager : MonoBehaviour
         {
             statusEffectManager?.ApplyStatusEffect(statusType, target);
         }
+
+
+        // ✅ Spawn VFX if available
+        if (card.VFXPrefab != null)
+        {
+            InstantiateEffect(card.VFXPrefab, target);
+        }
+    }
+
+    /// ✅ Method to instantiate VFX
+    private void InstantiateEffect(GameObject vfxPrefab, IEffectTarget target)
+    {
+        BaseCharacter targetCharacter = target as BaseCharacter;
+        if (targetCharacter == null)
+        {
+            Debug.LogError("[CardManager] ❌ Target is not a valid character!");
+            return;
+        }
+
+        Vector3 spawnPosition = targetCharacter.transform.position + new Vector3(0, 1, 0); // Offset for visibility
+        GameObject effectInstance = Instantiate(vfxPrefab, spawnPosition, Quaternion.identity);
+        
+        // ✅ Optional: Destroy the effect after a delay
+        Destroy(effectInstance, 2f);
     }
 }
 

@@ -17,7 +17,8 @@ MonoBehaviour:
   cardArt: {fileID: -6607481912129624618, guid: 96876b225e7bb4fabb103144fc6638e5, type: 3}
   description: Deals 12 damage to a single enemy
   cardType: 2
-  soundEffect: {fileID: 0}
+  soundEffect: {fileID: 8300000, guid: 2d07f03e8190b47f4b7863cb03ceeca0, type: 3}
   effectTypes: 00000000
   effectValues: 0c000000
   statusTypes: 
+  vfxPrefab: {fileID: 1947871717301538, guid: bc0af6fd299644bfab0959f6b3990fcf, type: 3}

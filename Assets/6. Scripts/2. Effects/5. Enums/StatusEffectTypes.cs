@@ -5,7 +5,8 @@ public enum StatusEffectTypes
     Weak,
     Vulnerable,
     Poison,
-    StrengthBuff,
+    Strengthened,
+    Blocking,
     Destabilized,
     Exhausted
 }

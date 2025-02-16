@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 630f675fb96884f62b83dac420e1cd6b, type: 3}
+  m_Name: Card_PoisonedDaggers
+  m_EditorClassIdentifier: 
+  cardName: Poisoned Daggers
+  cost: 2
+  cardArt: {fileID: -7713929258813215214, guid: 601468823217b41dc962b45a2deedc5b, type: 3}
+  description: Deals 4 damage and applies 2 stacks of Poison
+  cardType: 1
+  soundEffect: {fileID: 0}
+  effectTypes: 00000000
+  effectValues: 04000000
+  statusTypes: 02000000
+  vfxPrefab: {fileID: 1547757601392324, guid: f9acce354484143af930d97bc73de708, type: 3}

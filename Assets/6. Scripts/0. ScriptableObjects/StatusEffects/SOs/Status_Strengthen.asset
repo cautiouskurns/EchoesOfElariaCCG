@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a7313f610bca4f0bac2bd7ae733d9e8, type: 3}
+  m_Name: Status_Strengthen
+  m_EditorClassIdentifier: 
+  EffectName: Strengthen
+  StatusType: 3
+  MaxDuration: 3
+  MaxAmount: 0
+  Icon: {fileID: -3417600619704534854, guid: 580442e3ddeb34f1eb12ab49d0d23402, type: 3}
+  EffectSound: {fileID: 0}

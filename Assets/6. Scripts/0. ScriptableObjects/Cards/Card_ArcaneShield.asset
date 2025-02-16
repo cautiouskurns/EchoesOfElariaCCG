@@ -18,6 +18,6 @@ MonoBehaviour:
   description: Grants 8 Block to yourself or an ally
   cardType: 3
   soundEffect: {fileID: 0}
-  effectTypes: 00000000
+  effectTypes: 
   effectValues: 
-  statusTypes: 00000000
+  statusTypes: 04000000

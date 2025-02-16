@@ -10,6 +10,7 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     [SerializeField] private int block;
     [SerializeField] private int strength;
     [SerializeField] private int energy;
+    
 
     public CharacterCombat Combat { get; private set; }
 
@@ -35,6 +36,8 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
     public void ModifyStrength(int amount) => strength += amount;
     public void GainEnergy(int amount) => energy += amount;
+    public void GainBlock(int amount) => block += amount;
+
 
     // ✅ Card & Power System Hooks
     public void DrawCards(int amount) => HandManager.Instance.DrawCards(amount);

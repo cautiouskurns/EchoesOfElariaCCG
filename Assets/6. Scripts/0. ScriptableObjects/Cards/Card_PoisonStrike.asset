@@ -21,3 +21,4 @@ MonoBehaviour:
   effectTypes: 00000000
   effectValues: 1e000000
   statusTypes: 02000000
+  vfxPrefab: {fileID: 1547757601392324, guid: f9acce354484143af930d97bc73de708, type: 3}

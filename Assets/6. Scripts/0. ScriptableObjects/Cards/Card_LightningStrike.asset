@@ -17,7 +17,8 @@ MonoBehaviour:
   cardArt: {fileID: 3402156135608667222, guid: defbbcb8a4a3d4c64a63bc2f78d435a0, type: 3}
   description: Deals 10 damage and has a 25% chance to stun the target for 1 turn
   cardType: 2
-  soundEffect: {fileID: 0}
+  soundEffect: {fileID: 8300000, guid: 2d07f03e8190b47f4b7863cb03ceeca0, type: 3}
   effectTypes: 00000000
   effectValues: 0a000000
   statusTypes: 
+  vfxPrefab: {fileID: 1000011128802252, guid: 4db7463205f24445d855cd9e4347e47d, type: 3}

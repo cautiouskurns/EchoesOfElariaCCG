@@ -17,7 +17,8 @@ MonoBehaviour:
   cardArt: {fileID: 886557183449407133, guid: 80e4fa70c2dd14e90853ae9f274867e1, type: 3}
   description: Deals 6 damage and applies 1 turn of Weak
   cardType: 2
-  soundEffect: {fileID: 0}
+  soundEffect: {fileID: 8300000, guid: 2d07f03e8190b47f4b7863cb03ceeca0, type: 3}
   effectTypes: 00000000
   effectValues: 06000000
   statusTypes: 00000000
+  vfxPrefab: {fileID: 1907188104338014, guid: f4e76c493148b40d7b24acbbacb6bf2c, type: 3}

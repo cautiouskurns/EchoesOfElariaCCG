@@ -11,7 +11,7 @@ public class PoisonStatusEffect : BaseStatusEffect
         // Example Effect: Reduce target's attack damage by 25%
         if (target is BaseCharacter character)
         {
-            character.ModifyStrength(-2); // Example: Reduce strength by 2
+            character.TakeDamage(MaxAmount); // Example: Reduce strength by 2
         }
     }
 
@@ -19,11 +19,5 @@ public class PoisonStatusEffect : BaseStatusEffect
     {
         target.RemoveStatusEffect(this);
         Debug.Log($"{target} is no longer Poisoned!");
-
-        // Example: Restore lost strength
-        if (target is BaseCharacter character)
-        {
-            character.ModifyStrength(2); // Restore the strength that was lost
-        }
     }
 }

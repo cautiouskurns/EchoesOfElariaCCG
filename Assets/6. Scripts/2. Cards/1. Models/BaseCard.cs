@@ -17,6 +17,8 @@ public class BaseCard : ScriptableObject, ICard
     [SerializeField] private List<int> effectValues;
     [SerializeField] private List<StatusEffectTypes> statusTypes;
 
+    [SerializeField] private GameObject vfxPrefab;  
+
     private EffectFactory effectFactory;
     private StatusEffectFactory statusEffectFactory;
 
@@ -29,6 +31,7 @@ public class BaseCard : ScriptableObject, ICard
     public string Description => description;
     public CardType CardType => cardType;
     public AudioClip SoundEffect => soundEffect; 
+    public GameObject VFXPrefab => vfxPrefab;
 
     public List<EffectType> GetEffects() => effectTypes;
     public int GetEffectValue(EffectType effectType)
