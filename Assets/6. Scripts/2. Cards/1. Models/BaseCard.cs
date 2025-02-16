@@ -14,6 +14,7 @@ public class BaseCard : ScriptableObject, ICard
 
 
     [SerializeField] private List<EffectType> effectTypes;
+    [SerializeField] private List<int> effectValues;
     [SerializeField] private List<StatusEffectTypes> statusTypes;
 
     private EffectFactory effectFactory;
@@ -30,6 +31,11 @@ public class BaseCard : ScriptableObject, ICard
     public AudioClip SoundEffect => soundEffect; 
 
     public List<EffectType> GetEffects() => effectTypes;
+    public int GetEffectValue(EffectType effectType)
+    {
+        int index = effectTypes.IndexOf(effectType);
+        return (index >= 0) ? effectValues[index] : 0;  // Default to 0 if not found
+    }
     public List<StatusEffectTypes> GetStatusEffects() => statusTypes;
 }
 

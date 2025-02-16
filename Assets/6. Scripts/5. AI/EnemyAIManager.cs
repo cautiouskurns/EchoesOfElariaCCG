@@ -111,7 +111,7 @@ public class EnemyAIManager : MonoBehaviour
         // ✅ Apply all effects from `BaseCard`
         foreach (EffectType effectType in action.GetEffects()) 
         {
-            EffectManager.Instance.ApplyEffect(effectType, target);
+            EffectManager.Instance.ApplyEffect(effectType, target, action);
         }
 
         Debug.Log($"[EnemyAI] 🔥 {target.Name} was hit by {enemy.Name}'s {action.CardName}!");

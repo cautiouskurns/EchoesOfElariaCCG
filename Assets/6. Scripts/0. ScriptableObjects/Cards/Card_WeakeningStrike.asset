@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 630f675fb96884f62b83dac420e1cd6b, type: 3}
-  m_Name: PoisonStrike_C
+  m_Name: Card_WeakeningStrike
   m_EditorClassIdentifier: 
-  cardName: Poison Strike
+  cardName: Weakenng Strike
   cost: 2
-  cardArt: {fileID: 21300000, guid: 3925691c2a021aa429c1dc89712a1253, type: 3}
-  description: Poison strike
+  cardArt: {fileID: 21300000, guid: 4d7635c366a76274c85747592d98d2f5, type: 3}
+  description: Weakens target
   cardType: 1
-  soundEffect: {fileID: 8300000, guid: acf94774fdc6c41b393ef07d1b3a6a5c, type: 3}
+  soundEffect: {fileID: 0}
   effectTypes: 00000000
+  effectValues: 14000000
   statusTypes: 00000000

@@ -52,7 +52,7 @@ public class CardManager : MonoBehaviour
         // ✅ Apply Main Effects
         foreach (EffectType effectType in card.GetEffects())  // ✅ Now using GetEffects()
         {
-            effectManager?.ApplyEffect(effectType, target);
+            effectManager?.ApplyEffect(effectType, target, card);
         }
 
         // ✅ Apply Status Effects

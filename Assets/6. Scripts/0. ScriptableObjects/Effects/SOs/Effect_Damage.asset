@@ -9,8 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bea6c2828869342e8b2c3d05bde9ff74, type: 3}
-  m_Name: New Heal Effect
+  m_Script: {fileID: 11500000, guid: 5d87ff1d7ac904ed7b8b855db3d2dfa7, type: 3}
+  m_Name: Effect_Damage
   m_EditorClassIdentifier: 
-  effectType: 1
-  baseValue: 15
+  effectType: 0

@@ -30,23 +30,25 @@ public class EffectManager : MonoBehaviour
     /// <summary>
     /// ✅ Fetches effect from `EffectFactory` and applies it to the target.
     /// </summary>
-    public void ApplyEffect(EffectType effectType, IEffectTarget target)
+    public void ApplyEffect(EffectType effectType, IEffectTarget target, BaseCard sourceCard)
     {
-        if (target == null)
+        if (target == null || sourceCard == null)
         {
-            Debug.LogError("[EffectManager] ❌ Target is null!");
+            Debug.LogError("[EffectManager] ❌ Target or source card is null!");
             return;
         }
 
         BaseEffect effect = effectFactory.CreateEffect(effectType);
         if (effect != null)
         {
-            effect.ApplyEffect(target, effect.BaseValue);
-            Debug.Log($"[EffectManager] ✅ Applied {effectType} effect to {target}");
+            int effectValue = sourceCard.GetEffectValue(effectType); // ✅ Get damage/heal amount from card
+            Debug.Log($"[EffectManager] Applying {effectType} with value {effectValue} to {target}");
+            effect.ApplyEffect(target, effectValue);
         }
         else
         {
             Debug.LogError($"[EffectManager] ❌ No effect found for {effectType}");
         }
     }
+
 }

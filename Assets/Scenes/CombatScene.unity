@@ -675,10 +675,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
   - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
   - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
-  - {fileID: 11400000, guid: f45fee1088ac943c987d1a747e05b882, type: 2}
-  - {fileID: 11400000, guid: f45fee1088ac943c987d1a747e05b882, type: 2}
-  - {fileID: 11400000, guid: f45fee1088ac943c987d1a747e05b882, type: 2}
-  deckSize: 8
+  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
+  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
+  - {fileID: 11400000, guid: f5fddb891056742bc9fb64d28149de55, type: 2}
+  - {fileID: 11400000, guid: f5fddb891056742bc9fb64d28149de55, type: 2}
+  - {fileID: 11400000, guid: f5fddb891056742bc9fb64d28149de55, type: 2}
+  - {fileID: 11400000, guid: f5fddb891056742bc9fb64d28149de55, type: 2}
+  deckSize: 9
   exhaustPile: []
 --- !u!1 &565458002
 GameObject:
@@ -915,6 +918,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   statusEffectDatabase:
+  - {fileID: 11400000, guid: c5157ec164d3747de86ae7e4633c4bdd, type: 2}
   - {fileID: 11400000, guid: 32ac690bdb89b42458eab01612218154, type: 2}
 --- !u!1 &710377434
 GameObject:
@@ -1202,7 +1206,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectDatabase:
   - {fileID: 11400000, guid: f9b63c685533047448e1a5ecba284649, type: 2}
-  - {fileID: 11400000, guid: b7a62a00f561d40f580c71f5111f5fa6, type: 2}
+  - {fileID: 11400000, guid: 05e9c61a574b8422a940e75316751647, type: 2}
 --- !u!1001 &853742750
 PrefabInstance:
   m_ObjectHideFlags: 0
