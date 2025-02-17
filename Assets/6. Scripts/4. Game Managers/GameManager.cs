@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     private string overworldSceneName = "OverworldMap"; // Default overworld scene
-    public CharacterClass SelectedPlayerClass { get; private set; } // ✅ Store the selected class
+    public CharacterClass[] SelectedPlayerClasses { get; private set; } = new CharacterClass[3]; // ✅ Store up to 3 selected classes
 
     private void Awake()
     {
@@ -39,11 +39,17 @@ public class GameManager : MonoBehaviour
         Debug.Log($"[GameManager] Scene loaded: {scene.name}. Instance ID: {gameObject.GetInstanceID()}");
     }
 
-    // ✅ Set the player's class (called from Camp Selection Scene)
-    public void SetPlayerClass(CharacterClass newClass)
+    // ✅ Set player's selected class at a specific index (0, 1, or 2)
+    public void SetPlayerClass(int index, CharacterClass newClass)
     {
-        SelectedPlayerClass = newClass;
-        Debug.Log($"[GameManager] 🏹 Player class set to: {SelectedPlayerClass.classType}");
+        if (index < 0 || index >= SelectedPlayerClasses.Length)
+        {
+            Debug.LogError($"[GameManager] ❌ Invalid player class index: {index}");
+            return;
+        }
+
+        SelectedPlayerClasses[index] = newClass;
+        Debug.Log($"[GameManager] 🏹 Player {index + 1} class set to: {newClass.className}");
     }
 
     public void StartBattle(string battleScene, string overworldScene)

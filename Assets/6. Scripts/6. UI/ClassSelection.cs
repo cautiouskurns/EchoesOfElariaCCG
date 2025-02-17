@@ -20,31 +20,36 @@ public class ClassSelection : MonoBehaviour
     [SerializeField] private TextMeshProUGUI intelligenceText;
     [SerializeField] private Button confirmButton;
 
-    private CharacterClass selectedClass;
+    [Header("Selected Class UI")] // ✅ UI to display selected classes
+    [SerializeField] private Image[] selectedClassIcons;
+    [SerializeField] private TextMeshProUGUI[] selectedClassNames;
+
+    private CharacterClass[] selectedClasses = new CharacterClass[3]; // ✅ Store 3 selected classes
+    private int currentSelectionIndex = 0; // ✅ Track which slot is being selected
 
     private void Start()
     {
         StartCoroutine(CheckForGameManager());
 
-        // Hide confirm button until class is selected
         if (confirmButton != null) confirmButton.gameObject.SetActive(false);
         if (classInfoPanel != null) classInfoPanel.SetActive(false);
+
+        // ✅ Hide selected class UI initially
+        for (int i = 0; i < selectedClassIcons.Length; i++)
+        {
+            selectedClassIcons[i].enabled = false;
+            selectedClassNames[i].text = "Empty";
+        }
     }
 
     private IEnumerator CheckForGameManager()
     {
-        yield return new WaitForSeconds(0.1f); // Small delay to ensure scene is fully loaded
+        yield return new WaitForSeconds(0.1f);
 
         if (GameManager.Instance == null)
         {
-            Debug.LogError("[ClassSelection] No GameManager found! Please ensure GameManager exists in the Overworld and is marked DontDestroyOnLoad");
-            
-            // Optionally return to Overworld
+            Debug.LogError("[ClassSelection] ❌ No GameManager found! Returning to Overworld...");
             SceneManager.LoadScene("OverworldMap");
-        }
-        else
-        {
-            Debug.Log($"[ClassSelection] Found GameManager with ID: {GameManager.Instance.gameObject.GetInstanceID()}");
         }
     }
 
@@ -52,20 +57,32 @@ public class ClassSelection : MonoBehaviour
     {
         if (index < 0 || index >= availableClasses.Length)
         {
-            Debug.LogError("[ClassSelection] Invalid class index selected!");
+            Debug.LogError("[ClassSelection] ❌ Invalid class index selected!");
             return;
         }
 
-        selectedClass = availableClasses[index];
-        DisplayClassInfo(selectedClass);
+        if (currentSelectionIndex >= 3)
+        {
+            Debug.LogWarning("[ClassSelection] ⚠️ All 3 classes have already been selected.");
+            return;
+        }
+
+        selectedClasses[currentSelectionIndex] = availableClasses[index];
+        UpdateSelectedClassUI(currentSelectionIndex, selectedClasses[currentSelectionIndex]);
+        DisplayClassInfo(selectedClasses[currentSelectionIndex], currentSelectionIndex);
+        currentSelectionIndex++;
+
+        if (currentSelectionIndex == 3)
+        {
+            confirmButton.gameObject.SetActive(true); // ✅ Enable confirm button once all selections are made
+        }
     }
 
-    private void DisplayClassInfo(CharacterClass characterClass)
+    private void DisplayClassInfo(CharacterClass characterClass, int slot)
     {
         if (classInfoPanel != null) classInfoPanel.SetActive(true);
-        if (confirmButton != null) confirmButton.gameObject.SetActive(true);
 
-        if (classNameText != null) classNameText.text = characterClass.className;
+        if (classNameText != null) classNameText.text = $"Class {slot + 1}: {characterClass.className}";
         if (classIcon != null) classIcon.sprite = characterClass.classIcon;
         if (classDescriptionText != null) classDescriptionText.text = characterClass.classDescription;
         if (healthText != null) healthText.text = $"Health: {characterClass.baseHealth}";
@@ -74,18 +91,41 @@ public class ClassSelection : MonoBehaviour
         if (intelligenceText != null) intelligenceText.text = $"Intelligence: {characterClass.intelligence}";
     }
 
+    private void UpdateSelectedClassUI(int slot, CharacterClass characterClass)
+    {
+        if (selectedClassIcons[slot] != null)
+        {
+            selectedClassIcons[slot].enabled = true;
+            selectedClassIcons[slot].sprite = characterClass.classIcon;
+        }
+
+        if (selectedClassNames[slot] != null)
+        {
+            selectedClassNames[slot].text = characterClass.className;
+        }
+    }
+
     public void ConfirmSelection()
     {
-        if (selectedClass == null)
+        if (selectedClasses[0] == null || selectedClasses[1] == null || selectedClasses[2] == null)
         {
-            Debug.LogError("[ClassSelection] No class selected!");
+            Debug.LogError("[ClassSelection] ❌ Not all classes selected!");
             return;
         }
 
         if (GameManager.Instance != null)
         {   
-            GameManager.Instance.SetPlayerClass(selectedClass);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
+            for (int i = 0; i < 3; i++)
+            {
+                GameManager.Instance.SetPlayerClass(i, selectedClasses[i]);
+            }
+
+            Debug.Log("[ClassSelection] ✅ All 3 classes selected. Transitioning to overworld...");
+            SceneManager.LoadScene(nextSceneName);
+        }
+        else
+        {
+            Debug.LogError("[ClassSelection] ❌ GameManager is missing!");
         }
     }
 

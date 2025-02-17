@@ -25,7 +25,7 @@ public class ClassSelectionUI : MonoBehaviour
 
     public void ConfirmSelection()
     {
-        GameManager.Instance.SetPlayerClass(selectedClass);
+        GameManager.Instance.SetPlayerClass(0, selectedClass);
         SceneManager.LoadScene("OverworldMap"); // Return to main map
     }
 }
