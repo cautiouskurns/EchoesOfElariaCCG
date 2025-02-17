@@ -17,6 +17,7 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     private bool isSelected = false;
     public bool IsSelected => isSelected;
     private static BaseCharacter currentlySelectedCharacter;
+    public int GetHealth() => health;
 
     protected virtual void Awake()
     {
@@ -31,7 +32,17 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public event OnEffectUpdated EffectUpdated;  // ✅ Triggers UI update when effects change
 
     // ✅ Stat Modifiers
-    public virtual void TakeDamage(int damage) => Stats.ModifyHealth(-damage);
+    public virtual void TakeDamage(int damage)
+    {
+        Stats.ModifyHealth(-damage);
+        
+        // Check for death after taking damage
+        if (Stats.CurrentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
     public virtual void Heal(int amount) => Stats.ModifyHealth(amount);
     public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
     public void ModifyStrength(int amount) => strength += amount;
@@ -165,11 +176,24 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         }
     }
 
-    // public void EndTurn()
-    // {
-    //     Debug.Log($"[BaseCharacter] {Name} ending turn...");
-    //     ProcessEndOfTurnEffects();  // Only process effects once
-    // }
+    public void EndTurn()
+    {
+Debug.Log($"[BaseCharacter] {Name} ending turn...");
+    
+        for (int i = activeEffects.Count - 1; i >= 0; i--)
+        {
+            activeEffects[i].ReduceDuration();  // ✅ Reduce duration
+
+            if (activeEffects[i].Duration <= 0)
+            {
+                Debug.Log($"{Name} lost {activeEffects[i].EffectData.StatusType} effect.");
+                activeEffects.RemoveAt(i);
+            }
+        }
+
+        // ✅ Log updated effects
+        DebugStatusEffects();
+}
 
 
     public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
@@ -203,6 +227,26 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         statusUI.UpdateStatusEffects(activeEffects);
     }
 
+    public void SetHealth(int value)
+    {
+        health = Mathf.Max(value, 0); // ✅ Prevent negative values
+    }
+
+    protected virtual void Die()
+    {
+        Debug.Log($"[BaseCharacter] {Name} has been defeated!");
+        
+        // Trigger death effects/animations before destroying
+        OnDeath();
+        
+        // Delay destruction slightly to allow for effects
+        Destroy(gameObject, 1f);
+    }
+
+    protected virtual void OnDeath()
+    {
+        // Override in derived classes for specific death behaviors
+    }
 }
 
 // ✅ Helper class to store effect data + duration
