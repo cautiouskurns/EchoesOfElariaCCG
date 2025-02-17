@@ -18,34 +18,71 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
-        // Find all units in the scene
-        enemyUnits.AddRange(FindObjectsByType<EnemyUnit>(FindObjectsSortMode.None));
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("[BattleManager] ❌ GameManager not found! Cannot assign class data.");
+            return;
+        }
+
+        AssignClassStatsToExistingPlayers();
+        FindEnemies();
+        StartCoroutine(MonitorBattleOutcome());
+    }
+
+    /// ✅ Assigns Class Stats to Existing Player Units in Scene
+    private void AssignClassStatsToExistingPlayers()
+    {
         playerUnits.AddRange(FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None));
 
+        if (playerUnits.Count != GameManager.Instance.selectedClasses.Length)
+        {
+            Debug.LogWarning($"[BattleManager] ⚠ Expected {GameManager.Instance.selectedClasses.Length} players, but found {playerUnits.Count} in the scene.");
+        }
+
+        for (int i = 0; i < playerUnits.Count; i++)
+        {
+            if (i < GameManager.Instance.selectedClasses.Length)
+            {
+                CharacterClass selectedClass = GameManager.Instance.selectedClasses[i];
+
+                if (selectedClass != null)
+                {
+                    playerUnits[i].InitializeFromClass(selectedClass);
+                    Debug.Log($"[BattleManager] ✅ Assigned {selectedClass.className} to Player {i + 1}");
+                }
+                else
+                {
+                    Debug.LogError($"[BattleManager] ❌ No class selected for Player {i + 1}");
+                }
+            }
+        }
+    }
+
+    private void FindEnemies()
+    {
+        enemyUnits.Clear();
+        enemyUnits.AddRange(FindObjectsByType<EnemyUnit>(FindObjectsSortMode.None));
+
         Debug.Log($"[BattleManager] Found {enemyUnits.Count} enemies and {playerUnits.Count} players");
-        StartCoroutine(MonitorBattleOutcome());
     }
 
     private IEnumerator MonitorBattleOutcome()
     {
         while (true)
         {
-            // Remove any destroyed units from the lists
             enemyUnits.RemoveAll(enemy => enemy == null);
             playerUnits.RemoveAll(player => player == null);
 
-            // Check win condition (all enemies defeated)
             if (enemyUnits.Count == 0)
             {
-                Debug.Log("[BattleManager] All enemies defeated!");
+                Debug.Log("[BattleManager] 🏆 All enemies defeated!");
                 StartCoroutine(EndBattle(true));
                 yield break;
             }
 
-            // Check lose condition (all players defeated)
             if (playerUnits.Count == 0)
             {
-                Debug.Log("[BattleManager] All players defeated!");
+                Debug.Log("[BattleManager] 💀 All players defeated!");
                 StartCoroutine(EndBattle(false));
                 yield break;
             }
@@ -61,29 +98,17 @@ public class BattleManager : MonoBehaviour
         if (isVictory)
         {
             Debug.Log("[BattleManager] 🏆 Victory!");
-            if (UIManager.Instance != null)
-            {
-                UIManager.Instance.ShowEndBattleScreen(true);
-                yield return new WaitForSeconds(2f);
-                UIManager.Instance.ReturnToMap();
-            }
-            else
-            {
-                Debug.LogWarning("[BattleManager] UIManager not found, loading Overworld directly");
-                SceneManager.LoadScene("OverworldMap");
-            }
+            UIManager.Instance?.ShowEndBattleScreen(true);
+            yield return new WaitForSeconds(2f);
+            UIManager.Instance?.ReturnToMap();
         }
         else
         {
             Debug.Log("[BattleManager] 💀 Defeat!");
-            if (UIManager.Instance != null)
-            {
-                UIManager.Instance.ShowEndBattleScreen(false);
-            }
+            UIManager.Instance?.ShowEndBattleScreen(false);
         }
     }
 
-    // Method to manually check battle state (can be called from other scripts)
     public void CheckBattleState()
     {
         enemyUnits.RemoveAll(enemy => enemy == null);
@@ -92,6 +117,5 @@ public class BattleManager : MonoBehaviour
         Debug.Log($"[BattleManager] Battle Status - Enemies: {enemyUnits.Count}, Players: {playerUnits.Count}");
     }
 }
-
 
 

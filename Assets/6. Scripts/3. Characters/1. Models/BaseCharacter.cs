@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Microsoft.Unity.VisualStudio.Editor;
 
 public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 {
@@ -9,7 +10,12 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     [SerializeField] private int health;
     [SerializeField] private int block;
     [SerializeField] private int strength;
+    [SerializeField] private int dexterity;
+    [SerializeField] private int intelligence;
+    [SerializeField] private int luck;
     [SerializeField] private int energy;
+    [SerializeField] private Sprite portrait;
+    
     
 
     public CharacterCombat Combat { get; private set; }
@@ -24,6 +30,28 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         Stats = GetComponent<CharacterStats>();
         Combat = GetComponent<CharacterCombat>();
     }
+
+    public void InitializeFromClass(CharacterClass characterClass)
+    {
+        if (characterClass == null)
+        {
+            Debug.LogError("[BaseCharacter] ❌ Class data is null!");
+            return;
+        }
+
+        Name = characterClass.className;
+        health = characterClass.baseHealth;
+        energy = characterClass.baseEnergy;
+        strength = characterClass.strength;
+        dexterity = characterClass.dexterity;
+        intelligence = characterClass.intelligence;
+        luck = characterClass.luck;
+        portrait = characterClass.classIcon;
+        block = 0; // Reset block at start of battle
+
+        Debug.Log($"[BaseCharacter] ✅ {Name} initialized with (HP: {health}, STR: {strength}, EN: {energy})");
+    }
+
 
     /// ✅ Effect Tracking
     public List<ActiveStatusEffect> activeEffects = new List<ActiveStatusEffect>();
@@ -178,7 +206,7 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 
     public void EndTurn()
     {
-Debug.Log($"[BaseCharacter] {Name} ending turn...");
+    Debug.Log($"[BaseCharacter] {Name} ending turn...");
     
         for (int i = activeEffects.Count - 1; i >= 0; i--)
         {
@@ -193,7 +221,7 @@ Debug.Log($"[BaseCharacter] {Name} ending turn...");
 
         // ✅ Log updated effects
         DebugStatusEffects();
-}
+    }
 
 
     public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
