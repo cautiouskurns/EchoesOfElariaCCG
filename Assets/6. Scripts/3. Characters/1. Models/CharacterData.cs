@@ -14,6 +14,6 @@ public class CharacterData : ScriptableObject
     [SerializeField] public string description;
 
     [Header("Class Settings")]
-    public CharacterClass characterClass;
+    public CharacterClassType characterClass;
     public float classBonus = 1.0f;
 }

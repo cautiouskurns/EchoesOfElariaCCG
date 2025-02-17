@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/0. Scenes/OverworldMap.unity
     guid: a6b3bb90a9702497194b0b688e8e6c42
   - enabled: 1
+    path: Assets/0. Scenes/CampNode.unity
+    guid: e92ae5bd5bc614ec28a3f7c9e5db9bcd
+  - enabled: 1
     path: Assets/0. Scenes/Battle1.unity
     guid: d414729aaf82b413b94b038624f7d431
   - enabled: 1

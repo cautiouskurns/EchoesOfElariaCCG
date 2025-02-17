@@ -14,7 +14,7 @@ public class CharacterStats : MonoBehaviour
     public int CurrentHealth { get; private set; }
     public int MaxActionPoints { get; private set; }
     public int CurrentActionPoints { get; private set; }
-    public CharacterClass CharacterClass { get; private set; }
+    public CharacterClassType CharacterClass { get; private set; }
     public float ClassBonus { get; private set; }
 
     // ✅ Events for Health & Action Points
