@@ -6,8 +6,9 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     private string overworldSceneName = "OverworldMap"; // Default overworld scene
+    private string lastScene;
     public CharacterClass[] selectedClasses = new CharacterClass[3]; // ✅ Store all 3 classes
-
+    private DialogueData currentLoreDialogue;
     private void Awake()
     {
         if (Instance == null)
@@ -69,6 +70,42 @@ public class GameManager : MonoBehaviour
         else
         {
             Debug.LogError("[GameManager] ❌ No overworld scene stored!");
+        }
+    }
+
+    // Fix parameter order to match LoreNode's call
+    public void StartLoreEvent(DialogueData dialogueData, string loreScene)
+    {
+        if (dialogueData == null)
+        {
+            Debug.LogError("[GameManager] Cannot start lore event with null dialogue!");
+            return;
+        }
+
+        lastScene = SceneManager.GetActiveScene().name;
+        currentLoreDialogue = dialogueData;
+
+        Debug.Log($"[GameManager] 📖 Storing dialogue '{dialogueData.name}' and loading scene: {loreScene}");
+        SceneManager.LoadScene(loreScene);
+    }
+
+    // ✅ Get the stored dialogue data
+    public DialogueData GetStoredLoreDialogue()
+    {
+        return currentLoreDialogue;
+    }
+
+    public void ReturnFromLore()
+    {
+        if (!string.IsNullOrEmpty(lastScene))
+        {
+            Debug.Log($"[GameManager] 🔄 Returning to: {lastScene}");
+            SceneManager.LoadScene(lastScene);
+        }
+        else
+        {
+            Debug.LogError("[GameManager] ❌ No previous scene stored, returning to overworld.");
+            SceneManager.LoadScene(overworldSceneName);
         }
     }
 }
