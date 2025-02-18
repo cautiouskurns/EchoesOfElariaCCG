@@ -62,12 +62,18 @@ public class LoreManager : MonoBehaviour
         dialogueText.text = currentNode.text;
         outcomeText.text = "";
 
-        Debug.Log($"[LoreManager] 🗨️ Showing dialogue: {currentNode.text}");
-
         // Clear old choices
         foreach (Transform child in choiceContainer)
         {
             Destroy(child.gameObject);
+        }
+
+        // Check if this is an end node (no choices)
+        if (currentNode.choices == null || currentNode.choices.Count == 0)
+        {
+            Debug.Log("[LoreManager] End node reached - showing continue button");
+            if (continueButton != null) continueButton.gameObject.SetActive(true);
+            return;
         }
 
         // Add new choices
@@ -78,7 +84,7 @@ public class LoreManager : MonoBehaviour
             choiceButton.GetComponent<Button>().onClick.AddListener(() => SelectChoice(choice));
         }
 
-        // Hide continue button until needed
+        // Hide continue button while choices are available
         if (continueButton != null) continueButton.gameObject.SetActive(false);
     }
 
@@ -86,11 +92,17 @@ public class LoreManager : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(choice.nextId))
         {
-            StartDialogue(choice.nextId); // Move to next dialogue node
+            StartDialogue(choice.nextId);
         }
-        else if (currentNode.outcome != null)
+        else
         {
-            DisplayOutcome(currentNode.outcome);
+            // If there's no next node, show continue button
+            if (continueButton != null) continueButton.gameObject.SetActive(true);
+            
+            if (currentNode.outcome != null)
+            {
+                DisplayOutcome(currentNode.outcome);
+            }
         }
     }
 

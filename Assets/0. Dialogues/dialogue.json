@@ -2,54 +2,245 @@
   "nodes": [
     {
       "dialogueId": "start",
-      "text": "You see an old man standing by a campfire.",
+      "text": "You come across an ancient ruin. A hooded figure sits by a blue flame, his eyes reflecting the flickering glow. He gestures for you to approach.",
       "choices": [
         {
-          "choiceText": "Ask him for advice.",
-          "nextId": "advice"
+          "choiceText": "Step closer and greet him.",
+          "nextId": "greeting"
         },
         {
-          "choiceText": "Ignore him and leave.",
-          "nextId": "end_ignore"
+          "choiceText": "Examine the ruins before approaching.",
+          "nextId": "examine_ruins"
+        },
+        {
+          "choiceText": "Demand to know who he is.",
+          "nextId": "demand_identity"
+        },
+        {
+          "choiceText": "Leave without a word.",
+          "nextId": "leave"
         }
       ]
     },
     {
-      "dialogueId": "advice",
-      "text": "The old man smiles and shares his wisdom.",
+      "dialogueId": "greeting",
+      "text": "The figure tilts his head. 'A weary traveler, seeking knowledge or merely passing through?'",
       "choices": [
         {
-          "choiceText": "Thank him.",
-          "nextId": "end_thank"
+          "choiceText": "Ask about the blue flame.",
+          "nextId": "blue_flame"
         },
         {
-          "choiceText": "Attack him!",
-          "nextId": "battle"
+          "choiceText": "Request his wisdom.",
+          "nextId": "wisdom"
+        },
+        {
+          "choiceText": "Remain silent and watch him.",
+          "nextId": "silent_watch"
+        },
+        {
+          "choiceText": "Attempt to steal from him.",
+          "nextId": "steal_attempt"
         }
       ]
     },
     {
-      "dialogueId": "battle",
-      "text": "The old man transforms into a powerful enemy!",
-      "choices": [],
+      "dialogueId": "examine_ruins",
+      "text": "You notice ancient glyphs along the crumbling stone. They seem to whisper as you read them.",
+      "choices": [
+        {
+          "choiceText": "Touch the glyphs.",
+          "nextId": "glyphs_touched"
+        },
+        {
+          "choiceText": "Try to decipher the runes.",
+          "nextId": "decipher_runes"
+        },
+        {
+          "choiceText": "Ignore the ruins and approach the figure.",
+          "nextId": "greeting"
+        },
+        {
+          "choiceText": "Leave, uneasy about what you’ve seen.",
+          "nextId": "leave"
+        }
+      ]
+    },
+    {
+      "dialogueId": "demand_identity",
+      "text": "The figure chuckles. 'Names are shackles. But if you must know, I am the Keeper of Secrets. Do you wish to bargain?'",
+      "choices": [
+        {
+          "choiceText": "Offer a coin for knowledge.",
+          "nextId": "coin_bargain"
+        },
+        {
+          "choiceText": "Offer a secret of your own.",
+          "nextId": "secret_bargain"
+        },
+        {
+          "choiceText": "Threaten him.",
+          "nextId": "threaten_keeper"
+        },
+        {
+          "choiceText": "Refuse and walk away.",
+          "nextId": "leave"
+        }
+      ]
+    },
+    {
+      "dialogueId": "blue_flame",
+      "text": "‘This fire remembers,’ he says. ‘It burns not of wood, but of memory. Would you like to add your own?’",
+      "choices": [
+        {
+          "choiceText": "Sacrifice a memory.",
+          "nextId": "memory_lost"
+        },
+        {
+          "choiceText": "Ask what happens if you do.",
+          "nextId": "memory_explained"
+        },
+        {
+          "choiceText": "Refuse and change the subject.",
+          "nextId": "greeting"
+        },
+        {
+          "choiceText": "Try to extinguish the fire.",
+          "nextId": "fire_extinguished"
+        }
+      ]
+    },
+    {
+      "dialogueId": "wisdom",
+      "text": "He nods. ‘Wisdom carries a price. Will you pay it?’",
+      "choices": [
+        {
+          "choiceText": "Agree and listen.",
+          "nextId": "receive_wisdom"
+        },
+        {
+          "choiceText": "Ask what the price is first.",
+          "nextId": "wisdom_price"
+        },
+        {
+          "choiceText": "Mock him and walk away.",
+          "nextId": "mock_keeper"
+        },
+        {
+          "choiceText": "Try to intimidate him.",
+          "nextId": "threaten_keeper"
+        }
+      ]
+    },
+    {
+      "dialogueId": "steal_attempt",
+      "text": "Your fingers reach for his satchel... but suddenly, he vanishes. The air crackles with unseen energy.",
+      "outcome": {
+        "luckChange": -2,
+        "energyChange": -2
+      }
+    },
+    {
+      "dialogueId": "glyphs_touched",
+      "text": "A surge of energy courses through you. The glyphs pulse, and you hear a whisper in your mind.",
+      "outcome": {
+        "energyChange": 2,
+        "luckChange": 1
+      }
+    },
+    {
+      "dialogueId": "decipher_runes",
+      "text": "You recognize ancient warnings of power beyond mortal grasp. You feel both enlightened and uneasy.",
+      "outcome": {
+        "intelligenceChange": 2,
+        "strengthChange": -1
+      }
+    },
+    {
+      "dialogueId": "coin_bargain",
+      "text": "He examines the coin, then whispers forgotten knowledge into your ear.",
+      "outcome": {
+        "intelligenceChange": 1
+      }
+    },
+    {
+      "dialogueId": "secret_bargain",
+      "text": "You share a secret. The Keeper smiles. 'A fair trade,' he says, handing you a cryptic note.",
+      "outcome": {
+        "energyChange": 1,
+        "luckChange": 2
+      }
+    },
+    {
+      "dialogueId": "memory_lost",
+      "text": "The fire consumes your memory. You feel lighter, but something is missing...",
+      "outcome": {
+        "energyChange": -1,
+        "intelligenceChange": 2
+      }
+    },
+    {
+      "dialogueId": "memory_explained",
+      "text": "‘To lose a memory is to lose a part of yourself. Some find wisdom in absence, others regret.’",
+      "choices": [
+        {
+          "choiceText": "Offer a memory anyway.",
+          "nextId": "memory_lost"
+        },
+        {
+          "choiceText": "Refuse and walk away.",
+          "nextId": "leave"
+        }
+      ]
+    },
+    {
+      "dialogueId": "fire_extinguished",
+      "text": "As you reach for the flames, they twist into spectral hands, gripping your wrists.",
+      "outcome": {
+        "strengthChange": -2,
+        "luckChange": -2
+      }
+    },
+    {
+      "dialogueId": "receive_wisdom",
+      "text": "‘Beware the roads ahead. They shift like the wind, and not all paths lead home.’",
+      "outcome": {
+        "intelligenceChange": 1
+      }
+    },
+    {
+      "dialogueId": "wisdom_price",
+      "text": "‘Wisdom is earned, not given. You must make a choice and learn from it.’",
+      "choices": [
+        {
+          "choiceText": "Make a choice now.",
+          "nextId": "receive_wisdom"
+        },
+        {
+          "choiceText": "Refuse and leave.",
+          "nextId": "leave"
+        }
+      ]
+    },
+    {
+      "dialogueId": "mock_keeper",
+      "text": "You laugh at him. His gaze darkens. The air grows cold. 'A fool mocks the unknown.'",
+      "outcome": {
+        "luckChange": -2
+      }
+    },
+    {
+      "dialogueId": "threaten_keeper",
+      "text": "The figure tilts his head. ‘Fascinating.’ The next thing you know, the world fades to black.",
       "outcome": {
         "triggerBattle": true
       }
     },
     {
-      "dialogueId": "end_ignore",
-      "text": "You leave without saying a word.",
-      "choices": [],
+      "dialogueId": "leave",
+      "text": "You turn away, the whispers of the ruin fading behind you.",
       "outcome": {
         "energyChange": -1
-      }
-    },
-    {
-      "dialogueId": "end_thank",
-      "text": "You feel stronger from his wisdom.",
-      "choices": [],
-      "outcome": {
-        "strengthChange": 1
       }
     }
   ]
