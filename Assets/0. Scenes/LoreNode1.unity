@@ -564,6 +564,7 @@ MonoBehaviour:
   choiceContainer: {fileID: 727749659}
   dialoguePanel: {fileID: 771281788}
   continueButton: {fileID: 547663739}
+  dialogueFileName: dialogue
 --- !u!4 &957071247
 Transform:
   m_ObjectHideFlags: 0

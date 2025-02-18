@@ -12,123 +12,111 @@ public class LoreManager : MonoBehaviour
     [SerializeField] private GameObject choiceButtonPrefab;
     [SerializeField] private Transform choiceContainer;
     [SerializeField] private GameObject dialoguePanel;
-    [SerializeField] private Button continueButton; // ✅ Button for continuing after outcome
+    [SerializeField] private Button continueButton;
+
+    [Header("Dialogue File Settings")]
+    [SerializeField] private string dialogueFileName = "dialogue";
+    [SerializeField] private string dialoguePath = "Assets/0. Dialogues/"; // Add explicit path
+
+    private DialogueLoader dialogueLoader;
+    private DialogueNode currentNode;
 
     private void Awake()
     {
-        if (Instance == null)
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+
+        // Ensure DialogueLoader exists
+        dialogueLoader = GetComponent<DialogueLoader>();
+        if (dialogueLoader == null)
         {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
+            Debug.Log("[LoreManager] Adding missing DialogueLoader component");
+            dialogueLoader = gameObject.AddComponent<DialogueLoader>();
         }
     }
 
     private void Start()
     {
-        if (GameManager.Instance == null)
+        if (dialogueLoader == null)
         {
-            Debug.LogError("[LoreManager] ❌ GameManager not found!");
+            Debug.LogError("[LoreManager] DialogueLoader is null!");
             return;
         }
 
-        DialogueData dialogueData = GameManager.Instance.GetStoredLoreDialogue();
-        
-        if (dialogueData == null)
-        {
-            Debug.LogError("[LoreManager] ❌ No dialogue data found in GameManager!");
-            return;
-        }
-
-        Debug.Log($"[LoreManager] ✅ Loading dialogue: {dialogueData.name}");
-        StartLoreEvent(dialogueData);
+        string fullPath = System.IO.Path.Combine(dialoguePath, dialogueFileName + ".json");
+        Debug.Log($"[LoreManager] Loading dialogue from: {fullPath}");
+        dialogueLoader.LoadDialogueFromFile(fullPath);
+        StartDialogue("start");
     }
 
-    public void StartLoreEvent(DialogueData dialogueData)
+    public void StartDialogue(string nodeId)
     {
-        if (dialogueData == null)
+        currentNode = dialogueLoader.GetNode(nodeId);
+        if (currentNode == null)
         {
-            Debug.LogError("[LoreManager] ❌ Null DialogueData provided!");
+            Debug.LogError($"[LoreManager] ❌ Dialogue Node '{nodeId}' Not Found!");
             return;
         }
 
-        if (dialogueText == null)
-        {
-            Debug.LogError("[LoreManager] ❌ DialogueText component not assigned!");
-            return;
-        }
+        dialoguePanel.SetActive(true);
+        dialogueText.text = currentNode.text;
+        outcomeText.text = "";
 
-        dialoguePanel.SetActive(true); // ✅ Ensure panel is active
-        dialogueText.text = dialogueData.dialogueText;
-        outcomeText.text = ""; // ✅ Clear previous outcome text
+        Debug.Log($"[LoreManager] 🗨️ Showing dialogue: {currentNode.text}");
 
-        Debug.Log($"[LoreManager] 🗨️ Showing dialogue: {dialogueData.dialogueText}");
-
-        // ✅ Clear old choices before adding new ones
+        // Clear old choices
         foreach (Transform child in choiceContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // ✅ Create new choices
-        foreach (var choice in dialogueData.choices)
+        // Add new choices
+        foreach (var choice in currentNode.choices)
         {
             GameObject choiceButton = Instantiate(choiceButtonPrefab, choiceContainer);
             choiceButton.GetComponentInChildren<TextMeshProUGUI>().text = choice.choiceText;
             choiceButton.GetComponent<Button>().onClick.AddListener(() => SelectChoice(choice));
         }
 
-        // Hide continue button until a choice is made
+        // Hide continue button until needed
         if (continueButton != null) continueButton.gameObject.SetActive(false);
     }
 
-    private void SelectChoice(DialogueChoice choice)
+    private void SelectChoice(Choice choice)
     {
-        // Hide choices after selection
+        if (!string.IsNullOrEmpty(choice.nextId))
+        {
+            StartDialogue(choice.nextId); // Move to next dialogue node
+        }
+        else if (currentNode.outcome != null)
+        {
+            DisplayOutcome(currentNode.outcome);
+        }
+    }
+
+    private void DisplayOutcome(Outcome outcome)
+    {
+        outcomeText.text = outcome.outcomeText;
+        ApplyOutcome(outcome);
+
         foreach (Transform child in choiceContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // ✅ Display the outcome text
-        outcomeText.text = choice.outcome.outcomeText;
-        Debug.Log($"[LoreManager] 🏆 Outcome: {choice.outcome.outcomeText}");
-
-        // ✅ Apply effects
-        ApplyOutcome(choice.outcome);
-
-        // ✅ Show continue button after choice is made
         if (continueButton != null) continueButton.gameObject.SetActive(true);
     }
 
-    private void ApplyOutcome(DialogueOutcome outcome)
+    private void ApplyOutcome(Outcome outcome)
     {
-        if (GameManager.Instance != null)
-        {
-            if (outcome.energyChange != 0)
-            {
-                Debug.Log($"[LoreManager] ⚡ Energy changed by {outcome.energyChange}");
-            }
-            if (outcome.luckChange != 0)
-            {
-                Debug.Log($"[LoreManager] 🍀 Luck changed by {outcome.luckChange}");
-            }
-            if (outcome.strengthChange != 0)
-            {
-                Debug.Log($"[LoreManager] 💪 Strength changed by {outcome.strengthChange}");
-            }
-            if (outcome.giveItem)
-            {
-                Debug.Log("[LoreManager] 🎁 Player gained an item!");
-            }
-        }
+        if (outcome.energyChange != 0) Debug.Log($"[LoreManager] ⚡ Energy changed by {outcome.energyChange}");
+        if (outcome.strengthChange != 0) Debug.Log($"[LoreManager] 💪 Strength changed by {outcome.strengthChange}");
+        if (outcome.triggerBattle) GameManager.Instance.StartBattle("BattleScene", "OverworldMap");
     }
 
-    // ✅ Continue back to the overworld or previous scene
     public void Continue()
     {
         GameManager.Instance.ReturnFromLore();
     }
 }
+

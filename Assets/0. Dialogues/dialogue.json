@@ -1,0 +1,56 @@
+{
+  "nodes": [
+    {
+      "dialogueId": "start",
+      "text": "You see an old man standing by a campfire.",
+      "choices": [
+        {
+          "choiceText": "Ask him for advice.",
+          "nextId": "advice"
+        },
+        {
+          "choiceText": "Ignore him and leave.",
+          "nextId": "end_ignore"
+        }
+      ]
+    },
+    {
+      "dialogueId": "advice",
+      "text": "The old man smiles and shares his wisdom.",
+      "choices": [
+        {
+          "choiceText": "Thank him.",
+          "nextId": "end_thank"
+        },
+        {
+          "choiceText": "Attack him!",
+          "nextId": "battle"
+        }
+      ]
+    },
+    {
+      "dialogueId": "battle",
+      "text": "The old man transforms into a powerful enemy!",
+      "choices": [],
+      "outcome": {
+        "triggerBattle": true
+      }
+    },
+    {
+      "dialogueId": "end_ignore",
+      "text": "You leave without saying a word.",
+      "choices": [],
+      "outcome": {
+        "energyChange": -1
+      }
+    },
+    {
+      "dialogueId": "end_thank",
+      "text": "You feel stronger from his wisdom.",
+      "choices": [],
+      "outcome": {
+        "strengthChange": 1
+      }
+    }
+  ]
+}

@@ -42,3 +42,10 @@ MonoBehaviour:
       luckChange: 0
       strengthChange: 0
       giveItem: 0
+  - choiceText: 4
+    outcome:
+      outcomeText: 44
+      energyChange: 0
+      luckChange: 0
+      strengthChange: 0
+      giveItem: 0
