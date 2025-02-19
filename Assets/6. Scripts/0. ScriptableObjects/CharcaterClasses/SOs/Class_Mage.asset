@@ -22,5 +22,12 @@ MonoBehaviour:
   dexterity: 10
   intelligence: 15
   luck: 10
-  startingDeck: []
+  startingDeck:
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
   classPrefab: {fileID: 6621355191648621107, guid: cc3e574031cd94bf2982d69fed8a884a, type: 3}

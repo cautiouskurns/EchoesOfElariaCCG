@@ -11,6 +11,8 @@ public class PlayerUnit : BaseCharacter
     private CharacterStats stats;
     private CharacterCombat combat;
 
+    [SerializeField] private int classIndex;  // Assign in inspector for each player unit
+
     protected override void Awake()
     {
         base.Awake();
@@ -67,6 +69,9 @@ public class PlayerUnit : BaseCharacter
             base.Select();
             Debug.Log($"[PlayerUnit] Applied outline material to {Name}");
         }
+
+        // Switch to this character's deck when selected
+        HandManager.Instance?.SwitchActiveClass(classIndex);
     }
 
     public override void Deselect()

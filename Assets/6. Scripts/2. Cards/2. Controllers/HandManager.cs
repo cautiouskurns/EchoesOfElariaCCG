@@ -144,6 +144,24 @@ public class HandManager : MonoBehaviour
     {
         fanLayout?.OnCardHover(card, isHovered);
     }
+
+    public void SwitchActiveClass(int classIndex)
+    {
+        Debug.Log($"[HandManager] Switching to class {classIndex}'s hand");
+        ClearCurrentHand();
+        deckManager.SwitchToClassDeck(classIndex);
+        DrawCards(maxHandSize);
+    }
+
+    private void ClearCurrentHand()
+    {
+        foreach (var cardObj in cardObjects)
+        {
+            Destroy(cardObj);
+        }
+        currentHand.Clear();
+        cardObjects.Clear();
+    }
 }
 
 

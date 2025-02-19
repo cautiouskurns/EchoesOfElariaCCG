@@ -15,6 +15,9 @@ public class DeckManager : MonoBehaviour
     public IReadOnlyList<BaseCard> DiscardPile => discardPile;
     public IReadOnlyList<BaseCard> ExhaustPile => exhaustPile;
 
+    private int currentClassIndex = 0;  // Track which class's deck is active
+    private Dictionary<int, List<BaseCard>> classDeckMap = new Dictionary<int, List<BaseCard>>();
+
     private void Awake()
     {
         if (allCards == null || allCards.Count == 0)
@@ -24,6 +27,11 @@ public class DeckManager : MonoBehaviour
         }
 
         InitializeDeck();
+    }
+
+    private void Start()
+    {
+        InitializeClassDecks();
     }
 
     private void InitializeDeck()
@@ -45,6 +53,46 @@ public class DeckManager : MonoBehaviour
 
         ShuffleDeck(); // ✅ Ensures randomness at game start
         Debug.Log($"[DeckManager] ✅ Draw pile initialized with {drawPile.Count} cards.");
+    }
+
+    private void InitializeClassDecks()
+    {
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("[DeckManager] GameManager not found!");
+            return;
+        }
+
+        // Initialize decks for each selected class
+        for (int i = 0; i < GameManager.Instance.selectedClasses.Length; i++)
+        {
+            CharacterClass characterClass = GameManager.Instance.selectedClasses[i];
+            if (characterClass != null && characterClass.startingDeck != null)
+            {
+                classDeckMap[i] = new List<BaseCard>(characterClass.startingDeck);
+                Debug.Log($"[DeckManager] Initialized deck for {characterClass.className} with {characterClass.startingDeck.Count} cards");
+            }
+        }
+
+        // Initialize with first class's deck
+        SwitchToClassDeck(0);
+    }
+
+    public void SwitchToClassDeck(int classIndex)
+    {
+        if (!classDeckMap.ContainsKey(classIndex))
+        {
+            Debug.LogError($"[DeckManager] No deck found for class index {classIndex}!");
+            return;
+        }
+
+        currentClassIndex = classIndex;
+        drawPile.Clear();
+        discardPile.Clear();
+        drawPile.AddRange(classDeckMap[classIndex]);
+        ShuffleDeck();
+        
+        Debug.Log($"[DeckManager] Switched to deck for class {classIndex}");
     }
 
     public void ShuffleDeck()
