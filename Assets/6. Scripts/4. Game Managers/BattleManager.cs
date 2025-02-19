@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class BattleManager : MonoBehaviour
 {
     public static BattleManager Instance { get; private set; }
-
+    [SerializeField] private Transform[] playerSpawnPoints;  // Add spawn points for players
     private List<EnemyUnit> enemyUnits = new List<EnemyUnit>();
     private List<PlayerUnit> playerUnits = new List<PlayerUnit>();
 
@@ -24,36 +24,91 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        AssignClassStatsToExistingPlayers();
+        // AssignClassStatsToExistingPlayers();
+        SpawnPlayers();
         FindEnemies();
         StartCoroutine(MonitorBattleOutcome());
     }
 
-    /// ✅ Assigns Class Stats to Existing Player Units in Scene
-    private void AssignClassStatsToExistingPlayers()
+    // /// ✅ Assigns Class Stats to Existing Player Units in Scene
+    // private void AssignClassStatsToExistingPlayers()
+    // {
+    //     playerUnits.AddRange(FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None));
+
+    //     if (playerUnits.Count != GameManager.Instance.selectedClasses.Length)
+    //     {
+    //         Debug.LogWarning($"[BattleManager] ⚠ Expected {GameManager.Instance.selectedClasses.Length} players, but found {playerUnits.Count} in the scene.");
+    //     }
+
+    //     for (int i = 0; i < playerUnits.Count; i++)
+    //     {
+    //         if (i < GameManager.Instance.selectedClasses.Length)
+    //         {
+    //             CharacterClass selectedClass = GameManager.Instance.selectedClasses[i];
+
+    //             if (selectedClass != null)
+    //             {
+    //                 playerUnits[i].InitializeFromClass(selectedClass);
+    //                 Debug.Log($"[BattleManager] ✅ Assigned {selectedClass.className} to Player {i + 1}");
+    //             }
+    //             else
+    //             {
+    //                 Debug.LogError($"[BattleManager] ❌ No class selected for Player {i + 1}");
+    //             }
+    //         }
+    //     }
+    // }
+
+        /// ✅ Spawns Player Units Based on Their Selected Class
+    private void SpawnPlayers()
     {
-        playerUnits.AddRange(FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None));
-
-        if (playerUnits.Count != GameManager.Instance.selectedClasses.Length)
+        // Clear any existing player units from previous battles
+        foreach (var unit in playerUnits)
         {
-            Debug.LogWarning($"[BattleManager] ⚠ Expected {GameManager.Instance.selectedClasses.Length} players, but found {playerUnits.Count} in the scene.");
+            if (unit != null) Destroy(unit.gameObject);
         }
+        playerUnits.Clear();
 
-        for (int i = 0; i < playerUnits.Count; i++)
+        CharacterClass[] selectedClasses = GameManager.Instance.selectedClasses;
+
+        for (int i = 0; i < selectedClasses.Length; i++)
         {
-            if (i < GameManager.Instance.selectedClasses.Length)
+            if (selectedClasses[i] == null)
             {
-                CharacterClass selectedClass = GameManager.Instance.selectedClasses[i];
+                Debug.LogError($"[BattleManager] ❌ No class assigned for Player {i + 1}");
+                continue;
+            }
 
-                if (selectedClass != null)
-                {
-                    playerUnits[i].InitializeFromClass(selectedClass);
-                    Debug.Log($"[BattleManager] ✅ Assigned {selectedClass.className} to Player {i + 1}");
-                }
-                else
-                {
-                    Debug.LogError($"[BattleManager] ❌ No class selected for Player {i + 1}");
-                }
+            // Use the class-specific prefab variant
+            GameObject playerPrefab = selectedClasses[i].classPrefab;  // Make sure SO has a classPrefab field
+
+            if (playerPrefab == null)
+            {
+                Debug.LogError($"[BattleManager] ❌ No prefab found for {selectedClasses[i].className}");
+                continue;
+            }
+
+            Transform spawnPoint = (i < playerSpawnPoints.Length) ? playerSpawnPoints[i] : null;
+
+            if (spawnPoint == null)
+            {
+                Debug.LogWarning($"[BattleManager] ⚠ No spawn point assigned for Player {i + 1}, using default position.");
+                spawnPoint = new GameObject($"PlayerSpawn_{i}").transform;
+                spawnPoint.position = new Vector3(i * 2, 0, 0);
+            }
+
+            GameObject playerObj = Instantiate(playerPrefab, spawnPoint.position, Quaternion.identity);
+            PlayerUnit playerUnit = playerObj.GetComponent<PlayerUnit>();
+
+            if (playerUnit != null)
+            {
+                playerUnit.InitializeFromClass(selectedClasses[i]);
+                playerUnits.Add(playerUnit);
+                Debug.Log($"[BattleManager] ✅ Spawned {selectedClasses[i].className} at position {spawnPoint.position}");
+            }
+            else
+            {
+                Debug.LogError($"[BattleManager] ❌ {playerPrefab.name} is missing a PlayerUnit component!");
             }
         }
     }

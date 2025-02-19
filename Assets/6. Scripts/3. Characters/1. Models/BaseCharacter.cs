@@ -31,7 +31,28 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         Combat = GetComponent<CharacterCombat>();
     }
 
-    public void InitializeFromClass(CharacterClass characterClass)
+    // public void InitializeFromClass(CharacterClass characterClass)
+    // {
+    //     if (characterClass == null)
+    //     {
+    //         Debug.LogError("[BaseCharacter] ❌ Class data is null!");
+    //         return;
+    //     }
+
+    //     Name = characterClass.className;
+    //     health = characterClass.baseHealth;
+    //     energy = characterClass.baseEnergy;
+    //     strength = characterClass.strength;
+    //     dexterity = characterClass.dexterity;
+    //     intelligence = characterClass.intelligence;
+    //     luck = characterClass.luck;
+    //     portrait = characterClass.classIcon;
+    //     block = 0; // Reset block at start of battle
+
+    //     Debug.Log($"[BaseCharacter] ✅ {Name} initialized with (HP: {health}, STR: {strength}, EN: {energy})");
+    // }
+
+    public virtual void InitializeFromClass(CharacterClass characterClass)
     {
         if (characterClass == null)
         {

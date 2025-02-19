@@ -38,6 +38,13 @@ public class PlayerUnit : BaseCharacter
             Debug.LogError("[PlayerUnit] ❌ Outline material not assigned in inspector!");
         }
     }
+    
+    public override void InitializeFromClass(CharacterClass characterClass)
+    {
+        base.InitializeFromClass(characterClass);  // Ensure BaseCharacter handles stat initialization
+
+        Debug.Log($"[PlayerUnit] ✅ {characterClass.className} initialized.");
+    }
 
     public override void Select()
     {

@@ -15,4 +15,6 @@ public class CharacterClass : ScriptableObject
     public int intelligence;
     public int luck;
     public List<BaseCard> startingDeck;
+    public GameObject classPrefab;  // ✅ Add this field to hold prefab reference
+
 }

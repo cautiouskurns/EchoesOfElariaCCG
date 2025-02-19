@@ -23,3 +23,4 @@ MonoBehaviour:
   intelligence: 15
   luck: 10
   startingDeck: []
+  classPrefab: {fileID: 6621355191648621107, guid: cc3e574031cd94bf2982d69fed8a884a, type: 3}
