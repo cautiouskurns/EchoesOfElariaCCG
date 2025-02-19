@@ -13,7 +13,7 @@ public class DeckPileUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     {
         if (deckManager == null)
         {
-            deckManager = FindObjectOfType<DeckManager>();
+            deckManager = FindAnyObjectByType<DeckManager>();
         }
         if (pileText == null)
         {

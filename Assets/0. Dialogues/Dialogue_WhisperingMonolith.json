@@ -1,0 +1,120 @@
+{
+  "nodes": [
+    {
+      "dialogueId": "start",
+      "text": "Before you stands a massive monolith, half-buried in shifting reality. Faint whispers seep from its cracks, their words just beyond comprehension. The air feels heavier, charged with something ancient.",
+      "choices": [
+        {
+          "choiceText": "Press your hand against the monolith.",
+          "nextId": "absorb_knowledge"
+        },
+        {
+          "choiceText": "Attempt to decipher the inscriptions.",
+          "nextId": "decode_inscriptions"
+        },
+        {
+          "choiceText": "Prepare to destroy the monolith.",
+          "nextId": "destroy_monolith"
+        },
+        {
+          "choiceText": "Step back and leave.",
+          "nextId": "leave"
+        }
+      ]
+    },
+    {
+      "dialogueId": "absorb_knowledge",
+      "text": "The moment your hand touches the stone, a surge of information floods your mind. Fragmented visions of an ancient civilization, their desperate attempts to control the Rift… and their slow descent into madness. The whispers turn to screams.",
+      "choices": [
+        {
+          "choiceText": "Endure the knowledge.",
+          "nextId": "knowledge_gain"
+        },
+        {
+          "choiceText": "Pull away before it’s too late.",
+          "nextId": "partial_knowledge"
+        }
+      ]
+    },
+    {
+      "dialogueId": "knowledge_gain",
+      "text": "You grasp the knowledge, forcing it into coherence. A Rift spell forms in your mind, but your very soul feels... tainted. The whispers follow you even as you step away.",
+      "outcome": {
+        "gainSpell": true,
+        "corruptionIncrease": 1
+      }
+    },
+    {
+      "dialogueId": "partial_knowledge",
+      "text": "You wrench your hand away, gasping. The visions fade, but the damage is done. A headache pulses at your temples. The Rift's knowledge does not come freely.",
+      "outcome": {
+        "gainWeakSpell": true,
+        "corruptionIncrease": 0.5
+      }
+    },
+    {
+      "dialogueId": "decode_inscriptions",
+      "text": "Carefully, you trace the Elyndari symbols. The stone responds, revealing glimpses of their history: a desperate attempt to seal the Rifts... and a single word left behind—'Repentance'.",
+      "choices": [
+        {
+          "choiceText": "Dig deeper into the meaning.",
+          "nextId": "deep_translation"
+        },
+        {
+          "choiceText": "Record the inscription and move on.",
+          "nextId": "shallow_translation"
+        }
+      ]
+    },
+    {
+      "dialogueId": "deep_translation",
+      "text": "A pulse of energy bursts from the monolith, knocking you back. Whatever knowledge you sought was not meant to be read. The air hums with unseen forces.",
+      "outcome": {
+        "energyLoss": -1,
+        "intelligenceIncrease": 1
+      }
+    },
+    {
+      "dialogueId": "shallow_translation",
+      "text": "You take a rubbing of the inscription, careful not to disturb the magic. This knowledge could be valuable to those who study the Rifts.",
+      "outcome": {
+        "gainLoreItem": true
+      }
+    },
+    {
+      "dialogueId": "destroy_monolith",
+      "text": "You draw your weapon, preparing to strike the monolith. The whispers rise in protest, growing into a chorus of anguish.",
+      "choices": [
+        {
+          "choiceText": "Strike it down.",
+          "nextId": "shatter_monolith"
+        },
+        {
+          "choiceText": "Hesitate and reconsider.",
+          "nextId": "hesitate"
+        }
+      ]
+    },
+    {
+      "dialogueId": "shatter_monolith",
+      "text": "Your weapon makes contact, and the monolith **shatters** with an unearthly wail. The air **rips apart**, and something... **awakens**.",
+      "outcome": {
+        "triggerBattle": true
+      }
+    },
+    {
+      "dialogueId": "hesitate",
+      "text": "Something in the whispers shifts. There is no malice, only regret. Perhaps destruction is not the answer after all.",
+      "outcome": {
+        "gainInsight": true
+      }
+    },
+    {
+      "dialogueId": "leave",
+      "text": "You step away from the monolith. The whispers fade, but an unsettling feeling remains. What knowledge have you turned your back on?",
+      "outcome": {
+        "energyChange": -1
+      }
+    }
+  ]
+}

@@ -6,7 +6,7 @@ using System.Linq;
 public class CardFanLayoutManager : MonoBehaviour
 {
     [Header("Fan Settings")]
-    [SerializeField] private float curveRadius = 400f;     // Reduced from 1200f
+    [SerializeField] private float curveRadius;     // Reduced from 1200f
     [SerializeField] private float fanAngle = 8f;          // Increased from 5f
     [SerializeField] private float cardSpacing = 80f;      // New: Controls horizontal spacing
     [SerializeField] private float arcHeight = 50f;        // Reduced from 100f

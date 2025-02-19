@@ -21,7 +21,7 @@ public class Choice
 [System.Serializable]
 public class Outcome
 {
-    public string outcomeText; // ✅ This was missing!
+    public string outcomeText; 
     public int energyChange;
     public int strengthChange;
     public bool triggerBattle;

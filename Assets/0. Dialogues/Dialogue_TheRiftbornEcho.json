@@ -1,0 +1,133 @@
+{
+  "nodes": [
+    {
+      "dialogueId": "start",
+      "text": "The air is thick with distortion. The sky fractures into shards of flickering light, twisting in and out of existence. The land beneath you trembles with echoes of a past long forgotten.\n\nAhead, standing within a swirling vortex of unstable Rift energy, a spectral figure appears. His form is jagged and incomplete, flickering between moments like a broken projection. His voice is distant, layered, and filled with anguish.\n\n'No… not again… I must warn them… but it’s already too late…'\n\nHis body jerks violently, caught in an unseen struggle. Then the moment resets. He gasps, clutches his chest, and repeats the exact same words.",
+      "choices": [
+        {
+          "choiceText": "Step forward and try to break the loop.",
+          "nextId": "interrupt_loop"
+        },
+        {
+          "choiceText": "Remain hidden and watch the cycle repeat.",
+          "nextId": "observe"
+        },
+        {
+          "choiceText": "Call out to the figure.",
+          "nextId": "speak"
+        },
+        {
+          "choiceText": "End his suffering.",
+          "nextId": "purge"
+        }
+      ]
+    },
+    {
+      "dialogueId": "interrupt_loop",
+      "text": "As you take a step forward, a force grips your body, halting your movements. The world distorts around you. Time bends and ripples outward, pressing down as if resisting change.\n\nThe Riftwalker suddenly notices you. His gaze sharpens with desperation, his hands clawing at the air as if reaching for you. 'You… you are outside the cycle. Then it must be you. Take it before it finds me again.'\n\nHis outstretched hand offers a Riftstone, its surface writhing with unstable energy.",
+      "choices": [
+        {
+          "choiceText": "Take the Riftstone.",
+          "nextId": "take_riftstone"
+        },
+        {
+          "choiceText": "Refuse and step back.",
+          "nextId": "refuse_riftstone"
+        }
+      ]
+    },
+    {
+      "dialogueId": "take_riftstone",
+      "text": "The moment your fingers graze the Riftstone, the world fractures. A sudden surge of power courses through your body, filling you with unbearable heat. The Riftwalker lets out a relieved sigh as his form begins to unravel.\n\n'It is yours now… but it will come for you as it did for me.'\n\nThe Rift energy seeps into your skin. You feel a presence stir—a force watching from the other side.",
+      "outcome": {
+        "gainArtifact": "Riftstone",
+        "instabilityIncrease": 2
+      }
+    },
+    {
+      "dialogueId": "refuse_riftstone",
+      "text": "You shake your head. 'I will not take this burden.'\n\nThe Echo recoils, his spectral form glitching and distorting. 'Then I remain. The cycle… must continue.'\n\nBefore you can react, time snaps backward, and the Riftwalker resets once more.",
+      "outcome": {
+        "loreHint": "Cycle Unbroken"
+      }
+    },
+    {
+      "dialogueId": "observe",
+      "text": "You remain motionless, studying the Riftwalker as he relives his final moments. His form flickers—one moment he is calling out, the next he is clutching his chest, eyes filled with horror.\n\nThen, a second figure appears in the distance—another Riftwalker, but twisted and wrong. A shadow clings to him, warping his movements, as if he exists in two realities at once.\n\n'We were sent to close the Rift,' the Echo whispers. 'But he… he turned on us. We were never meant to return…'",
+      "choices": [
+        {
+          "choiceText": "Continue watching.",
+          "nextId": "observe_further"
+        },
+        {
+          "choiceText": "Step forward and interact.",
+          "nextId": "interrupt_loop"
+        }
+      ]
+    },
+    {
+      "dialogueId": "observe_further",
+      "text": "The shadowed figure raises his hand, and the Rift pulses violently. The Echo lets out a silent scream before collapsing.\n\nThe shadow turns toward you.\n\nThen the cycle resets.",
+      "outcome": {
+        "gainLoreHint": "Great Riftwalker Betrayal"
+      }
+    },
+    {
+      "dialogueId": "speak",
+      "text": "You take a cautious step forward. 'Who are you?'\n\nThe Riftwalker’s gaze locks onto yours, his voice filled with urgency. 'I was Kaelen. Riftwalker of the Sixth Expedition. We were sent to close the Rift, but they lied. We were never meant to return.'\n\nHis hands tremble as he reaches toward you. 'You must find the truth. The Riftwalkers were betrayed. Someone ensured our failure. It was one of us.'",
+      "choices": [
+        {
+          "choiceText": "Press him for more answers.",
+          "nextId": "speak_further"
+        },
+        {
+          "choiceText": "Step away and process his words.",
+          "nextId": "leave"
+        }
+      ]
+    },
+    {
+      "dialogueId": "speak_further",
+      "text": "Kaelen’s form flickers violently. 'The Betrayer… walks among you still. The mark… watch for the mark…'\n\nHis voice distorts, breaking into fragmented echoes. Before you can ask more, his body fractures, dissolving into the Rift.",
+      "outcome": {
+        "gainLoreHint": "Riftwalker Betrayal",
+        "markMysteryUnlocked": true
+      }
+    },
+    {
+      "dialogueId": "purge",
+      "text": "You grip your weapon, steadying yourself. 'Rest now.'\n\nThe Riftwalker lets out a sigh of relief before you strike. As your attack lands, a soundless scream echoes through the Rift. The ground trembles, the sky twists, and for a fleeting moment, all is still.",
+      "choices": [
+        {
+          "choiceText": "Turn away and leave.",
+          "nextId": "purge_outcome"
+        },
+        {
+          "choiceText": "Linger and watch the Rift.",
+          "nextId": "rift_watching"
+        }
+      ]
+    },
+    {
+      "dialogueId": "purge_outcome",
+      "text": "The Rift is not so easily silenced. As you turn away, a violent rupture splits the air. The Rift howls.\n\nSomething is coming.",
+      "outcome": {
+        "triggerBattle": true
+      }
+    },
+    {
+      "dialogueId": "rift_watching",
+      "text": "A towering presence stirs within the Rift, its gaze settling upon you. A shape begins to emerge—a being that was never meant to exist.\n\nThen the vision fades, but the feeling remains.",
+      "outcome": {
+        "gainLoreHint": "Something Watches"
+      }
+    },
+    {
+      "dialogueId": "leave",
+      "text": "You take one last look at the Rift before stepping away. Whatever truth lies here will have to wait.",
+      "outcome": {
+        "energyChange": -1
+      }
+    }
+  ]
+}
