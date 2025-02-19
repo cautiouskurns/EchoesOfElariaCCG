@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
+using System.IO;
 
 public class LoreManager : MonoBehaviour
 {
@@ -15,8 +16,22 @@ public class LoreManager : MonoBehaviour
     [SerializeField] private Button continueButton;
 
     [Header("Dialogue File Settings")]
-    [SerializeField] private string dialogueFileName = "dialogue";
+    [SerializeField] private string dialogueFileName = "Dialogue_WhisperingMonolith";
     [SerializeField] private string dialoguePath = "Assets/0. Dialogues/"; // Add explicit path
+
+    [Header("UI References")]
+    [SerializeField] private Image sceneImage;  // Reference to the SceneImage object in Canvas
+    [SerializeField] private Sprite dialogueImage;  // The sprite to display
+    [SerializeField] private Image dialogueImageDisplay;  // Add this to hold the UI Image component
+
+    [Header("Prefab-Specific Settings")]
+    [SerializeField] private string loreSceneId;  // Unique identifier for this scene's lore
+    [SerializeField] private DialogueData defaultDialogue;  // Default dialogue for this specific scene
+    [SerializeField] private Sprite defaultSceneImage;  // Default scene image for this instance
+
+    [Header("Scroll View Settings")]
+    [SerializeField] private ScrollRect scrollRect;
+    [SerializeField] private float scrollSpeed = 20f;
 
     private DialogueLoader dialogueLoader;
     private DialogueNode currentNode;
@@ -43,9 +58,32 @@ public class LoreManager : MonoBehaviour
             return;
         }
 
-        string fullPath = System.IO.Path.Combine(dialoguePath, dialogueFileName + ".json");
-        Debug.Log($"[LoreManager] Loading dialogue from: {fullPath}");
-        dialogueLoader.LoadDialogueFromFile(fullPath);
+        // Use scene-specific dialogue file if provided
+        string fileName = $"{dialogueFileName}_{loreSceneId}";
+        string fullPath = System.IO.Path.Combine(dialoguePath, fileName + ".json");
+
+        Debug.Log($"[LoreManager] Loading dialogue for scene {loreSceneId} from: {fullPath}");
+        
+        if (File.Exists(fullPath))
+        {
+            dialogueLoader.LoadDialogueFromFile(fullPath);
+        }
+        else
+        {
+            Debug.Log($"[LoreManager] Using default dialogue for scene {loreSceneId}");
+            // Use default dialogue data if JSON not found
+            if (defaultDialogue != null)
+            {
+                currentNode = new DialogueNode
+                {
+                    dialogueId = "start",
+                    text = defaultDialogue.dialogueText,
+                    nodeSprite = defaultSceneImage
+                    // Set other properties as needed
+                };
+            }
+        }
+
         StartDialogue("start");
     }
 
@@ -61,6 +99,32 @@ public class LoreManager : MonoBehaviour
         dialoguePanel.SetActive(true);
         dialogueText.text = currentNode.text;
         outcomeText.text = "";
+
+        // Update the scene image
+        if (sceneImage != null)
+        {
+            sceneImage.sprite = dialogueImage;
+        }
+
+        // Update the image display with the sprite
+        if (dialogueImageDisplay != null)
+        {
+            if (dialogueImage != null)
+            {
+                dialogueImageDisplay.sprite = dialogueImage;
+                dialogueImageDisplay.gameObject.SetActive(true);
+            }
+            else
+            {
+                dialogueImageDisplay.gameObject.SetActive(false);
+            }
+        }
+
+        // Reset scroll position to top when new dialogue starts
+        if (scrollRect != null)
+        {
+            scrollRect.verticalNormalizedPosition = 1f;
+        }
 
         // Clear old choices
         foreach (Transform child in choiceContainer)
@@ -129,6 +193,16 @@ public class LoreManager : MonoBehaviour
     public void Continue()
     {
         GameManager.Instance.ReturnFromLore();
+    }
+
+    // Optional: Add method for automatic scrolling
+    public void ScrollText()
+    {
+        if (scrollRect != null)
+        {
+            float newPosition = scrollRect.verticalNormalizedPosition - (scrollSpeed * Time.deltaTime);
+            scrollRect.verticalNormalizedPosition = Mathf.Clamp01(newPosition);
+        }
     }
 }
 

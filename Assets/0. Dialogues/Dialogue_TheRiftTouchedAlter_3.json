@@ -1,0 +1,121 @@
+{
+  "nodes": [
+    {
+      "dialogueId": "start",
+      "text": "The ruined chapel looms before you, its once-sacred walls warped by the Rift’s touch. Inside, the air shimmers, bending reality in ways you cannot comprehend. At the center stands an ancient altar, its stone cracked by a thin veil of shifting energy. Upon it, a half-decayed book flickers between existence and oblivion, its pages caught between past and present.",
+      "choices": [
+        {
+          "choiceText": "Read the book aloud.",
+          "nextId": "read_book"
+        },
+        {
+          "choiceText": "Offer Rift energy to the altar.",
+          "nextId": "offer_energy"
+        },
+        {
+          "choiceText": "Attempt to stabilize the altar.",
+          "nextId": "stabilize_altar"
+        },
+        {
+          "choiceText": "Burn the book.",
+          "nextId": "burn_book"
+        }
+      ]
+    },
+    {
+      "dialogueId": "read_book",
+      "text": "You reach for the book, its cover flickering between ages—once pristine, now torn, then whole again. As you speak the words aloud, the Rift pulses, distorting the air around you. A voice, distant and fractured, echoes your words.",
+      "choices": [
+        {
+          "choiceText": "Continue reading.",
+          "nextId": "prophecy"
+        },
+        {
+          "choiceText": "Stop before it’s too late.",
+          "nextId": "partial_prophecy"
+        }
+      ]
+    },
+    {
+      "dialogueId": "prophecy",
+      "text": "‘When the last Riftwalker stands before the Veil, a choice shall be made. The path to salvation or the road to ruin… only one may cross.’\n\nA searing pain lances through your mind. Visions of a future yet to come fill your thoughts—cities crumbling, a figure standing alone before a great Rift, shadows reaching for them. Then, darkness.\n\nWhen you regain focus, the book is gone. The prophecy is now part of you.",
+      "outcome": {
+        "gainProphecy": true,
+        "hallucinationDebuff": true
+      }
+    },
+    {
+      "dialogueId": "partial_prophecy",
+      "text": "You slam the book shut, the whispers in your mind fading… but not entirely. A fragment of the knowledge lingers, an incomplete message etched into your thoughts.",
+      "outcome": {
+        "gainFragmentedProphecy": true
+      }
+    },
+    {
+      "dialogueId": "offer_energy",
+      "text": "You place your hands upon the altar and focus, channeling your Rift energy into its core. The veil shudders, the chapel trembles, and something beyond time stirs.",
+      "choices": [
+        {
+          "choiceText": "Continue, no matter the risk.",
+          "nextId": "rift_spell"
+        },
+        {
+          "choiceText": "Pull away before you lose control.",
+          "nextId": "energy_loss"
+        }
+      ]
+    },
+    {
+      "dialogueId": "rift_spell",
+      "text": "The altar drinks in the energy greedily, and for a brief moment, the Rift stabilizes. A new spell burns itself into your mind—something powerful, something forbidden. But as you step back, you feel a darkness clawing at your soul.",
+      "outcome": {
+        "gainSpell": true,
+        "corruptionIncrease": 1
+      }
+    },
+    {
+      "dialogueId": "energy_loss",
+      "text": "You wrench your hands away, gasping. The altar shudders but does not consume your energy. Whatever knowledge it held remains sealed… for now.",
+      "outcome": {
+        "minorCorruptionIncrease": true
+      }
+    },
+    {
+      "dialogueId": "stabilize_altar",
+      "text": "You study the shifting energy, searching for a way to bind it into place. The altar is resisting, demanding something in return.",
+      "choices": [
+        {
+          "choiceText": "Sacrifice some of your vitality.",
+          "nextId": "altar_stabilized"
+        },
+        {
+          "choiceText": "Refuse and step back.",
+          "nextId": "altar_unstable"
+        }
+      ]
+    },
+    {
+      "dialogueId": "altar_stabilized",
+      "text": "You let the altar siphon a portion of your life force. The Rift energies settle, and the structure becomes… still. The chapel is no longer shifting—it is now a beacon, a place of refuge in the chaos of the Rift.",
+      "outcome": {
+        "unlockFastTravel": true,
+        "healthLoss": 2
+      }
+    },
+    {
+      "dialogueId": "altar_unstable",
+      "text": "You step away, unwilling to pay the price. The energy within the altar flares once, then settles into its unstable rhythm. This place remains untamed.",
+      "outcome": {
+        "gainLoreHint": "Altar Unstable"
+      }
+    },
+    {
+      "dialogueId": "burn_book",
+      "text": "You set the book alight. The flames consume it instantly, its knowledge lost to time. The whispers of the chapel grow silent… but so does whatever secret it held.",
+      "outcome": {
+        "preventCorruption": true,
+        "loseLoreHint": "Prophecy"
+      }
+    }
+  ]
+}

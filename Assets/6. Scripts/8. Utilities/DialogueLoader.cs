@@ -7,6 +7,7 @@ public class DialogueNode
 {
     public string dialogueId;
     public string text;
+    public Sprite nodeSprite;  // Can be assigned in inspector
     public List<Choice> choices;
     public Outcome outcome;
 }

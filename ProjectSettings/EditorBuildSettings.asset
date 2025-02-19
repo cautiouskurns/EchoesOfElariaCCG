@@ -18,6 +18,15 @@ EditorBuildSettings:
     path: Assets/0. Scenes/LoreNode2.unity
     guid: e780d1b8089ca498ba39d9fb7851942b
   - enabled: 1
+    path: Assets/0. Scenes/LoreNode3.unity
+    guid: c3808234a93b94a3da49c38b60a7af66
+  - enabled: 1
+    path: Assets/0. Scenes/LoreNode4.unity
+    guid: 2f4066b6aadfd436296fefd58e2a6ec7
+  - enabled: 1
+    path: Assets/0. Scenes/LoreNode5.unity
+    guid: 50451f193148048d491df5de2d6cec7e
+  - enabled: 1
     path: Assets/0. Scenes/Battle1.unity
     guid: d414729aaf82b413b94b038624f7d431
   - enabled: 1

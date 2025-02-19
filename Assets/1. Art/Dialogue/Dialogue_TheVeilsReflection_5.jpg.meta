@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: f1008544999c24356a409a36fc47fc9b
+guid: b56d6128c3be043b9af4fe98855ca5c2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1166454588265536782
-    second: Dialogue_TheRiftbornEcho_1_0
+      213: -8208443445157640863
+    second: Dialogue_TheVeilsReflection_5_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Dialogue_TheRiftbornEcho_1_0
+      name: Dialogue_TheVeilsReflection_5_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e0d11349444103010800000000000000
-      internalID: 1166454588265536782
+      spriteID: 165ce744d20c51e80800000000000000
+      internalID: -8208443445157640863
       vertices: []
       indices: 
       edges: []

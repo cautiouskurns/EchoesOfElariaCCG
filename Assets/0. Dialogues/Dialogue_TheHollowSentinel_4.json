@@ -1,0 +1,143 @@
+{
+  "nodes": [
+    {
+      "dialogueId": "start",
+      "text": "A towering construct looms before you, its metallic frame etched with runes long since faded. Though its joints are rusted and its form cracked by time, it remains frozen in the stance of a warrior. As you step closer, its core flickers with a dying light.\n\nA voice, low and distant, grinds from within its hollow chest: *'Does the Rift still consume?'*",
+      "choices": [
+        {
+          "choiceText": "Tell the truth.",
+          "nextId": "truth_response"
+        },
+        {
+          "choiceText": "Lie and say the world is safe.",
+          "nextId": "lie_response"
+        },
+        {
+          "choiceText": "Attempt to reactivate it.",
+          "nextId": "reactivate_attempt"
+        },
+        {
+          "choiceText": "Attack the Sentinel.",
+          "nextId": "attack"
+        }
+      ]
+    },
+    {
+      "dialogueId": "truth_response",
+      "text": "You step forward, your voice steady. *'The Rift still consumes. The world remains fractured, and we struggle to hold it together.'*\n\nThe Sentinel hums, its energy flickering weakly. *'Then we have failed. But you still fight… That means the war is not over.'*\n\nIts form shudders as hidden mechanisms whir to life. A panel opens within its chest, revealing a small metallic core.",
+      "choices": [
+        {
+          "choiceText": "Take the core and examine it.",
+          "nextId": "elyndari_war"
+        },
+        {
+          "choiceText": "Ask it about the war.",
+          "nextId": "ask_war"
+        },
+        {
+          "choiceText": "Remain silent and wait.",
+          "nextId": "sentinel_fate"
+        }
+      ]
+    },
+    {
+      "dialogueId": "elyndari_war",
+      "text": "The core pulses in your palm, an ancient data node still intact. The Sentinel’s voice fractures: *'We were built to stand against the Rift. To fight until the last of us fell.'*\n\nA final pulse of energy surges through the construct. It lowers its weapon, its voice softening. *'If the war still rages, then our time has not yet ended.'*",
+      "outcome": {
+        "gainLoreHint": "Elyndari War Data"
+      }
+    },
+    {
+      "dialogueId": "ask_war",
+      "text": "You ask the Sentinel for details about the Elyndari War. It hesitates before speaking: *'The Rifts tore our world asunder. But it was not them that undid us. It was...'*\n\nThe voice distorts, as if something is missing.\n\n*'One of us. A Betrayer. They turned our power upon us. The war was lost the moment they chose ambition over duty.'*\n\nA spark ignites within its eyes before fading.",
+      "outcome": {
+        "gainLoreHint": "The Betrayer"
+      }
+    },
+    {
+      "dialogueId": "sentinel_fate",
+      "text": "The Sentinel lowers its head. *'If the war still rages, then perhaps my watch is not over.'*\n\nSlowly, its systems begin to shut down, conserving what little remains of its power.",
+      "outcome": {
+        "gainTemporaryBuff": "Sentinel's Protection"
+      }
+    },
+    {
+      "dialogueId": "lie_response",
+      "text": "You speak carefully. *'The Rift no longer consumes. The world is safe.'*\n\nFor a moment, the Sentinel remains motionless. Then its eyes dim. *'Then my duty is fulfilled…'* it says softly.\n\nThe construct shudders once before powering down completely. The silence left behind is heavy.",
+      "choices": [
+        {
+          "choiceText": "Leave it alone.",
+          "nextId": "sentinel_shutdown"
+        },
+        {
+          "choiceText": "Try to reactivate it again.",
+          "nextId": "reactivate_attempt"
+        }
+      ]
+    },
+    {
+      "dialogueId": "sentinel_shutdown",
+      "text": "As you turn away, something lingers in your mind—a feeling that you have erased a piece of history. One of your Riftwalkers shifts uncomfortably, haunted by the weight of deception.",
+      "outcome": {
+        "gainDebuff": "Guilt of the Lie"
+      }
+    },
+    {
+      "dialogueId": "reactivate_attempt",
+      "text": "You examine the Sentinel's core systems. If you can reroute its remaining power, you might be able to restore some functionality.\n\nAs you manipulate the ancient circuits, its eyes flicker. *'New directives detected… I will follow.'*",
+      "choices": [
+        {
+          "choiceText": "Command it to follow you.",
+          "nextId": "sentinel_follows"
+        },
+        {
+          "choiceText": "Ask it what it remembers.",
+          "nextId": "memory_fragment"
+        }
+      ]
+    },
+    {
+      "dialogueId": "sentinel_follows",
+      "text": "The Sentinel steps forward, its movements slow but determined. *'Directive updated. I will walk beside you… for now.'*\n\nA strange energy pulses from its frame—unstable, as if something within it resists revival.",
+      "outcome": {
+        "gainCompanion": "Hollow Sentinel",
+        "corruptionIncrease": 1
+      }
+    },
+    {
+      "dialogueId": "memory_fragment",
+      "text": "The Sentinel’s voice crackles. *'Fragments remain. I was deployed during the final days. The Rift… it was never meant to be closed. The war… was not what it seemed.'*\n\nIts energy wanes, as if the knowledge it holds is too much to bear. *'I must… remember…'*",
+      "outcome": {
+        "gainLoreHint": "False War"
+      }
+    },
+    {
+      "dialogueId": "attack",
+      "text": "You grip your weapon and charge. The Sentinel reacts instantly, its rusted joints groaning as it raises its blade.",
+      "choices": [
+        {
+          "choiceText": "Strike with all your might.",
+          "nextId": "sentinel_destroyed"
+        },
+        {
+          "choiceText": "Wait and let it make the first move.",
+          "nextId": "sentinel_counterattack"
+        }
+      ]
+    },
+    {
+      "dialogueId": "sentinel_destroyed",
+      "text": "Your strike lands true, shattering the Sentinel’s core. A final, broken voice echoes: *'You… are no different… than them…'*.\n\nAs the construct collapses, something remains—an Elyndari weapon, still humming with lost power.",
+      "outcome": {
+        "gainWeapon": "Elyndari Warblade"
+      }
+    },
+    {
+      "dialogueId": "sentinel_counterattack",
+      "text": "The Sentinel moves with a speed you did not expect. A pulse of energy explodes from its core, knocking you back. When you regain your senses, the construct is gone—only its footprints remain.",
+      "outcome": {
+        "gainLoreHint": "Sentinel's Escape"
+      }
+    }
+  ]
+}

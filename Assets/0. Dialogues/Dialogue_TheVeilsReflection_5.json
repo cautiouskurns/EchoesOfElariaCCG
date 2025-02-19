@@ -1,0 +1,132 @@
+{
+  "nodes": [
+    {
+      "dialogueId": "start",
+      "text": "The air warps as you step forward. A veil of shifting light stretches across the path, its surface rippling like liquid glass. As you draw closer, reflections take form within the distortion—not just your own, but something… altered.\n\nThe figures within the Veil step forward. They wear your faces, wield your weapons, but their eyes hold knowledge you do not yet possess.\n\nOne of them speaks, their voice your own:\n\n*'We have seen what comes next. You may not be ready.'*",
+      "choices": [
+        {
+          "choiceText": "Listen to their warnings.",
+          "nextId": "listen_warnings"
+        },
+        {
+          "choiceText": "Trade places with your reflection.",
+          "nextId": "trade_places"
+        },
+        {
+          "choiceText": "Shatter the reflection.",
+          "nextId": "shatter_reflection"
+        },
+        {
+          "choiceText": "Walk away without engaging.",
+          "nextId": "walk_away"
+        }
+      ]
+    },
+    {
+      "dialogueId": "listen_warnings",
+      "text": "You step forward, locking eyes with your own reflection. It regards you with a weary expression.\n\n*'We have fought the battles you will fight. We have bled where you will bleed. The path before you forks—one road leads to salvation, the other to ruin.'*\n\nThe reflection leans closer, whispering:",
+      "choices": [
+        {
+          "choiceText": "'Tell me what you know.'",
+          "nextId": "receive_prophecy"
+        },
+        {
+          "choiceText": "'What happens if we fail?'",
+          "nextId": "grim_warning"
+        },
+        {
+          "choiceText": "Remain silent and listen.",
+          "nextId": "silent_warning"
+        }
+      ]
+    },
+    {
+      "dialogueId": "receive_prophecy",
+      "text": "The reflection closes its eyes. *'Your enemy already knows your weakness. The Betrayer walks among you, hidden in plain sight.'*\n\nA pulse of Rift energy distorts the air. You suddenly see **a battle not yet fought**, a face turning in shadow. Then it fades, leaving you with a lingering sense of unease.",
+      "outcome": {
+        "gainLoreHint": "The Betrayer Revealed",
+        "futureBossIntel": true
+      }
+    },
+    {
+      "dialogueId": "grim_warning",
+      "text": "*'You will lose something you are not willing to sacrifice. And in that moment, you will be given a choice—to let go, or to become something… else.'*\n\nThe reflection flickers. For a brief moment, its form shifts into something monstrous, something **wrong**. Then it resets, watching you intently.",
+      "outcome": {
+        "gainLoreHint": "The Rift’s Price"
+      }
+    },
+    {
+      "dialogueId": "silent_warning",
+      "text": "You say nothing. The reflection nods, as if understanding something unspoken.\n\n*'Perhaps it is better this way.'*\n\nThe reflection slowly fades, leaving behind a single inscribed symbol on the Veil’s surface.",
+      "outcome": {
+        "gainMysteryClue": "Unknown Glyph"
+      }
+    },
+    {
+      "dialogueId": "trade_places",
+      "text": "Your reflection smiles, extending a hand. *'You wish to know the other side? Then step forward, and we will exchange places.'*\n\nThe moment you make contact, a **searing pain** floods your body. Your thoughts blur, shifting between past and present, future and possibility. Then… silence.",
+      "choices": [
+        {
+          "choiceText": "Embrace the change.",
+          "nextId": "fully_switch"
+        },
+        {
+          "choiceText": "Fight against it.",
+          "nextId": "partial_switch"
+        }
+      ]
+    },
+    {
+      "dialogueId": "fully_switch",
+      "text": "Your mind stabilizes, but something is different. Your skills have changed, your very **essence rewritten**. You look back at the Veil—your former self stands within, watching you through the glass.\n\n*'It is done. Walk a new path.'*",
+      "outcome": {
+        "gainNewAbilities": true,
+        "alteredFate": true
+      }
+    },
+    {
+      "dialogueId": "partial_switch",
+      "text": "You resist, pulling away before the transformation is complete. The Rift convulses, and a fragment of your reflection **clings to your mind**. You are still yourself, but… different.\n\n*'You are not ready…'*\n\nThe Veil shatters, leaving behind a lingering sense of unease.",
+      "outcome": {
+        "gainHybridAbilities": true,
+        "fateUncertain": true
+      }
+    },
+    {
+      "dialogueId": "shatter_reflection",
+      "text": "With a single motion, you strike the Veil. It **screams**, a thousand voices splitting into fractured echoes. The reflections **shatter**, dissolving into dust and light.",
+      "choices": [
+        {
+          "choiceText": "Search the remains.",
+          "nextId": "gain_relic"
+        },
+        {
+          "choiceText": "Step away quickly.",
+          "nextId": "rift_stabilizes"
+        }
+      ]
+    },
+    {
+      "dialogueId": "gain_relic",
+      "text": "Among the shattered remnants, something gleams—a relic untouched by time. As you lift it, the air trembles, reality itself seeming **less stable** than before.",
+      "outcome": {
+        "gainRelic": "Veil-Touched Shard",
+        "riftInstabilityIncrease": 1
+      }
+    },
+    {
+      "dialogueId": "rift_stabilizes",
+      "text": "You step back, leaving the fragments undisturbed. The Rift's energies slowly **calm**, the anomaly sealing itself as if it had never been there.",
+      "outcome": {
+        "riftClosed": true
+      }
+    },
+    {
+      "dialogueId": "walk_away",
+      "text": "You turn and leave, resisting the urge to look back. But even as you distance yourself, a presence lingers just beyond sight. The feeling of **being watched** does not fade.",
+      "outcome": {
+        "gainMysteryStatus": "Marked by the Rift"
+      }
+    }
+  ]
+}
