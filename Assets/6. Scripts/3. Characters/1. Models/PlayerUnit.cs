@@ -70,8 +70,11 @@ public class PlayerUnit : BaseCharacter
             Debug.Log($"[PlayerUnit] Applied outline material to {Name}");
         }
 
-        // Switch to this character's deck when selected
+        // Switch both deck and AP pool when character is selected
         HandManager.Instance?.SwitchActiveClass(classIndex);
+        APManager.Instance?.SwitchActiveClass(classIndex);
+        
+        Debug.Log($"[PlayerUnit] Switched to class {classIndex}'s deck and AP pool");
     }
 
     public override void Deselect()

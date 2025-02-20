@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private GameObject winScreen;
     [SerializeField] private GameObject loseScreen;
+
+    [Header("AP Display")]
+    [SerializeField] private TextMeshProUGUI[] classAPTexts;  // Array of AP displays for each class
 
     private void Awake()
     {
@@ -46,6 +50,19 @@ public class UIManager : MonoBehaviour
         {
             Debug.LogWarning("[UIManager] GameManager not found, loading Overworld scene directly");
             SceneManager.LoadScene("OverworldMap");
+        }
+    }
+
+    public void UpdateAPDisplay()
+    {
+        for (int i = 0; i < classAPTexts.Length; i++)
+        {
+            if (classAPTexts[i] != null)
+            {
+                int currentAP = APManager.Instance.GetCurrentAP();
+                int maxAP = APManager.Instance.GetMaxAP();
+                classAPTexts[i].text = $"AP: {currentAP}/{maxAP}";
+            }
         }
     }
 }

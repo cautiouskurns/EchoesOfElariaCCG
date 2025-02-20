@@ -78,7 +78,7 @@ public class TurnManager : MonoBehaviour
     private void StartPlayerTurn()
     {
         Debug.Log("[TurnManager] 👑 Player turn started");
-        APManager.Instance.ResetAP();
+        APManager.Instance.ResetAllAP();  // Reset AP for all classes at turn start
         
         if (handManager != null)
         {
