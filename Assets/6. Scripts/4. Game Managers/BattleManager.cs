@@ -10,6 +10,10 @@ public class BattleManager : MonoBehaviour
     private List<EnemyUnit> enemyUnits = new List<EnemyUnit>();
     private List<PlayerUnit> playerUnits = new List<PlayerUnit>();
 
+    [Header("Enemy Configuration")]
+    [SerializeField] private EnemyType[] enemyTypes;
+    [SerializeField] private Transform[] enemySpawnLocations;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -26,38 +30,12 @@ public class BattleManager : MonoBehaviour
 
         // AssignClassStatsToExistingPlayers();
         SpawnPlayers();
+        SpawnEnemies();
         FindEnemies();
         StartCoroutine(MonitorBattleOutcome());
     }
 
-    // /// ✅ Assigns Class Stats to Existing Player Units in Scene
-    // private void AssignClassStatsToExistingPlayers()
-    // {
-    //     playerUnits.AddRange(FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None));
 
-    //     if (playerUnits.Count != GameManager.Instance.selectedClasses.Length)
-    //     {
-    //         Debug.LogWarning($"[BattleManager] ⚠ Expected {GameManager.Instance.selectedClasses.Length} players, but found {playerUnits.Count} in the scene.");
-    //     }
-
-    //     for (int i = 0; i < playerUnits.Count; i++)
-    //     {
-    //         if (i < GameManager.Instance.selectedClasses.Length)
-    //         {
-    //             CharacterClass selectedClass = GameManager.Instance.selectedClasses[i];
-
-    //             if (selectedClass != null)
-    //             {
-    //                 playerUnits[i].InitializeFromClass(selectedClass);
-    //                 Debug.Log($"[BattleManager] ✅ Assigned {selectedClass.className} to Player {i + 1}");
-    //             }
-    //             else
-    //             {
-    //                 Debug.LogError($"[BattleManager] ❌ No class selected for Player {i + 1}");
-    //             }
-    //         }
-    //     }
-    // }
 
         /// ✅ Spawns Player Units Based on Their Selected Class
     private void SpawnPlayers()
@@ -109,6 +87,27 @@ public class BattleManager : MonoBehaviour
             else
             {
                 Debug.LogError($"[BattleManager] ❌ {playerPrefab.name} is missing a PlayerUnit component!");
+            }
+        }
+    }
+
+    private void SpawnEnemies()
+    {
+        enemyUnits.Clear();
+        
+        for (int i = 0; i < enemyTypes.Length; i++)
+        {
+            if (enemyTypes[i] == null) continue;
+
+            Vector3 spawnPos = (i < enemySpawnLocations.Length) ? 
+                enemySpawnLocations[i].position : 
+                new Vector3(i * 2, 0, 0);
+
+            GameObject enemyObj = Instantiate(enemyTypes[i].enemyPrefab, spawnPos, Quaternion.identity);
+            if (enemyObj.TryGetComponent<EnemyUnit>(out var enemy))
+            {
+                enemyUnits.Add(enemy);
+                Debug.Log($"[BattleManager] Spawned enemy: {enemyTypes[i].enemyName}");
             }
         }
     }
