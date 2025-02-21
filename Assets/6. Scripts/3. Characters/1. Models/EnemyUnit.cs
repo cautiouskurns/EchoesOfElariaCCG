@@ -5,7 +5,7 @@ public class EnemyUnit : BaseCharacter
 {
     [SerializeField] private EnemyIntentUI intentUI;
     private EnemyAnimationController animationController;
-    private EnemyType enemyData;
+    private EnemyClass enemyData;
     private int currentHealth;
     private int currentStrength;
     private int currentDefense;
@@ -40,7 +40,7 @@ public class EnemyUnit : BaseCharacter
         }
     }
 
-    public void InitializeFromType(EnemyType type)
+    public void InitializeFromType(EnemyClass type)
     {
         enemyData = type;
         Name = type.enemyName;

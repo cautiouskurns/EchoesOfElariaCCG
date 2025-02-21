@@ -3,8 +3,6 @@ using System;
 
 public class CharacterStats : MonoBehaviour
 {
-    [Header("Data Source")]
-    [SerializeField] private CharacterData characterData;  // ScriptableObject for base stats
 
     [Header("Base Stats")]
     [SerializeField] private int maxHealth;               // Exposed in Inspector
@@ -23,7 +21,7 @@ public class CharacterStats : MonoBehaviour
 
     private void Awake()
     {
-        ApplyCharacterData();  // Apply values from ScriptableObject
+        // ApplyCharacterData();  // Apply values from ScriptableObject
         Initialize(maxHealth, startingActionPoints);
     }
 
@@ -63,23 +61,5 @@ public class CharacterStats : MonoBehaviour
         CurrentActionPoints = MaxActionPoints;
         Debug.Log($"[CharacterStats] 🔄 Action Points refreshed to {CurrentActionPoints}");
         OnActionPointsChanged?.Invoke(CurrentActionPoints);
-    }
-
-    // ✅ Automatically update values in the Inspector during Edit Mode
-    private void OnValidate()
-    {
-        ApplyCharacterData();
-    }
-
-    // Apply data from the ScriptableObject to the exposed fields
-    private void ApplyCharacterData()
-    {
-        if (characterData != null)
-        {
-            maxHealth = characterData.maxHealth;
-            startingActionPoints = characterData.startingActionPoints;
-            CharacterClass = characterData.characterClass;
-            ClassBonus = characterData.classBonus;
-        }
     }
 }

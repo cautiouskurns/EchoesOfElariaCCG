@@ -66,6 +66,8 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public virtual void TakeDamage(int damage)
     {
         Stats.ModifyHealth(-damage);
+
+        Debug.Log($"[BaseCharacter] {Name} took {damage} damage. HP: {Stats.CurrentHealth}/{Stats.MaxHealth}");
         
         // Check for death after taking damage
         if (Stats.CurrentHealth <= 0)

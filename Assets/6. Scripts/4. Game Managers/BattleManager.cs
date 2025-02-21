@@ -11,7 +11,7 @@ public class BattleManager : MonoBehaviour
     private List<PlayerUnit> playerUnits = new List<PlayerUnit>();
 
     [Header("Enemy Configuration")]
-    [SerializeField] private EnemyType[] enemyTypes;
+    [SerializeField] private EnemyClass[] enemyTypes;
     [SerializeField] private Transform[] enemySpawnLocations;
 
     private void Awake()
