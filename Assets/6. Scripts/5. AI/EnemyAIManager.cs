@@ -28,31 +28,53 @@ public class EnemyAIManager : MonoBehaviour
         var enemies = FindObjectsByType<EnemyUnit>(FindObjectsSortMode.None);
         var players = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None);
 
+        if (enemies.Length == 0)
+        {
+            Debug.LogWarning("[EnemyAI] ⚠️ No enemies found. Skipping enemy turn.");
+            TurnManager.Instance.EndEnemyTurn();
+            yield break;
+        }
+
+        if (players.Length == 0)
+        {
+            Debug.LogWarning("[EnemyAI] ⚠️ No player units found. Skipping enemy turn.");
+            TurnManager.Instance.EndEnemyTurn();
+            yield break;
+        }
+
         foreach (var enemy in enemies)
         {
+            Debug.Log($"[EnemyAI] 🏴 {enemy.Name} starting turn. AP: {enemy.Stats.CurrentActionPoints}");
+
             enemy.Stats.RefreshActionPoints();
 
             while (enemy.Stats.CurrentActionPoints > 0)
             {
-                // Select an action and a target
                 var action = SelectRandomAction(enemy);
                 var target = SelectRandomTarget(players);
 
-                if (action == null || target == null)
+                if (action == null)
                 {
-                    Debug.LogWarning("[EnemyAI] ⚠️ No valid action or target found!");
+                    Debug.LogWarning($"[EnemyAI] ⚠️ {enemy.Name} has no available actions!");
+                    break;
+                }
+
+                if (target == null)
+                {
+                    Debug.LogWarning($"[EnemyAI] ⚠️ {enemy.Name} has no valid target!");
                     break;
                 }
 
                 if (action.Cost > enemy.Stats.CurrentActionPoints)
                 {
-                    Debug.Log($"[EnemyAI] ❌ {enemy.Name} does not have enough AP for {action.CardName}");
-                    break; // Not enough AP for action
+                    Debug.Log($"[EnemyAI] ❌ {enemy.Name} does not have enough AP ({enemy.Stats.CurrentActionPoints}) for {action.CardName} (Cost: {action.Cost})");
+                    break; 
                 }
+
+                Debug.Log($"[EnemyAI] ⚔️ {enemy.Name} attacking {target.Name} with {action.CardName}");
 
                 yield return StartCoroutine(PerformEnemyAttack(enemy, target, action));
 
-                // Spend AP after the attack sequence
                 enemy.Stats.UseActionPoints(action.Cost);
 
                 yield return new WaitForSeconds(actionDelay);
@@ -62,6 +84,7 @@ public class EnemyAIManager : MonoBehaviour
         Debug.Log("[EnemyAI] ✅ Enemy turn complete");
         TurnManager.Instance.EndEnemyTurn();
     }
+
 
     /// <summary>
     /// ✅ Selects a random action from the enemy's available actions.
@@ -111,7 +134,7 @@ public class EnemyAIManager : MonoBehaviour
         // ✅ Apply all effects from `BaseCard`
         foreach (EffectType effectType in action.GetEffects()) 
         {
-            //EffectManager.Instance.ApplyEffect(effectType, target, action); FIX HERE
+            EffectManager.Instance.ApplyEffect(effectType, target, action); 
         }
 
         Debug.Log($"[EnemyAI] 🔥 {target.Name} was hit by {enemy.Name}'s {action.CardName}!");

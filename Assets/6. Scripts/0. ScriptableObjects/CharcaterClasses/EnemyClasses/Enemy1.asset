@@ -13,14 +13,21 @@ MonoBehaviour:
   m_Name: Enemy1
   m_EditorClassIdentifier: 
   enemyName: Enemy1
-  description: 
+  classDescription: 
   enemyPrefab: {fileID: 1594980137760161270, guid: 5f03ecdb35f0348ab8fa480b6e56ef5b, type: 3}
   enemySprite: {fileID: 0}
-  maxHealth: 100
-  baseStrength: 10
+  baseHealth: 100
+  baseEnergy: 3
+  strength: 10
+  dexterity: 10
+  intelligence: 10
+  luck: 10
   baseDefense: 5
   speed: 5
-  actionDeck: []
+  actionDeck:
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
   isElite: 0
   isBoss: 0
   actionsPerTurn: 1

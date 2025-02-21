@@ -43,15 +43,16 @@ public class TurnManager : MonoBehaviour
     private void StartEnemyTurn()
     {
         Debug.Log("[TurnManager] 👿 Enemy turn started");
-        if (EnemyAIManager.Instance != null)
+
+        if (EnemyAIManager.Instance == null)
         {
-            EnemyAIManager.Instance.ExecuteEnemyTurn();
+            Debug.LogError("[TurnManager] ❌ EnemyAIManager instance is NULL! Enemies will NOT act.");
+            EndEnemyTurn(); 
+            return;
         }
-        else
-        {
-            Debug.LogError("[TurnManager] ❌ No EnemyAIManager found in scene!");
-            EndEnemyTurn();
-        }
+
+        Debug.Log("[TurnManager] ✅ Calling ExecuteEnemyTurn()");
+        EnemyAIManager.Instance.ExecuteEnemyTurn();
     }
 
     public void EndEnemyTurn()

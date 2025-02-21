@@ -33,6 +33,7 @@ public class EnemyUnit : BaseCharacter
         }
     }
 
+
     /// ✅ **Override BaseCharacter's InitializeFromClass to handle enemy-specific adjustments**
     public override void InitializeFromClass(ICharacterClass characterClass)
     {
@@ -70,6 +71,7 @@ public class EnemyUnit : BaseCharacter
                   $"\nHP: {Stats.CurrentHealth}/{Stats.MaxHealth}" +
                   $"\nStrength: {Stats.Strength}");
     }
+
 
     // ✅ Override BaseCharacter methods to use CharacterStats properly
     public override int GetHealth() => Stats.CurrentHealth;
@@ -128,16 +130,5 @@ public class EnemyUnit : BaseCharacter
         Debug.Log($"[EnemyUnit] 🔥 {player.Name} took 5 damage!");
     }
 
-    private void OnValidate()
-    {
-        if (intentUI == null)
-        {
-            intentUI = GetComponentInChildren<EnemyIntentUI>();
-            if (intentUI == null)
-            {
-                Debug.LogWarning("[EnemyUnit] ⚠️ EnemyIntentUI component needs to be assigned!");
-            }
-        }
-    }
 }
 
