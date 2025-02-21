@@ -6,10 +6,6 @@ public class EnemyUnit : BaseCharacter
     [SerializeField] private EnemyIntentUI intentUI;
     private EnemyAnimationController animationController;
     private EnemyClass enemyData;
-    private int currentHealth;
-    private int currentStrength;
-    private int currentDefense;
-    private int currentSpeed;
     public string Description { get; private set; }
 
     protected override void Awake()
@@ -18,10 +14,7 @@ public class EnemyUnit : BaseCharacter
         Name = "Enemy";
 
         // Get or find intent UI
-        if (intentUI == null)
-        {
-            intentUI = GetComponentInChildren<EnemyIntentUI>(true); // Include inactive objects
-        }
+        intentUI = GetComponentInChildren<EnemyIntentUI>(true);
         if (intentUI == null)
         {
             Debug.LogError("[EnemyUnit] ❌ EnemyIntentUI not found!");
@@ -40,54 +33,55 @@ public class EnemyUnit : BaseCharacter
         }
     }
 
-    public void InitializeFromType(EnemyClass type)
+    /// ✅ **Override BaseCharacter's InitializeFromClass to handle enemy-specific adjustments**
+    public override void InitializeFromClass(ICharacterClass characterClass)
     {
-        enemyData = type;
-        Name = type.enemyName;
-        Description = type.description;
-
-        // Initialize stats directly from ScriptableObject
-        currentHealth = type.maxHealth;
-        currentStrength = type.baseStrength;
-        currentDefense = type.baseDefense;
-        currentSpeed = type.speed;
-
-        // Apply elite/boss modifiers if needed
-        if (type.isElite || type.isBoss)
+        if (!(characterClass is EnemyClass enemyClass))
         {
-            float multiplier = type.isBoss ? 2.5f : 1.5f;
-            currentHealth = Mathf.RoundToInt(currentHealth * multiplier);
-            currentStrength = Mathf.RoundToInt(currentStrength * multiplier);
+            Debug.LogError("[EnemyUnit] ❌ Invalid class type passed to EnemyUnit.");
+            return;
         }
 
-        // Set up visuals
-        if (type.enemySprite != null)
+        enemyData = enemyClass;
+        Description = enemyClass.ClassDescription;
+
+        // ✅ Call base method to initialize standard stats
+        base.InitializeFromClass(enemyClass);
+
+        // ✅ Apply Elite/Boss Modifiers AFTER Initialization
+        if (enemyClass.isElite || enemyClass.isBoss)
+        {
+            float multiplier = enemyClass.isBoss ? 2.5f : 1.5f;
+            Stats.ModifyHealth((int)(Stats.MaxHealth * (multiplier - 1)));  // Increase Health
+            Stats.ModifyStrength((int)(Stats.Strength * (multiplier - 1))); // Increase Strength
+        }
+
+        // ✅ Set up visuals
+        if (enemyClass.enemySprite != null)
         {
             var spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             if (spriteRenderer != null)
             {
-                spriteRenderer.sprite = type.enemySprite;
+                spriteRenderer.sprite = enemyClass.enemySprite;
             }
         }
 
-        Debug.Log($"[EnemyUnit] Initialized {(type.isBoss ? "Boss" : type.isElite ? "Elite" : "")} {Name}" +
-                 $"\nHP: {currentHealth}/{type.maxHealth}" +
-                 $"\nStrength: {currentStrength}");
+        Debug.Log($"[EnemyUnit] Initialized {(enemyClass.isBoss ? "Boss" : enemyClass.isElite ? "Elite" : "Normal")} {Name}" +
+                  $"\nHP: {Stats.CurrentHealth}/{Stats.MaxHealth}" +
+                  $"\nStrength: {Stats.Strength}");
     }
 
-    // Override base character methods to use our own stat tracking
-    public override int GetHealth() => currentHealth;
-    public override int GetMaxHealth() => enemyData != null ? enemyData.maxHealth : 0;
-    public override int GetStrength() => currentStrength;
-    public override int GetDefense() => currentDefense;
+    // ✅ Override BaseCharacter methods to use CharacterStats properly
+    public override int GetHealth() => Stats.CurrentHealth;
+    public override int GetMaxHealth() => Stats.MaxHealth;
+    public override int GetStrength() => Stats.Strength;
 
     public override void TakeDamage(int amount)
     {
-        int previousHealth = currentHealth;
-        currentHealth = Mathf.Max(0, currentHealth - amount);
-        Debug.Log($"[EnemyUnit] {Name} took {amount} damage. HP: {currentHealth}/{GetMaxHealth()}");
+        Stats.ModifyHealth(-amount);
+        Debug.Log($"[EnemyUnit] {Name} took {amount} damage. HP: {Stats.CurrentHealth}/{Stats.MaxHealth}");
 
-        if (currentHealth <= 0)
+        if (Stats.CurrentHealth <= 0)
         {
             Die();
         }

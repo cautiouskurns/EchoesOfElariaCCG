@@ -17,7 +17,6 @@ public class PlayerUnitClickHandler : MonoBehaviour
 
         if (!playerUnit.IsSelected)
         {
-            Debug.Log($"[PlayerUnitClickHandler] 👆 Selecting {playerUnit.Name} ({playerUnit.Stats.CharacterClass})");
             playerUnit.Select();
         }
         else

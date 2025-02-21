@@ -6,55 +6,9 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 {
     public string Name { get; protected set; }
     public CharacterStats Stats { get; private set; }
-
-    [SerializeField] private int health;
-    [SerializeField] private int block;
-    [SerializeField] private int strength;
-    [SerializeField] private int dexterity;
-    [SerializeField] private int intelligence;
-    [SerializeField] private int luck;
-    [SerializeField] private int energy;
+    public CharacterCombat Combat { get; private set; }
     [SerializeField] private Sprite portrait;
     
-    
-
-    public CharacterCombat Combat { get; private set; }
-
-    private bool isSelected = false;
-    public bool IsSelected => isSelected;
-    private static BaseCharacter currentlySelectedCharacter;
-    public virtual int GetHealth() => Stats.CurrentHealth;
-    public virtual int GetMaxHealth() => Stats.MaxHealth;
-    public virtual int GetStrength() => strength;
-    public virtual int GetDefense() => block;
-
-    protected virtual void Awake()
-    {
-        Stats = GetComponent<CharacterStats>();
-        Combat = GetComponent<CharacterCombat>();
-    }
-
-    public virtual void InitializeFromClass(CharacterClass characterClass)
-    {
-        if (characterClass == null)
-        {
-            Debug.LogError("[BaseCharacter] ❌ Class data is null!");
-            return;
-        }
-
-        Name = characterClass.className;
-        health = characterClass.baseHealth;
-        energy = characterClass.baseEnergy; 
-        strength = characterClass.strength;
-        dexterity = characterClass.dexterity;
-        intelligence = characterClass.intelligence;
-        luck = characterClass.luck;
-        portrait = characterClass.classIcon;
-        block = 0; // Reset block at start of battle
-
-        Debug.Log($"[BaseCharacter] ✅ {Name} initialized with (HP: {health}, STR: {strength}, EN: {energy})");
-    }
-
 
     /// ✅ Effect Tracking
     public List<ActiveStatusEffect> activeEffects = new List<ActiveStatusEffect>();
@@ -62,14 +16,62 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public delegate void OnEffectUpdated();
     public event OnEffectUpdated EffectUpdated;  // ✅ Triggers UI update when effects change
 
-    // ✅ Stat Modifiers
+
+    private bool isSelected = false;
+    public bool IsSelected => isSelected;
+    private static BaseCharacter currentlySelectedCharacter;
+
+
+    protected virtual void Awake()
+    {
+        Stats = GetComponent<CharacterStats>();
+        Combat = GetComponent<CharacterCombat>();
+    }
+
+
+    /// ✅ **Unified Initialization for Both Players and Enemies**
+    public virtual void InitializeFromClass(ICharacterClass characterClass)
+    {
+        if (characterClass == null)
+        {
+            Debug.LogError("[BaseCharacter] ❌ CharacterClass is null!");
+            return;
+        }
+
+        Name = characterClass.ClassName;
+        portrait = characterClass.ClassIcon;
+
+        // ✅ Initialize all stats from CharacterClass (whether Player or Enemy)
+        Stats.Initialize(
+            characterClass.BaseHealth,
+            characterClass.BaseEnergy,
+            characterClass.Strength,
+            characterClass.Dexterity,
+            characterClass.Intelligence,
+            characterClass.Luck
+        );
+
+        Debug.Log($"[BaseCharacter] ✅ {Name} initialized (HP: {Stats.MaxHealth}, STR: {Stats.Strength}, EN: {Stats.MaxActionPoints})");
+    }
+
+
+    // ✅ Retrieves Stats dynamically from CharacterStats component
+    public virtual int GetHealth() => Stats.CurrentHealth;
+    public virtual int GetMaxHealth() => Stats.MaxHealth;
+    public virtual int GetActionPoints() => Stats.CurrentActionPoints;
+    public virtual int GetMaxActionPoints() => Stats.MaxActionPoints;
+    public virtual int GetStrength() => Stats.Strength;
+    public virtual int GetDexterity() => Stats.Dexterity;
+    public virtual int GetIntelligence() => Stats.Intelligence;
+    public virtual int GetLuck() => Stats.Luck;
+
+
+    // ✅ Handles taking damage
     public virtual void TakeDamage(int damage)
     {
         Stats.ModifyHealth(-damage);
-
         Debug.Log($"[BaseCharacter] {Name} took {damage} damage. HP: {Stats.CurrentHealth}/{Stats.MaxHealth}");
-        
-        // Check for death after taking damage
+
         if (Stats.CurrentHealth <= 0)
         {
             Die();
@@ -78,15 +80,20 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 
     public virtual void Heal(int amount) => Stats.ModifyHealth(amount);
     public virtual void UseActionPoints(int amount) => Stats.UseActionPoints(amount);
-    public void ModifyStrength(int amount) => strength += amount;
-    public void GainEnergy(int amount) => energy += amount;
-    public void GainBlock(int amount) => block += amount;
 
+    public void ModifyStrength(int amount) => Stats.ModifyStrength(amount);
+    public void ModifyDexterity(int amount) => Stats.ModifyDexterity(amount);
+    public void ModifyIntelligence(int amount) => Stats.ModifyIntelligence(amount);
+    public void ModifyLuck(int amount) => Stats.ModifyLuck(amount);
+
+    public void GainEnergy(int amount) => Stats.ModifyEnergy(amount);
+    public void GainBlock(int amount) => Stats.ModifyBlock(amount);
 
     // ✅ Card & Power System Hooks
     public void DrawCards(int amount) => HandManager.Instance.DrawCards(amount);
     public void ExhaustCard() => HandManager.Instance.ExhaustRandomCard();
     public void ApplyPowerEffect(int value) => Debug.Log($"[BaseCharacter] {Name} applied Power Effect!");
+
 
     /// ✅ Handles Receiving Direct Effects
     public void ReceiveEffect(int value, EffectType type)
@@ -260,11 +267,6 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         statusUI.UpdateStatusEffects(activeEffects);
     }
 
-    public void SetHealth(int value)
-    {
-        health = Mathf.Max(value, 0); // ✅ Prevent negative values
-    }
-
     protected virtual void Die()
     {
         Debug.Log($"[BaseCharacter] {Name} has been defeated!");
@@ -281,6 +283,8 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         // Override in derived classes for specific death behaviors
     }
 }
+
+
 
 // ✅ Helper class to store effect data + duration
 [System.Serializable]

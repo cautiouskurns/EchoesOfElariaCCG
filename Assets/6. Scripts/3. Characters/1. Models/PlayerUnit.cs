@@ -41,11 +41,9 @@ public class PlayerUnit : BaseCharacter
         }
     }
     
-    public override void InitializeFromClass(CharacterClass characterClass)
+    public override void InitializeFromClass(ICharacterClass characterClass)
     {
         base.InitializeFromClass(characterClass);  // Ensure BaseCharacter handles stat initialization
-
-        Debug.Log($"[PlayerUnit] ✅ {characterClass.className} initialized.");
     }
 
     public override void Select()
