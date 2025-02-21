@@ -9,14 +9,25 @@ public class PlayerUnitClickHandler : MonoBehaviour
     private void Awake()
     {
         playerUnit = GetComponent<PlayerUnit>();
+        if (playerUnit == null)
+        {
+            Debug.LogError("[PlayerUnitClickHandler] ❌ No PlayerUnit found!");
+        }
     }
 
     private void OnMouseDown()
     {
-        if (playerUnit == null) return;
+        Debug.Log($"[PlayerUnitClickHandler] Mouse clicked on {gameObject.name}");
 
-        if (!playerUnit.IsSelected)
+        if (playerUnit == null)
         {
+            Debug.LogError("[PlayerUnitClickHandler] ❌ PlayerUnit reference is NULL!");
+            return;
+        }
+
+        if (!playerUnit.Selection.IsSelected)
+        {
+            Debug.Log($"[PlayerUnitClickHandler] ✅ Selecting {playerUnit.Name}");
             playerUnit.Select();
         }
         else

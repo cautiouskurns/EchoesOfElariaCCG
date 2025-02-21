@@ -60,6 +60,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8234461433177931747, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
+      propertyPath: classIndex
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9189689331450480431, guid: 25ea465bb7707455cb9589ee53c69ca3, type: 3}
       propertyPath: m_Name
       value: MageClass

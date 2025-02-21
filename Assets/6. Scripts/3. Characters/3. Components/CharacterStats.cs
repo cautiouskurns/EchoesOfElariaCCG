@@ -16,7 +16,7 @@ public class CharacterStats : MonoBehaviour
     public int Energy { get; private set; }
     public int Block { get; private set; }
 
-    // ✅ Events for Health & Action Points
+    // ✅ Events for Health & Action Points 
     public event Action<int> OnHealthChanged;
     public event Action<int> OnActionPointsChanged;
 
@@ -42,7 +42,7 @@ public class CharacterStats : MonoBehaviour
         Debug.Log($"[CharacterStats] 🔄 AP refreshed to {CurrentActionPoints}");
         OnActionPointsChanged?.Invoke(CurrentActionPoints);
     }
-    
+
     public void ModifyStrength(int amount) => Strength += amount;
     public void ModifyDexterity(int amount) => Dexterity += amount;
     public void ModifyIntelligence(int amount) => Intelligence += amount;

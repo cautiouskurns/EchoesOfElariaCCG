@@ -1,100 +1,91 @@
 using UnityEngine;
 
+
 [RequireComponent(typeof(CharacterStats))]
 [RequireComponent(typeof(CharacterCombat))]
+[RequireComponent(typeof(CharacterSelection))]
 public class PlayerUnit : BaseCharacter
 {
     [SerializeField] private Material outlineMaterial;
     private Material defaultMaterial;
-    private Renderer characterRenderer; // Changed from SpriteRenderer to Renderer to work with both 2D and 3D
+    private Renderer characterRenderer;
+    private CharacterSelection selection;
 
-    private CharacterStats stats;
-    private CharacterCombat combat;
-
-    [SerializeField] private int classIndex;  // Assign in inspector for each player unit
+    [SerializeField] private int classIndex; // ✅ Assign in Inspector for each player unit
 
     protected override void Awake()
     {
         base.Awake();
-        Name = "Player";
+        selection = GetComponent<CharacterSelection>();
 
-        // Get required components
-        stats = GetComponent<CharacterStats>();
-        combat = GetComponent<CharacterCombat>();
-        
-        // Look for renderer in children
         characterRenderer = GetComponentInChildren<Renderer>();
 
         if (characterRenderer != null)
         {
             defaultMaterial = characterRenderer.sharedMaterial;
-            Debug.Log($"[PlayerUnit] Found {characterRenderer.GetType().Name} in {characterRenderer.gameObject.name} and stored default material: {defaultMaterial?.name ?? "null"}");
         }
         else
         {
-            Debug.LogError("[PlayerUnit] ❌ No renderer component found in children! Check hierarchy for MeshRenderer or SpriteRenderer.");
+            Debug.LogError("[PlayerUnit] ❌ No renderer found!");
         }
 
-        if (outlineMaterial == null)
+        // ✅ Assign `classIndex` from PlayerUnit to CharacterSelection
+        if (selection != null)
         {
-            Debug.LogError("[PlayerUnit] ❌ Outline material not assigned in inspector!");
+            selection.GetType().GetField("classIndex").SetValue(selection, classIndex);
         }
     }
-    
-    public override void InitializeFromClass(ICharacterClass characterClass)
-    {
-        base.InitializeFromClass(characterClass);  // Ensure BaseCharacter handles stat initialization
-    }
 
-    public override void Select()
+    public void Select()
     {
-        // Validate components before selection
-        if (characterRenderer == null)
+        if (selection == null)
         {
-            Debug.LogError("[PlayerUnit] ❌ Cannot select: Missing renderer component!");
+            Debug.LogError("[PlayerUnit] ❌ Selection component is NULL!");
             return;
         }
 
-        if (outlineMaterial == null)
+        Debug.Log($"[PlayerUnit] Attempting to select {Name}...");
+
+        if (!selection.IsSelected)
         {
-            Debug.LogError("[PlayerUnit] ❌ Cannot select: Missing outline material!");
+            Debug.Log($"[PlayerUnit] ✅ Selecting {Name}");
+
+            if (characterRenderer != null && outlineMaterial != null)
+            {
+                characterRenderer.material = new Material(outlineMaterial); // ✅ Ensure a new material instance
+            }
+            else
+            {
+                Debug.LogWarning("[PlayerUnit] ⚠️ Outline material is missing!");
+            }
+
+            selection.Select(); // ✅ Calls CharacterSelection.Select()
+        }
+    }
+
+
+    public void Deselect()
+    {
+        if (selection == null)
+        {
+            Debug.LogError("[PlayerUnit] ❌ Selection component is NULL!");
             return;
         }
 
-        if (!IsSelected)
-        {
-            characterRenderer.material = outlineMaterial;
-            base.Select();
-            Debug.Log($"[PlayerUnit] Applied outline material to {Name}");
-        }
+        Debug.Log($"[PlayerUnit] Attempting to deselect {Name}...");
 
-        // Switch both deck and AP pool when character is selected
-        HandManager.Instance?.SwitchActiveClass(classIndex);
-        APManager.Instance?.SwitchActiveClass(classIndex);
-        
-        Debug.Log($"[PlayerUnit] Switched to class {classIndex}'s deck and AP pool");
-    }
-
-    public override void Deselect()
-    {
-        if (IsSelected)  // Only proceed if currently selected
+        if (selection.IsSelected)
         {
+            Debug.Log($"[PlayerUnit] ❌ Deselecting {Name}");
+
             if (characterRenderer != null && defaultMaterial != null)
             {
                 characterRenderer.material = defaultMaterial;
-                base.Deselect();  // Call base.Deselect() after restoring material
-                Debug.Log($"[PlayerUnit] Restored default material to {Name}");
             }
+
+            selection.Deselect(); // ✅ Calls CharacterSelection.Deselect()
         }
     }
 
-    // Add validation in inspector
-    private void OnValidate()
-    {
-        if (outlineMaterial == null)
-        {
-            Debug.LogWarning("[PlayerUnit] ⚠️ Outline material needs to be assigned!");
-        }
-    }
 }
 

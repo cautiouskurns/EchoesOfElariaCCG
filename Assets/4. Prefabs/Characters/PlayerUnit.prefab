@@ -451,12 +451,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4923213520312634624, guid: 0adfcfdbd8319403eb8c079e183d9b42, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1617323451148600755}
-    - targetCorrespondingSourceObject: {fileID: 4923213520312634624, guid: 0adfcfdbd8319403eb8c079e183d9b42, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2564612464425915869}
-    - targetCorrespondingSourceObject: {fileID: 4923213520312634624, guid: 0adfcfdbd8319403eb8c079e183d9b42, type: 3}
-      insertIndex: -1
       addedObject: {fileID: -3107331174420109185}
     - targetCorrespondingSourceObject: {fileID: 4923213520312634624, guid: 0adfcfdbd8319403eb8c079e183d9b42, type: 3}
       insertIndex: -1
@@ -475,33 +469,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4923213520312634624, guid: 0adfcfdbd8319403eb8c079e183d9b42, type: 3}
   m_PrefabInstance: {fileID: 4312919429344070191}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1617323451148600755
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9189689331450480431}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f761e7d4124242b6864673d84cd4a17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characterData: {fileID: 11400000, guid: 9ccc0755df7064c21bbd9bcb67cacca1, type: 2}
-  maxHealth: 100
-  startingActionPoints: 3
---- !u!114 &2564612464425915869
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9189689331450480431}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f56e9f522c60442ea884181a17aa4ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &-3107331174420109185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -514,12 +481,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59bca17ac11f14264a6c58058a5d2fb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 0
-  block: 0
-  strength: 0
-  energy: 0
+  portrait: {fileID: 0}
   activeEffects: []
   outlineMaterial: {fileID: 2100000, guid: 8c5e48ed4d1be41d8a9bb295af93c960, type: 2}
+  classIndex: 0
 --- !u!114 &3849004577806978974
 MonoBehaviour:
   m_ObjectHideFlags: 0

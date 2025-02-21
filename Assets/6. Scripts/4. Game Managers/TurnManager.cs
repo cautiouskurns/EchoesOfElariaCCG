@@ -27,12 +27,12 @@ public class TurnManager : MonoBehaviour
 
     public void EndPlayerTurn()
     {
-        // Deselect current character if one exists
-        BaseCharacter selectedChar = BaseCharacter.GetSelectedCharacter();
-        if (selectedChar != null)
-        {
-            selectedChar.Deselect();
-        }
+    // Deselect current character if one exists
+    CharacterSelection selectedChar = FindAnyObjectByType<CharacterSelection>();
+    if (selectedChar != null)
+    {
+        selectedChar.Deselect();  // ✅ Now calling Deselect() from CharacterSelection component
+    }
 
         Debug.Log("[TurnManager] 🔄 Player turn ended");
         CurrentTurn = TurnState.EnemyTurn;
@@ -62,12 +62,17 @@ public class TurnManager : MonoBehaviour
 
         Debug.Log("[TurnManager] Ending turn...");
 
-        // ✅ Find all characters and process their end-turn status effects
-        BaseCharacter[] allCharacters = FindObjectsByType<BaseCharacter>(FindObjectsSortMode.None);
-        foreach (BaseCharacter character in allCharacters)
+        // // ✅ Find all characters and process their end-turn status effects
+        // BaseCharacter[] allCharacters = FindObjectsByType<BaseCharacter>(FindObjectsSortMode.None);
+        // foreach (BaseCharacter character in allCharacters)
+        // {
+        //     character.ProcessEndOfTurnEffects();
+        // }
+
+        CharacterEffects[] effects = FindObjectsByType<CharacterEffects>(FindObjectsSortMode.None);
+        foreach (CharacterEffects effect in effects)
         {
-            //character.EndTurn();
-            character.ProcessEndOfTurnEffects();
+            effect.ProcessEndOfTurnEffects();  // ✅ Now calling from CharacterTurnManager component
         }
 
         Debug.Log("[TurnManager] --- Turn Ended ---");

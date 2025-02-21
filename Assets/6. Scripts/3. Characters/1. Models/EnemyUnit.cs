@@ -86,8 +86,14 @@ public class EnemyUnit : BaseCharacter
             Die();
         }
     }
+    // protected override void Die()
+    // {
+    //     Debug.Log($"[EnemyUnit] {Name} has been defeated!");
+    //     // TODO: Add death animation
+    //     Destroy(gameObject);
+    // }
 
-    protected override void Die()
+    protected void Die()
     {
         Debug.Log($"[EnemyUnit] {Name} has been defeated!");
         // TODO: Add death animation
