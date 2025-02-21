@@ -50,7 +50,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2581829989390881081, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
       propertyPath: m_Name
-      value: EnemyUnit
+      value: Enemy1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2853951261988319604, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
+      propertyPath: maxHealth
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

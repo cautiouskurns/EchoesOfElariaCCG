@@ -23,34 +23,16 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     private bool isSelected = false;
     public bool IsSelected => isSelected;
     private static BaseCharacter currentlySelectedCharacter;
-    public int GetHealth() => health;
+    public virtual int GetHealth() => Stats.CurrentHealth;
+    public virtual int GetMaxHealth() => Stats.MaxHealth;
+    public virtual int GetStrength() => strength;
+    public virtual int GetDefense() => block;
 
     protected virtual void Awake()
     {
         Stats = GetComponent<CharacterStats>();
         Combat = GetComponent<CharacterCombat>();
     }
-
-    // public void InitializeFromClass(CharacterClass characterClass)
-    // {
-    //     if (characterClass == null)
-    //     {
-    //         Debug.LogError("[BaseCharacter] ❌ Class data is null!");
-    //         return;
-    //     }
-
-    //     Name = characterClass.className;
-    //     health = characterClass.baseHealth;
-    //     energy = characterClass.baseEnergy;
-    //     strength = characterClass.strength;
-    //     dexterity = characterClass.dexterity;
-    //     intelligence = characterClass.intelligence;
-    //     luck = characterClass.luck;
-    //     portrait = characterClass.classIcon;
-    //     block = 0; // Reset block at start of battle
-
-    //     Debug.Log($"[BaseCharacter] ✅ {Name} initialized with (HP: {health}, STR: {strength}, EN: {energy})");
-    // }
 
     public virtual void InitializeFromClass(CharacterClass characterClass)
     {
@@ -62,7 +44,7 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
 
         Name = characterClass.className;
         health = characterClass.baseHealth;
-        energy = characterClass.baseEnergy;
+        energy = characterClass.baseEnergy; 
         strength = characterClass.strength;
         dexterity = characterClass.dexterity;
         intelligence = characterClass.intelligence;

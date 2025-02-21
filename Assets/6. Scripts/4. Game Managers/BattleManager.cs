@@ -106,8 +106,9 @@ public class BattleManager : MonoBehaviour
             GameObject enemyObj = Instantiate(enemyTypes[i].enemyPrefab, spawnPos, Quaternion.identity);
             if (enemyObj.TryGetComponent<EnemyUnit>(out var enemy))
             {
+                enemy.InitializeFromType(enemyTypes[i]);
                 enemyUnits.Add(enemy);
-                Debug.Log($"[BattleManager] Spawned enemy: {enemyTypes[i].enemyName}");
+                Debug.Log($"[BattleManager] Spawned and initialized {enemyTypes[i].enemyName}");
             }
         }
     }
