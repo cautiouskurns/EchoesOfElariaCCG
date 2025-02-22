@@ -2424,7 +2424,7 @@ MonoBehaviour:
   - {fileID: 1035442949}
   - {fileID: 252647900}
   - {fileID: 1409629977}
-  enemyTypes:
+  enemyClasses:
   - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
   - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
   - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}

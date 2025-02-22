@@ -1048,6 +1048,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   winScreen: {fileID: 0}
   loseScreen: {fileID: 0}
+  classAPTexts: []
 --- !u!1001 &786992102
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1621,9 +1622,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedClasses:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 1ba733c69ef684a59952938b1a881e00, type: 2}
+  - {fileID: 11400000, guid: 2d7383c00b68f4a4e922ea201c12e54c, type: 2}
+  - {fileID: 11400000, guid: 4e92a08a1a65c499cbcaf484686d17a1, type: 2}
 --- !u!1 &1165745346
 GameObject:
   m_ObjectHideFlags: 0

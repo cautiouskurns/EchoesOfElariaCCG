@@ -16,13 +16,11 @@ public class PlayerUnit : BaseCharacter
     protected override void Awake()
     {
         base.Awake();
-        selection = GetComponent<CharacterSelection>();
 
         // ✅ Automatically assign class index based on player units in the game
-        selection.ClassIndex = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None).Length - 1;
+        Selection.ClassIndex = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None).Length - 1;
 
         characterRenderer = GetComponentInChildren<Renderer>();
-
         if (characterRenderer != null)
         {
             defaultMaterial = characterRenderer.sharedMaterial;
@@ -32,11 +30,6 @@ public class PlayerUnit : BaseCharacter
             Debug.LogError("[PlayerUnit] ❌ No renderer found!");
         }
 
-        // ✅ Assign `classIndex` from PlayerUnit to CharacterSelection
-        if (selection != null)
-        {
-            selection.GetType().GetField("classIndex").SetValue(selection, classIndex);
-        }
     }
 
     public override void Select()  // ✅ Now correctly overriding BaseCharacter.Select()

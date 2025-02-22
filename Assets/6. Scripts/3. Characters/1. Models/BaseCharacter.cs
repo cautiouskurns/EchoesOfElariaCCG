@@ -46,7 +46,11 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         }
         Selection?.Deselect();
     }
+    
 
+    public void ReceiveStatusEffect(IStatusEffect effect, int duration) => Effects?.ReceiveStatusEffect(effect, duration);
+    public void RemoveStatusEffect(IStatusEffect effect) => Effects?.RemoveStatusEffect(effect);
+    public virtual void ProcessEndOfTurnEffects() => Effects?.ProcessEndOfTurnEffects();
 
 
 
@@ -116,8 +120,8 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public void ApplyPowerEffect(int value) => Debug.Log($"[BaseCharacter] {Name} applied Power Effect!");
 
     // Implement IEffectTarget interface methods
-    public void ReceiveStatusEffect(IStatusEffect effect, int duration) => Effects.ReceiveStatusEffect(effect, duration);
-    public void RemoveStatusEffect(IStatusEffect effect) => Effects.RemoveStatusEffect(effect);
+    // public void ReceiveStatusEffect(IStatusEffect effect, int duration) => Effects.ReceiveStatusEffect(effect, duration);
+    // public void RemoveStatusEffect(IStatusEffect effect) => Effects.RemoveStatusEffect(effect);
 
     /// ✅ Handles Receiving Direct Effects
     public void ReceiveEffect(int value, EffectType type)

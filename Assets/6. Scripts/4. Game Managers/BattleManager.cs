@@ -11,7 +11,7 @@ public class BattleManager : MonoBehaviour
     private List<PlayerUnit> playerUnits = new List<PlayerUnit>();
 
     [Header("Enemy Configuration")]
-    [SerializeField] private EnemyClass[] enemyTypes;
+    [SerializeField] private EnemyClass[] enemyClasses;
     [SerializeField] private Transform[] enemySpawnLocations;
 
     private void Awake()
@@ -95,20 +95,20 @@ public class BattleManager : MonoBehaviour
     {
         enemyUnits.Clear();
         
-        for (int i = 0; i < enemyTypes.Length; i++)
+        for (int i = 0; i < enemyClasses.Length; i++)
         {
-            if (enemyTypes[i] == null) continue;
+            if (enemyClasses[i] == null) continue;
 
             Vector3 spawnPos = (i < enemySpawnLocations.Length) ? 
                 enemySpawnLocations[i].position : 
                 new Vector3(i * 2, 0, 0);
 
-            GameObject enemyObj = Instantiate(enemyTypes[i].enemyPrefab, spawnPos, Quaternion.identity);
+            GameObject enemyObj = Instantiate(enemyClasses[i].enemyPrefab, spawnPos, Quaternion.identity);
             if (enemyObj.TryGetComponent<EnemyUnit>(out var enemy))
             {
-                enemy.InitializeFromClass(enemyTypes[i]);
+                enemy.InitializeFromClass(enemyClasses[i]);
                 enemyUnits.Add(enemy);
-                Debug.Log($"[BattleManager] Spawned and initialized {enemyTypes[i].enemyName}");
+                Debug.Log($"[BattleManager] Spawned and initialized {enemyClasses[i].enemyName}");
             }
         }
     }

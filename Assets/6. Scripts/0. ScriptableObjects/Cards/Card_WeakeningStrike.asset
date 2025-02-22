@@ -19,6 +19,6 @@ MonoBehaviour:
   cardType: 1
   soundEffect: {fileID: 0}
   effectTypes: 00000000
-  effectValues: 64000000
+  effectValues: 14000000
   statusTypes: 00000000
   vfxPrefab: {fileID: 0}
