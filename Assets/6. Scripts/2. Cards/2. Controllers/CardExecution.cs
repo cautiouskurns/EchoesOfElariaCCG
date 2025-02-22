@@ -18,7 +18,7 @@ public class CardExecution : MonoBehaviour
     {
         if (!ValidatePlayConditions()) return;
 
-        BaseCharacter sourceCharacter = CharacterSelection.GetSelectedCharacter();
+        BaseCharacter sourceCharacter = BaseCharacter.GetSelectedCharacter();
         if (sourceCharacter == null)
         {
             Debug.LogWarning("[CardExecution] ❌ No character selected to play card!");
@@ -45,7 +45,7 @@ public class CardExecution : MonoBehaviour
             yield break;
         }
 
-        BaseCharacter sourceCharacter = CharacterSelection.GetSelectedCharacter();
+        BaseCharacter sourceCharacter = BaseCharacter.GetSelectedCharacter();
         if (sourceCharacter == null)
         {
             Debug.LogError("[CardExecution] ❌ No character selected to perform attack.");

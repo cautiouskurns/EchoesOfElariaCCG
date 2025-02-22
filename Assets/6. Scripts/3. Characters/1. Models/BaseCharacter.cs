@@ -13,6 +13,9 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public CharacterTurnManager TurnManager { get; private set; }
     public CharacterDeathHandler DeathHandler { get; private set; }
 
+    private static BaseCharacter currentlySelectedCharacter;
+
+
     protected virtual void Awake()
     {
         Stats = GetComponent<CharacterStats>();
@@ -22,11 +25,28 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         TurnManager = GetComponent<CharacterTurnManager>();
         DeathHandler = GetComponent<CharacterDeathHandler>();
     }
+    public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
 
-    public virtual void Select() => Selection?.Select();
-    public virtual void Deselect() => Selection?.Deselect();   
+    public virtual void Select()
+    {
+        if (currentlySelectedCharacter != null && currentlySelectedCharacter != this)
+        {
+            currentlySelectedCharacter.Deselect();
+        }
 
-    public virtual void GetSelectedCharacter() => CharacterSelection.GetSelectedCharacter(); 
+        currentlySelectedCharacter = this;
+        Selection?.Select();
+    }
+
+    public virtual void Deselect()
+    {
+        if (currentlySelectedCharacter == this)
+        {
+            currentlySelectedCharacter = null;
+        }
+        Selection?.Deselect();
+    }
+
 
 
 
