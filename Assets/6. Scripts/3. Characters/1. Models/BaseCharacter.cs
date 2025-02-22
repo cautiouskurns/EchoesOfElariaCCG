@@ -23,6 +23,13 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         DeathHandler = GetComponent<CharacterDeathHandler>();
     }
 
+    public virtual void Select() => Selection?.Select();
+    public virtual void Deselect() => Selection?.Deselect();   
+
+    public virtual void GetSelectedCharacter() => CharacterSelection.GetSelectedCharacter(); 
+
+
+
     /// ✅ **Unified Initialization for Both Players and Enemies**
     public virtual void InitializeFromClass(ICharacterClass characterClass)
     {

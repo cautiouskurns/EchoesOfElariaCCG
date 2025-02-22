@@ -36,9 +36,9 @@ public class PlayerUnit : BaseCharacter
         }
     }
 
-    public void Select()
+    public override void Select()  // ✅ Now correctly overriding BaseCharacter.Select()
     {
-        if (selection == null)
+        if (Selection == null)
         {
             Debug.LogError("[PlayerUnit] ❌ Selection component is NULL!");
             return;
@@ -46,27 +46,26 @@ public class PlayerUnit : BaseCharacter
 
         Debug.Log($"[PlayerUnit] Attempting to select {Name}...");
 
-        if (!selection.IsSelected)
+        if (!Selection.IsSelected)
         {
             Debug.Log($"[PlayerUnit] ✅ Selecting {Name}");
 
             if (characterRenderer != null && outlineMaterial != null)
             {
-                characterRenderer.material = new Material(outlineMaterial); // ✅ Ensure a new material instance
+                characterRenderer.material = new Material(outlineMaterial); // ✅ Ensures a new material instance
             }
             else
             {
                 Debug.LogWarning("[PlayerUnit] ⚠️ Outline material is missing!");
             }
 
-            selection.Select(); // ✅ Calls CharacterSelection.Select()
+            base.Select();  // ✅ Calls the base class `Select()` which delegates to `CharacterSelection`
         }
     }
 
-
-    public void Deselect()
+    public override void Deselect()  // ✅ Now correctly overriding BaseCharacter.Deselect()
     {
-        if (selection == null)
+        if (Selection == null)
         {
             Debug.LogError("[PlayerUnit] ❌ Selection component is NULL!");
             return;
@@ -74,7 +73,7 @@ public class PlayerUnit : BaseCharacter
 
         Debug.Log($"[PlayerUnit] Attempting to deselect {Name}...");
 
-        if (selection.IsSelected)
+        if (Selection.IsSelected)
         {
             Debug.Log($"[PlayerUnit] ❌ Deselecting {Name}");
 
@@ -83,7 +82,7 @@ public class PlayerUnit : BaseCharacter
                 characterRenderer.material = defaultMaterial;
             }
 
-            selection.Deselect(); // ✅ Calls CharacterSelection.Deselect()
+            base.Deselect();  // ✅ Calls the base class `Deselect()` which delegates to `CharacterSelection`
         }
     }
 
