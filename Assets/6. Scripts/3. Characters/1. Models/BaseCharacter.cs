@@ -14,6 +14,7 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public CharacterDeathHandler DeathHandler { get; private set; }
 
     private static BaseCharacter currentlySelectedCharacter;
+    public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
 
 
     protected virtual void Awake()
@@ -25,36 +26,9 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         TurnManager = GetComponent<CharacterTurnManager>();
         DeathHandler = GetComponent<CharacterDeathHandler>();
     }
-    public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
-
-    public virtual void Select()
-    {
-        if (currentlySelectedCharacter != null && currentlySelectedCharacter != this)
-        {
-            currentlySelectedCharacter.Deselect();
-        }
-
-        currentlySelectedCharacter = this;
-        Selection?.Select();
-    }
-
-    public virtual void Deselect()
-    {
-        if (currentlySelectedCharacter == this)
-        {
-            currentlySelectedCharacter = null;
-        }
-        Selection?.Deselect();
-    }
-    
-
-    public void ReceiveStatusEffect(IStatusEffect effect, int duration) => Effects?.ReceiveStatusEffect(effect, duration);
-    public void RemoveStatusEffect(IStatusEffect effect) => Effects?.RemoveStatusEffect(effect);
-    public virtual void ProcessEndOfTurnEffects() => Effects?.ProcessEndOfTurnEffects();
 
 
-
-    /// ✅ **Unified Initialization for Both Players and Enemies**
+        /// ✅ **Unified Initialization for Both Players and Enemies**
     public virtual void InitializeFromClass(ICharacterClass characterClass)
     {
         if (characterClass == null)
@@ -79,7 +53,6 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
         Debug.Log($"[BaseCharacter] ✅ {Name} initialized (HP: {Stats.MaxHealth}, STR: {Stats.Strength}, EN: {Stats.MaxActionPoints})");
     }
 
-
     // ✅ Retrieves Stats dynamically from CharacterStats component
     public virtual int GetHealth() => Stats.CurrentHealth;
     public virtual int GetMaxHealth() => Stats.MaxHealth;
@@ -90,6 +63,30 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public virtual int GetIntelligence() => Stats.Intelligence;
     public virtual int GetLuck() => Stats.Luck;
 
+
+    public virtual void Select()
+    {
+        if (currentlySelectedCharacter != null && currentlySelectedCharacter != this)
+        {
+            currentlySelectedCharacter.Deselect();
+        }
+
+        currentlySelectedCharacter = this;
+        Selection?.Select();
+    }
+
+    public virtual void Deselect()
+    {
+        if (currentlySelectedCharacter == this)
+        {
+            currentlySelectedCharacter = null;
+        }
+        Selection?.Deselect();
+    }
+    
+    public void ReceiveStatusEffect(IStatusEffect effect, int duration) => Effects?.ReceiveStatusEffect(effect, duration);
+    public void RemoveStatusEffect(IStatusEffect effect) => Effects?.RemoveStatusEffect(effect);
+    public virtual void ProcessEndOfTurnEffects() => Effects?.ProcessEndOfTurnEffects();
 
     // ✅ Handles taking damage
     public virtual void TakeDamage(int damage)
@@ -119,9 +116,6 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     public void ExhaustCard() => HandManager.Instance.ExhaustRandomCard();
     public void ApplyPowerEffect(int value) => Debug.Log($"[BaseCharacter] {Name} applied Power Effect!");
 
-    // Implement IEffectTarget interface methods
-    // public void ReceiveStatusEffect(IStatusEffect effect, int duration) => Effects.ReceiveStatusEffect(effect, duration);
-    // public void RemoveStatusEffect(IStatusEffect effect) => Effects.RemoveStatusEffect(effect);
 
     /// ✅ Handles Receiving Direct Effects
     public void ReceiveEffect(int value, EffectType type)

@@ -50,6 +50,4 @@ public class CharacterStats : MonoBehaviour
     public void ModifyBlock(int amount) => Block += amount;
     public void ModifyEnergy(int amount) => Energy += amount;
 
-
-
 }

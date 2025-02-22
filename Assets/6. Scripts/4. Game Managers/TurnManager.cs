@@ -70,13 +70,6 @@ public class TurnManager : MonoBehaviour
             character.ProcessEndOfTurnEffects();
         }
 
-        // CharacterEffects[] effects = FindObjectsByType<CharacterEffects>(FindObjectsSortMode.None);
-        // foreach (CharacterEffects effect in effects)
-        // {
-        //     // effect.ProcessEndOfTurnEffects();  // ✅ Now calling from CharacterTurnManager component
-
-        // }
-
         Debug.Log("[TurnManager] --- Turn Ended ---");
 
         StartPlayerTurn();
