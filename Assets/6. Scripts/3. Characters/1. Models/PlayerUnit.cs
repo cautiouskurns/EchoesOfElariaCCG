@@ -18,6 +18,9 @@ public class PlayerUnit : BaseCharacter
         base.Awake();
         selection = GetComponent<CharacterSelection>();
 
+        // ✅ Automatically assign class index based on player units in the game
+        selection.ClassIndex = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None).Length - 1;
+
         characterRenderer = GetComponentInChildren<Renderer>();
 
         if (characterRenderer != null)
