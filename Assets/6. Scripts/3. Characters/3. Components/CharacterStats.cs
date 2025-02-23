@@ -33,8 +33,14 @@ public class CharacterStats : MonoBehaviour
         Luck = luck;
     }
 
-    public void ModifyHealth(int amount) => CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, MaxHealth);
+    // public void ModifyHealth(int amount) => CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, MaxHealth);
     public void UseActionPoints(int amount) => CurrentActionPoints = Mathf.Max(0, CurrentActionPoints - amount);
+
+    public void ModifyHealth(int amount)
+    {
+        CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, MaxHealth);
+        OnHealthChanged?.Invoke(CurrentHealth);
+    }
 
     public void RefreshActionPoints()
     {

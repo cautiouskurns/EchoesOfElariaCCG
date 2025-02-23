@@ -49,7 +49,7 @@ public class BattleManager : MonoBehaviour
 
         CharacterClass[] selectedClasses = GameManager.Instance.selectedClasses;
 
-        for (int i = 0; i < selectedClasses.Length; i++)
+        for (int i = 0; i < selectedClasses.Length - 1; i++)
         {
             if (selectedClasses[i] == null)
             {

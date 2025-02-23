@@ -24,7 +24,7 @@ public class ClassSelection : MonoBehaviour
     [SerializeField] private Image[] selectedClassIcons;
     [SerializeField] private TextMeshProUGUI[] selectedClassNames;
 
-    private CharacterClass[] selectedClasses = new CharacterClass[3]; // ✅ Store 3 selected classes
+    private CharacterClass[] selectedClasses = new CharacterClass[2]; // ✅ Store 3 selected classes
     private int currentSelectionIndex = 0; // ✅ Track which slot is being selected
 
     private void Start()
@@ -61,7 +61,7 @@ public class ClassSelection : MonoBehaviour
             return;
         }
 
-        if (currentSelectionIndex >= 3)
+        if (currentSelectionIndex >= 2)
         {
             Debug.LogWarning("[ClassSelection] ⚠️ All 3 classes have already been selected.");
             return;
@@ -72,7 +72,7 @@ public class ClassSelection : MonoBehaviour
         DisplayClassInfo(selectedClasses[currentSelectionIndex], currentSelectionIndex);
         currentSelectionIndex++;
 
-        if (currentSelectionIndex == 3)
+        if (currentSelectionIndex == 2)
         {
             confirmButton.gameObject.SetActive(true); // ✅ Enable confirm button once all selections are made
         }
@@ -107,7 +107,7 @@ public class ClassSelection : MonoBehaviour
 
     public void ConfirmSelection()
     {
-        if (selectedClasses[0] == null || selectedClasses[1] == null || selectedClasses[2] == null)
+        if (selectedClasses[0] == null || selectedClasses[1] == null) // || selectedClasses[2] == null)
         {
             Debug.LogError("[ClassSelection] ❌ Not all classes selected!");
             return;
@@ -115,7 +115,7 @@ public class ClassSelection : MonoBehaviour
 
         if (GameManager.Instance != null)
         {   
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
             {
                 GameManager.Instance.SetPlayerClass(i, selectedClasses[i]);
             }

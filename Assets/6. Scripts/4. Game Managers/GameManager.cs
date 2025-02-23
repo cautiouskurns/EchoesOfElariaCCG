@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 
     private string overworldSceneName = "OverworldMap"; // Default overworld scene
     private string lastScene;
-    public CharacterClass[] selectedClasses = new CharacterClass[3]; // ✅ Store all 3 classes
+    public CharacterClass[] selectedClasses = new CharacterClass[2]; // ✅ Store all 3 classes
     private DialogueData currentLoreDialogue;
     private void Awake()
     {
