@@ -30,9 +30,6 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ✅ Executes the effects of a card.
-    /// </summary>
     public void PlayCard(BaseCard card, IEffectTarget target)
     {
         if (card == null || target == null)
@@ -43,47 +40,45 @@ public class CardManager : MonoBehaviour
 
         Debug.Log($"[CardManager] 🎴 Executing {card.CardName} on {target}");
 
-        // ✅ Play Sound
+        // First: Spawn VFX
+        if (card.VFXPrefab != null)
+        {
+            InstantiateEffect(card.VFXPrefab, target);
+            Debug.Log($"[CardManager] 🎇 VFX spawned for {card.CardName}");
+        }
+
+        // Second: Play Sound
         if (card.SoundEffect != null)
         {
             AudioManager.Instance?.PlaySound(card.SoundEffect);
         }
 
-        // ✅ Apply Main Effects
-        foreach (EffectType effectType in card.GetEffects())  // ✅ Now using GetEffects()
-        {
-            effectManager?.ApplyEffect(effectType, target, card);
-        }
+        // Third: Apply Effects
+        effectManager?.ApplyEffects(card, target);
 
-        // ✅ Apply Status Effects
-        foreach (StatusEffectTypes statusType in card.GetStatusEffects())  // ✅ Now using GetStatusEffects()
+        // Fourth: Apply Status Effects
+        if (card.StatusEffects != null && card.StatusEffects.Count > 0)
         {
-            statusEffectManager?.ApplyStatusEffect(statusType, target);
-        }
-
-
-        // ✅ Spawn VFX if available
-        if (card.VFXPrefab != null)
-        {
-            InstantiateEffect(card.VFXPrefab, target);
+            foreach (var statusEffect in card.StatusEffects)
+            {
+                statusEffectManager?.ApplyStatusEffects(card, target);
+            }
         }
     }
 
-    /// ✅ Method to instantiate VFX
     private void InstantiateEffect(GameObject vfxPrefab, IEffectTarget target)
     {
-        BaseCharacter targetCharacter = target as BaseCharacter;
-        if (targetCharacter == null)
+        if (target is MonoBehaviour targetMono)
         {
-            Debug.LogError("[CardManager] ❌ Target is not a valid character!");
-            return;
+            Vector3 spawnPosition = targetMono.transform.position + Vector3.up;
+            GameObject effectInstance = Instantiate(vfxPrefab, spawnPosition, Quaternion.identity);
+            Destroy(effectInstance, 2f);
+            Debug.Log($"[CardManager] VFX instantiated at {spawnPosition}");
         }
-
-        Vector3 spawnPosition = targetCharacter.transform.position + new Vector3(0, 1, 0); // Offset for visibility
-        GameObject effectInstance = Instantiate(vfxPrefab, spawnPosition, Quaternion.identity);
-        
-        // ✅ Optional: Destroy the effect after a delay
-        Destroy(effectInstance, 2f);
+        else
+        {
+            Debug.LogError("[CardManager] ❌ Target is not a valid GameObject!");
+        }
     }
 }
 

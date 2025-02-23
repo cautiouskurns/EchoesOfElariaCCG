@@ -1,6 +1,6 @@
 using UnityEngine;
-using Cards;
 using System.Collections.Generic;
+using Cards;
 
 public interface ICard
 {
@@ -10,6 +10,6 @@ public interface ICard
     string Description { get; }
     CardType CardType { get; }
 
-    List<EffectType> GetEffects();
-    List<StatusEffectTypes> GetStatusEffects();
+    IReadOnlyList<EffectData> Effects { get; } // ✅ Updated: Returns full effect details
+    IReadOnlyList<StatusEffectData> StatusEffects { get; } // ✅ Updated: Returns full status effect details
 }

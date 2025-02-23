@@ -5,7 +5,7 @@ public class EffectManager : MonoBehaviour
 {
     public static EffectManager Instance { get; private set; }
 
-    [SerializeField] private EffectFactory effectFactory; // ✅ Uses factory to create effects
+    [SerializeField] private EffectFactory effectFactory;
 
     private void Awake()
     {
@@ -17,38 +17,34 @@ public class EffectManager : MonoBehaviour
         }
 
         if (effectFactory == null)
-        {
             effectFactory = FindFirstObjectByType<EffectFactory>();
-        }
-
-        if (effectFactory == null)
-        {
-            Debug.LogError("[EffectManager] ❌ Missing EffectFactory!");
-        }
     }
 
-    /// <summary>
-    /// ✅ Fetches effect from `EffectFactory` and applies it to the target.
-    /// </summary>
-    public void ApplyEffect(EffectType effectType, IEffectTarget target, BaseCard sourceCard)
+    public void ApplyEffects(BaseCard card, IEffectTarget target)
     {
-        if (target == null || sourceCard == null)
+        if (card == null || target == null)
         {
-            Debug.LogError("[EffectManager] ❌ Target or source card is null!");
+            Debug.LogError("[EffectManager] ❌ Card or target is null!");
             return;
         }
 
-        BaseEffect effect = effectFactory.CreateEffect(effectType);
-        if (effect != null)
+        foreach (EffectData effect in card.Effects)
         {
-            int effectValue = sourceCard.GetEffectValue(effectType); // ✅ Get damage/heal amount from card
-            Debug.Log($"[EffectManager] Applying {effectType} with value {effectValue} to {target}");
-            effect.ApplyEffect(target, effectValue);
-        }
-        else
-        {
-            Debug.LogError($"[EffectManager] ❌ No effect found for {effectType}");
+            ApplySingleEffect(effect, target);
         }
     }
 
+    public void ApplySingleEffect(EffectData effectData, IEffectTarget target)
+    {
+        BaseEffect effect = effectFactory.CreateEffect(effectData.effectType);
+        if (effect != null)
+        {
+            effect.ApplyEffect(target, effectData.value);
+            Debug.Log($"[EffectManager] ✅ Applied {effectData.effectType} ({effectData.value}) to {target}");
+        }
+        else
+        {
+            Debug.LogError($"[EffectManager] ❌ No effect found for {effectData.effectType}");
+        }
+    }
 }
