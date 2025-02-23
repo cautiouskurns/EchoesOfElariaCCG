@@ -55,7 +55,8 @@ public enum EffectTarget
     SingleEnemy,
     AllEnemies,
     SingleAlly,
-    AllAllies
+    AllAllies,
+    AllUnits
 }
 
 

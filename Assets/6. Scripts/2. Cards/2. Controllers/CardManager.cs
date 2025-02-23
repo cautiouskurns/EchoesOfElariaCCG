@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using Cards;
 
 public class CardManager : MonoBehaviour
@@ -30,55 +31,53 @@ public class CardManager : MonoBehaviour
         }
     }
 
-    public void PlayCard(BaseCard card, IEffectTarget target)
+    public void PlayCard(BaseCard card, IEffectTarget clickedTarget)
     {
-        if (card == null || target == null)
+        if (card == null || clickedTarget == null)
         {
             Debug.LogError("[CardManager] ❌ Invalid card or target.");
             return;
         }
 
-        Debug.Log($"[CardManager] 🎴 Executing {card.CardName} on {target}");
+        Debug.Log($"[CardManager] 🎴 Executing {card.CardName}");
 
-        // First: Spawn VFX
+        // Handle VFX for each effect's targets
         if (card.VFXPrefab != null)
         {
-            InstantiateEffect(card.VFXPrefab, target);
-            Debug.Log($"[CardManager] 🎇 VFX spawned for {card.CardName}");
+            foreach (EffectData effect in card.Effects)
+            {
+                List<IEffectTarget> targets = effectManager.ResolveTargets(effect.target, clickedTarget);
+                foreach (var target in targets)
+                {
+                    if (target is MonoBehaviour targetMono)
+                    {
+                        InstantiateVFX(card.VFXPrefab, targetMono.transform.position);
+                    }
+                }
+            }
         }
 
-        // Second: Play Sound
+        // Play sound effect
         if (card.SoundEffect != null)
         {
             AudioManager.Instance?.PlaySound(card.SoundEffect);
         }
 
-        // Third: Apply Effects
-        effectManager?.ApplyEffects(card, target);
-
-        // Fourth: Apply Status Effects
+        // Apply effects and status effects
+        effectManager?.ApplyEffects(card, clickedTarget);
+        
         if (card.StatusEffects != null && card.StatusEffects.Count > 0)
         {
-            foreach (var statusEffect in card.StatusEffects)
-            {
-                statusEffectManager?.ApplyStatusEffects(card, target);
-            }
+            statusEffectManager?.ApplyStatusEffects(card, clickedTarget);
         }
     }
 
-    private void InstantiateEffect(GameObject vfxPrefab, IEffectTarget target)
+    private void InstantiateVFX(GameObject vfxPrefab, Vector3 position)
     {
-        if (target is MonoBehaviour targetMono)
-        {
-            Vector3 spawnPosition = targetMono.transform.position + Vector3.up;
-            GameObject effectInstance = Instantiate(vfxPrefab, spawnPosition, Quaternion.identity);
-            Destroy(effectInstance, 2f);
-            Debug.Log($"[CardManager] VFX instantiated at {spawnPosition}");
-        }
-        else
-        {
-            Debug.LogError("[CardManager] ❌ Target is not a valid GameObject!");
-        }
+        Vector3 spawnPos = position + Vector3.up;
+        GameObject vfx = Instantiate(vfxPrefab, spawnPos, Quaternion.identity);
+        Destroy(vfx, 2f);
+        Debug.Log($"[CardManager] 🎆 VFX spawned at {spawnPos}");
     }
 }
 
