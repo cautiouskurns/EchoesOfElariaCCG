@@ -18,7 +18,17 @@ MonoBehaviour:
   description: "If Strength is 10 or higher, deals 20 damage instead of 10.\t"
   cardType: 1
   soundEffect: {fileID: 0}
-  effectTypes: 00000000
-  effectValues: 0a000000
-  statusTypes: 
+  effects:
+  - effectType: 0
+    value: 0
+    target: 0
+    condition: 0
+    conditionValue: 0
+  statusEffects:
+  - statusType: 0
+    duration: 0
+    intensity: 0
+    target: 0
+    conditionType: 0
+    conditionValue: 0
   vfxPrefab: {fileID: 0}

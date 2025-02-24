@@ -20,9 +20,9 @@ public class StatusEffectManager : MonoBehaviour
             statusEffectFactory = FindFirstObjectByType<StatusEffectFactory>();
     }
 
-    public void ApplyStatusEffects(BaseCard card, IEffectTarget target)
+    public void ApplyStatusEffects(BaseCard card, IEffectTarget clickedTarget)
     {
-        if (card == null || target == null)
+        if (card == null || clickedTarget == null)
         {
             Debug.LogError("[StatusEffectManager] ❌ Card or target is null!");
             return;
@@ -30,7 +30,20 @@ public class StatusEffectManager : MonoBehaviour
 
         foreach (StatusEffectData statusEffect in card.StatusEffects)
         {
-            ApplySingleStatusEffect(statusEffect, target);
+            List<IEffectTarget> targets = EffectManager.Instance.ResolveTargets(statusEffect.target, clickedTarget);
+
+            foreach (var target in targets)
+            {
+                // ✅ Check if the condition for applying the effect is met
+                if (ConditionEvaluator.IsConditionMet(statusEffect.conditionType, (BaseCharacter)target, statusEffect.conditionValue))
+                {
+                    ApplySingleStatusEffect(statusEffect, target);
+                }
+                else
+                {
+                    Debug.Log($"[StatusEffectManager] ❌ Condition {statusEffect.conditionType} not met for {statusEffect.statusType}, skipping...");
+                }
+            }
         }
     }
 

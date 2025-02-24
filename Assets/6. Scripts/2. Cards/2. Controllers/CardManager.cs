@@ -10,6 +10,8 @@ public class CardManager : MonoBehaviour
     [SerializeField] private StatusEffectManager statusEffectManager;
 
     public CardType LastCardPlayedType { get; private set; }  // ✅ Tracks last card played
+    public BaseCard LastCardPlayed { get; private set; }  // ✅ Tracks last card played
+
 
     private void Awake()
     {
@@ -43,6 +45,10 @@ public class CardManager : MonoBehaviour
         Debug.Log($"[CardManager] 🎴 Executing {card.CardName}");
 
         LastCardPlayedType = card.CardType;  // ✅ Store last card type
+        LastCardPlayed = card;  // ✅ Track last played card
+
+        //    // ✅ Track last played card
+        // GameStateTracker.SetLastCardPlayed(card);
 
         if (card.VFXPrefab != null)
         {

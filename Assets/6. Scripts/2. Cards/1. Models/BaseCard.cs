@@ -36,7 +36,7 @@ public struct EffectData
     public EffectType effectType;
     public int value;
     public EffectTarget target; 
-    public ConditionType condition;  // ✅ New condition support
+    public ConditionType condition;  
     public int conditionValue;
 }
 
@@ -48,6 +48,8 @@ public struct StatusEffectData
     public int duration;
     public int intensity;
     public EffectTarget target;
+    public ConditionType conditionType; 
+    public int conditionValue;
 }
 
 // ✅ New Target Enum
@@ -69,4 +71,8 @@ public enum ConditionType
     PlayerBelowHP,      // ✅ Applies effect if player is below a certain HP threshold
     HasBuff,            // ✅ Applies if the player has a Strength/Defense buff
     HasDebuff,          // ✅ Applies if the player has a weakness debuff
+    HasStatusEffect,
+    TargetIsStunned,
+    PlayerHealthBelowThreshold,
+    EnemyHealthBelowThreshold
 }
