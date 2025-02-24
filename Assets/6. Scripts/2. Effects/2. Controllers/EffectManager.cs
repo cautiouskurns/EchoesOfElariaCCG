@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
+using Cards;
 
 public class EffectManager : MonoBehaviour
 {
@@ -30,12 +32,18 @@ public class EffectManager : MonoBehaviour
 
         foreach (EffectData effect in card.Effects)
         {
-            // Get all relevant targets for this effect
-            List<IEffectTarget> targets = ResolveTargets(effect.target, clickedTarget);
-            
-            foreach (var target in targets)
+            if (ConditionMet(effect, clickedTarget))  // ✅ Check conditions before applying effect
             {
-                ApplySingleEffect(effect, target);
+                List<IEffectTarget> targets = ResolveTargets(effect.target, clickedTarget);
+
+                foreach (var target in targets)
+                {
+                    ApplySingleEffect(effect, target);
+                }
+            }
+            else
+            {
+                Debug.Log($"[EffectManager] ❌ Effect {effect.effectType} NOT applied due to unmet condition.");
             }
         }
     }
@@ -43,7 +51,7 @@ public class EffectManager : MonoBehaviour
     public List<IEffectTarget> ResolveTargets(EffectTarget targetType, IEffectTarget clickedTarget)
     {
         List<IEffectTarget> targets = new List<IEffectTarget>();
-        
+
         switch (targetType)
         {
             case EffectTarget.Self:
@@ -77,6 +85,33 @@ public class EffectManager : MonoBehaviour
         return targets;
     }
 
+    private bool ConditionMet(EffectData effect, IEffectTarget target)
+    {
+        switch (effect.condition)
+        {
+            case ConditionType.None:
+                return true;
+
+            case ConditionType.LastCardWasAttack:
+                return CardManager.Instance.LastCardPlayedType == CardType.Attack;
+
+            case ConditionType.TargetIsWeak:
+                return target.HasStatusEffect(StatusEffectTypes.Weak);
+
+            case ConditionType.PlayerBelowHP:
+                return (target as BaseCharacter)?.GetHealth() < effect.conditionValue;
+
+            case ConditionType.HasBuff:
+                return target.HasBuff();
+
+            case ConditionType.HasDebuff:
+                return target.HasDebuff();
+
+            default:
+                return false;
+        }
+    }
+
     public void ApplySingleEffect(EffectData effectData, IEffectTarget target)
     {
         BaseEffect effect = effectFactory.CreateEffect(effectData.effectType);
@@ -91,3 +126,4 @@ public class EffectManager : MonoBehaviour
         }
     }
 }
+

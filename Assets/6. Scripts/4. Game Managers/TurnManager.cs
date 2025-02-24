@@ -27,12 +27,12 @@ public class TurnManager : MonoBehaviour
 
     public void EndPlayerTurn()
     {
-    // Deselect current character if one exists
-    CharacterSelection selectedChar = FindAnyObjectByType<CharacterSelection>();
-    if (selectedChar != null)
-    {
-        selectedChar.Deselect();  // ✅ Now calling Deselect() from CharacterSelection component
-    }
+        // Deselect current character if one exists
+        BaseCharacter selectedChar = BaseCharacter.GetSelectedCharacter();
+        if (selectedChar != null)
+        {
+            selectedChar.Deselect();
+        }
 
         Debug.Log("[TurnManager] 🔄 Player turn ended");
         CurrentTurn = TurnState.EnemyTurn;
@@ -43,16 +43,15 @@ public class TurnManager : MonoBehaviour
     private void StartEnemyTurn()
     {
         Debug.Log("[TurnManager] 👿 Enemy turn started");
-
-        if (EnemyAIManager.Instance == null)
+        if (EnemyAIManager.Instance != null)
         {
-            Debug.LogError("[TurnManager] ❌ EnemyAIManager instance is NULL! Enemies will NOT act.");
-            EndEnemyTurn(); 
-            return;
+            EnemyAIManager.Instance.ExecuteEnemyTurn();
         }
-
-        Debug.Log("[TurnManager] ✅ Calling ExecuteEnemyTurn()");
-        EnemyAIManager.Instance.ExecuteEnemyTurn();
+        else
+        {
+            Debug.LogError("[TurnManager] ❌ No EnemyAIManager found in scene!");
+            EndEnemyTurn();
+        }
     }
 
     public void EndEnemyTurn()
@@ -63,10 +62,11 @@ public class TurnManager : MonoBehaviour
 
         Debug.Log("[TurnManager] Ending turn...");
 
-        // // ✅ Find all characters and process their end-turn status effects
+        // ✅ Find all characters and process their end-turn status effects
         BaseCharacter[] allCharacters = FindObjectsByType<BaseCharacter>(FindObjectsSortMode.None);
         foreach (BaseCharacter character in allCharacters)
         {
+            //character.EndTurn();
             character.ProcessEndOfTurnEffects();
         }
 
@@ -78,7 +78,7 @@ public class TurnManager : MonoBehaviour
     private void StartPlayerTurn()
     {
         Debug.Log("[TurnManager] 👑 Player turn started");
-        APManager.Instance.ResetAllAP();  // Reset AP for all classes at turn start
+        APManager.Instance.ResetAllAP();
         
         if (handManager != null)
         {

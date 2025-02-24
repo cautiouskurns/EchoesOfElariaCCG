@@ -18,7 +18,15 @@ MonoBehaviour:
   description: "Deal 5 damage to all enemies.\t"
   cardType: 0
   soundEffect: {fileID: 0}
-  effectTypes: 00000000
-  effectValues: 05000000
-  statusTypes: 
+  effects:
+  - effectType: 0
+    value: 5
+    target: 2
+    condition: 0
+    conditionValue: 0
+  statusEffects:
+  - statusType: 0
+    duration: 2
+    intensity: 0
+    target: 1
   vfxPrefab: {fileID: 0}

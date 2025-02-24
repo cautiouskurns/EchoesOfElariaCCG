@@ -8,5 +8,7 @@ public enum StatusEffectTypes
     Strengthened,
     Blocking,
     Destabilized,
-    Exhausted
+    Exhausted,
+    Buff,
+    Debuff
 }

@@ -6,8 +6,10 @@ public class CardManager : MonoBehaviour
 {
     public static CardManager Instance { get; private set; }
 
-    [SerializeField] private EffectManager effectManager;  // ✅ Now exposed in Inspector
-    [SerializeField] private StatusEffectManager statusEffectManager;  // ✅ Now exposed in Inspector
+    [SerializeField] private EffectManager effectManager;
+    [SerializeField] private StatusEffectManager statusEffectManager;
+
+    public CardType LastCardPlayedType { get; private set; }  // ✅ Tracks last card played
 
     private void Awake()
     {
@@ -18,7 +20,6 @@ public class CardManager : MonoBehaviour
             return;
         }
 
-        // If not assigned in the Inspector, try to find them automatically
         if (effectManager == null)
             effectManager = FindAnyObjectByType<EffectManager>();
 
@@ -41,7 +42,8 @@ public class CardManager : MonoBehaviour
 
         Debug.Log($"[CardManager] 🎴 Executing {card.CardName}");
 
-        // Handle VFX for each effect's targets
+        LastCardPlayedType = card.CardType;  // ✅ Store last card type
+
         if (card.VFXPrefab != null)
         {
             foreach (EffectData effect in card.Effects)
@@ -57,15 +59,13 @@ public class CardManager : MonoBehaviour
             }
         }
 
-        // Play sound effect
         if (card.SoundEffect != null)
         {
             AudioManager.Instance?.PlaySound(card.SoundEffect);
         }
 
-        // Apply effects and status effects
         effectManager?.ApplyEffects(card, clickedTarget);
-        
+
         if (card.StatusEffects != null && card.StatusEffects.Count > 0)
         {
             statusEffectManager?.ApplyStatusEffects(card, clickedTarget);
@@ -80,5 +80,6 @@ public class CardManager : MonoBehaviour
         Debug.Log($"[CardManager] 🎆 VFX spawned at {spawnPos}");
     }
 }
+
 
 

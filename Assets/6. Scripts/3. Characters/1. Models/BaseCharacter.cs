@@ -86,6 +86,24 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     
     public void ReceiveStatusEffect(IStatusEffect effect, int duration) => Effects?.ReceiveStatusEffect(effect, duration);
     public void RemoveStatusEffect(IStatusEffect effect) => Effects?.RemoveStatusEffect(effect);
+        /// ✅ Checks if this character has a specific status effect
+    public bool HasStatusEffect(StatusEffectTypes statusType)
+    {
+        return Effects.HasStatusEffect(statusType);
+    }
+
+    /// ✅ Checks if the character has an **active Buff**
+    public bool HasBuff()
+    {
+        return Effects.HasBuff();
+    }
+
+    /// ✅ Checks if the character has an **active Debuff**
+    public bool HasDebuff()
+    {
+        return Effects.HasDebuff();
+    }
+
     public virtual void ProcessEndOfTurnEffects() => Effects?.ProcessEndOfTurnEffects();
 
     // ✅ Handles taking damage

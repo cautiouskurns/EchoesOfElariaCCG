@@ -64,6 +64,24 @@ public class CharacterEffects : MonoBehaviour
         UpdateStatusUI();  // ✅ Make sure the UI updates after modifying status effects
     }
 
+    /// ✅ Checks if this character has a specific status effect
+    public bool HasStatusEffect(StatusEffectTypes statusType)
+    {
+        return activeEffects.Exists(effect => effect.EffectData.StatusType == statusType);
+    }
+
+    /// ✅ Checks if the character has an **active Buff**
+    public bool HasBuff()
+    {
+        return activeEffects.Exists(effect => effect.EffectData.StatusType == StatusEffectTypes.Buff);
+    }
+
+    /// ✅ Checks if the character has an **active Debuff**
+    public bool HasDebuff()
+    {
+        return activeEffects.Exists(effect => effect.EffectData.StatusType == StatusEffectTypes.Debuff);
+    }
+    
     public void UpdateStatusUI()
     {
         StatusEffectUI statusUI = GetComponentInChildren<StatusEffectUI>();
