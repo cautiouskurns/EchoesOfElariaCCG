@@ -14,11 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: "Berserker\u2019s Rage\t"
   cost: 1
-  cardArt: {fileID: 0}
+  cardArt: {fileID: -160609429710101668, guid: 24fca65a767ec40469e1b276b739c962, type: 3}
   description: "Gain +5 Strength for 3 turns, but take 50% more damage.\t"
   cardType: 0
   soundEffect: {fileID: 0}
-  effectTypes: 
-  effectValues: 
-  statusTypes: 03000000
+  effects: []
+  statusEffects:
+  - statusType: 3
+    duration: 3
+    intensity: 5
+    target: 0
+    conditionType: 0
+    conditionValue: 0
+  - statusType: 1
+    duration: 3
+    intensity: 5
+    target: 0
+    conditionType: 0
+    conditionValue: 0
   vfxPrefab: {fileID: 0}

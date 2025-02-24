@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebc6a24fbeb2845128ca5c7b8c6cd9c0, type: 3}
+  m_Name: Status_Exhausted
+  m_EditorClassIdentifier: 
+  EffectName: Exhausted
+  StatusType: 6
+  MaxDuration: 3
+  MaxAmount: 2
+  Icon: {fileID: -4733039052000751752, guid: d3e286cbd6d3a4b31ad84668f461f9cb, type: 3}
+  EffectSound: {fileID: 0}

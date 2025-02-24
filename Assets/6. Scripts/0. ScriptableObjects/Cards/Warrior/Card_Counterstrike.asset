@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Counterstrike
   cost: 1
-  cardArt: {fileID: 0}
+  cardArt: {fileID: -1364921500239167092, guid: 6941ae378da604721b18dd895858973e, type: 3}
   description: "If attacked this turn, deal 6 damage back to the attacker.\t"
   cardType: 3
   soundEffect: {fileID: 0}
-  effectTypes: 00000000
-  effectValues: 06000000
-  statusTypes: 
+  effects: []
+  statusEffects: []
   vfxPrefab: {fileID: 0}

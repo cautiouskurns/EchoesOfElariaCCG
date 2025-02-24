@@ -9,8 +9,9 @@ public class CardManager : MonoBehaviour
     [SerializeField] private EffectManager effectManager;
     [SerializeField] private StatusEffectManager statusEffectManager;
 
-    public CardType LastCardPlayedType { get; private set; }  // ✅ Tracks last card played
-    public BaseCard LastCardPlayed { get; private set; }  // ✅ Tracks last card played
+    public CardType LastCardPlayedType { get; private set; } = CardType.None;  // ✅ Default value
+    public BaseCard LastCardPlayed { get; private set; } = null;  // ✅ Starts as null
+
 
 
     private void Awake()
@@ -44,8 +45,7 @@ public class CardManager : MonoBehaviour
 
         Debug.Log($"[CardManager] 🎴 Executing {card.CardName}");
 
-        LastCardPlayedType = card.CardType;  // ✅ Store last card type
-        LastCardPlayed = card;  // ✅ Track last played card
+        Debug.Log($"[CardManager] 🎴 Executing {card.CardType}");
 
         //    // ✅ Track last played card
         // GameStateTracker.SetLastCardPlayed(card);
@@ -76,6 +76,8 @@ public class CardManager : MonoBehaviour
         {
             statusEffectManager?.ApplyStatusEffects(card, clickedTarget);
         }
+        LastCardPlayedType = card.CardType;  // ✅ Store last card type
+        LastCardPlayed = card;  // ✅ Track last played card
     }
 
     private void InstantiateVFX(GameObject vfxPrefab, Vector3 position)

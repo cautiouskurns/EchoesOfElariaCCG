@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1fbb1970e1f844077ac3fd8cb5171d0b, type: 3}
-  m_Name: Status_Poison
+  m_Script: {fileID: 11500000, guid: 710e2b604695c490395e06c50aa20155, type: 3}
+  m_Name: Status_Weakened
   m_EditorClassIdentifier: 
-  EffectName: Poison
-  StatusType: 2
+  EffectName: Weak
+  StatusType: 0
   MaxDuration: 3
-  MaxAmount: 3
-  Icon: {fileID: -4320913970512475346, guid: 6d315527c7e684ec39d38c24650c06db, type: 3}
+  MaxAmount: 0
+  Icon: {fileID: -2908920752090814125, guid: e509f189b831a4fb5800236f2ef87316, type: 3}
   EffectSound: {fileID: 0}

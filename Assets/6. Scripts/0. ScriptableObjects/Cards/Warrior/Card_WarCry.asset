@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: War Cry
   cost: 1
-  cardArt: {fileID: 0}
+  cardArt: {fileID: 8455783256001103762, guid: f9a18918544b94b6d9d96458ab7a22e0, type: 3}
   description: "Increases all allies\u2019 Strength by 2 for 2 turns.\t"
   cardType: 3
   soundEffect: {fileID: 0}
-  effectTypes: 
-  effectValues: 
-  statusTypes: 03000000
+  effects: []
+  statusEffects: []
   vfxPrefab: {fileID: 0}

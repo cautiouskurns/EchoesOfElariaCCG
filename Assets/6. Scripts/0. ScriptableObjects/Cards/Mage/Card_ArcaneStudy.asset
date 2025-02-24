@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 630f675fb96884f62b83dac420e1cd6b, type: 3}
+  m_Name: Card_ArcaneStudy
+  m_EditorClassIdentifier: 
+  cardName: "Arcane Study\t"
+  cost: 1
+  cardArt: {fileID: 1933204025467939058, guid: 5650327f6e99146609039de5494ad058, type: 3}
+  description: 'Draw 3 cards. '
+  cardType: 3
+  soundEffect: {fileID: 0}
+  effects: []
+  statusEffects: []
+  vfxPrefab: {fileID: 0}

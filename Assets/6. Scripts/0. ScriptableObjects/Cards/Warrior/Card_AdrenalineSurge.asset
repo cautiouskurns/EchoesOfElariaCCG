@@ -13,12 +13,11 @@ MonoBehaviour:
   m_Name: Card_AdrenalineSurge
   m_EditorClassIdentifier: 
   cardName: "Adrenaline Surge\t"
-  cost: 0
-  cardArt: {fileID: 0}
+  cost: 1
+  cardArt: {fileID: 1172452936857548570, guid: 08669eb022a9c432f94f2840f002f1c0, type: 3}
   description: "Gain 1 AP and draw 2 cards.\t"
   cardType: 3
   soundEffect: {fileID: 0}
-  effectTypes: 03000000
-  effectValues: 
-  statusTypes: 
+  effects: []
+  statusEffects: []
   vfxPrefab: {fileID: 0}

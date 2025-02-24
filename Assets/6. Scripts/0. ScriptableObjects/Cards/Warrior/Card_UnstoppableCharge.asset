@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: Unstoppable Charge
   cost: 1
-  cardArt: {fileID: 0}
+  cardArt: {fileID: 1618301137565059891, guid: c7067477985d447919d3467a203c65bf, type: 3}
   description: "Deals 8 damage. Gain +1 AP if the enemy is stunned.\t"
   cardType: 1
   soundEffect: {fileID: 0}
-  effectTypes: 00000000
-  effectValues: 08000000
-  statusTypes: 
+  effects: []
+  statusEffects: []
   vfxPrefab: {fileID: 0}

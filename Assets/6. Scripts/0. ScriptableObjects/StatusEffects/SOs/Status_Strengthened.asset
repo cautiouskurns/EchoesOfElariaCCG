@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 710e2b604695c490395e06c50aa20155, type: 3}
-  m_Name: Status_Weak
+  m_Script: {fileID: 11500000, guid: 5a7313f610bca4f0bac2bd7ae733d9e8, type: 3}
+  m_Name: Status_Strengthened
   m_EditorClassIdentifier: 
-  EffectName: Weak
-  StatusType: 0
+  EffectName: Strengthen
+  StatusType: 3
   MaxDuration: 3
   MaxAmount: 0
-  Icon: {fileID: -2908920752090814125, guid: e509f189b831a4fb5800236f2ef87316, type: 3}
+  Icon: {fileID: -3417600619704534854, guid: 580442e3ddeb34f1eb12ab49d0d23402, type: 3}
   EffectSound: {fileID: 0}

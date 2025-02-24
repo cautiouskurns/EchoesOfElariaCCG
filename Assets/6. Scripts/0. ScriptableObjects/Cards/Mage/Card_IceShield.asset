@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 630f675fb96884f62b83dac420e1cd6b, type: 3}
+  m_Name: Card_IceShield
+  m_EditorClassIdentifier: 
+  cardName: "Ice Shield\t"
+  cost: 1
+  cardArt: {fileID: -6003959651238540266, guid: 463f392e3662b45638d4b29a24fa83eb, type: 3}
+  description: 'Gain 6 Block. If played after a Fire spell, freeze the enemy for
+    1 turn. '
+  cardType: 2
+  soundEffect: {fileID: 0}
+  effects: []
+  statusEffects: []
+  vfxPrefab: {fileID: 0}

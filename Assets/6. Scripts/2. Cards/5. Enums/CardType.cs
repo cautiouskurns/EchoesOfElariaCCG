@@ -4,6 +4,10 @@ namespace Cards
     {
         None,
         Attack,
+        Defense,
+        Utility,
+        Buff,
+        Debuff,
         Spell,
         Support
     }

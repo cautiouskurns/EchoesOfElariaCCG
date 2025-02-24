@@ -14,11 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: "Defensive Stance\t"
   cost: 1
-  cardArt: {fileID: 0}
+  cardArt: {fileID: 6445273529349926962, guid: 427be3a522bdb4abc9e8e5ed5b099f1f, type: 3}
   description: "Gain 10 Block. Next attack deals 50% less damage.\t"
   cardType: 3
   soundEffect: {fileID: 0}
-  effectTypes: 
-  effectValues: 
-  statusTypes: 04000000
+  effects: []
+  statusEffects:
+  - statusType: 4
+    duration: 3
+    intensity: 10
+    target: 0
+    conditionType: 0
+    conditionValue: 0
+  - statusType: 3
+    duration: 1
+    intensity: 0
+    target: 0
+    conditionType: 0
+    conditionValue: 0
   vfxPrefab: {fileID: 0}

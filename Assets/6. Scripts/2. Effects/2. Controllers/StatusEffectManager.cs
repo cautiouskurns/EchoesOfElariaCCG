@@ -28,6 +28,8 @@ public class StatusEffectManager : MonoBehaviour
             return;
         }
 
+        Debug.Log($"[StatusEffectManager] 🎴 Applying status effects for {card.CardName}");
+
         foreach (StatusEffectData statusEffect in card.StatusEffects)
         {
             List<IEffectTarget> targets = EffectManager.Instance.ResolveTargets(statusEffect.target, clickedTarget);

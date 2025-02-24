@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 630f675fb96884f62b83dac420e1cd6b, type: 3}
+  m_Name: Card_ChainLightning
+  m_EditorClassIdentifier: 
+  cardName: Chain Lightning
+  cost: 1
+  cardArt: {fileID: -3963334329314848592, guid: 1e4d7f2b12c0948afbd430e945edf148, type: 3}
+  description: 'Deals 4 damage to one target, then chains to another enemy. '
+  cardType: 6
+  soundEffect: {fileID: 0}
+  effects: []
+  statusEffects: []
+  vfxPrefab: {fileID: 0}

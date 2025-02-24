@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3858aa60bf0f544bd825e6f2aaa54f43, type: 3}
   m_Name: Class_Mage
   m_EditorClassIdentifier: 
-  classType: 2
   className: Mage
   classIcon: {fileID: -7285376162372006033, guid: 8f7d01129d23a4ae7878782315f8819f, type: 3}
   classDescription: Powerful Mage
@@ -23,11 +22,15 @@ MonoBehaviour:
   intelligence: 15
   luck: 10
   startingDeck:
-  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
-  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
-  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
-  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
-  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
-  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
-  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: 8e3388a93b3204d99aad883a316c07a8, type: 2}
+  - {fileID: 11400000, guid: 632f6328ba30a4aaf80788e6d88fbe49, type: 2}
+  - {fileID: 11400000, guid: dc905e005f6954b41b4427afa350a07e, type: 2}
+  - {fileID: 11400000, guid: 60a199686f98e42c5bfeeb7fbe35372e, type: 2}
+  - {fileID: 11400000, guid: 936367b0280bc42b885cb6149b0d7991, type: 2}
+  - {fileID: 11400000, guid: b51a41ec0899643f99c24e5073dd7529, type: 2}
+  - {fileID: 11400000, guid: 59d2248fafc85425cab0dd196398f736, type: 2}
+  - {fileID: 11400000, guid: a09c1cf866ef64a85bb90fd1c9fe431b, type: 2}
+  - {fileID: 11400000, guid: 4bc23f92d6a034fb69c7f588f5a4d087, type: 2}
+  - {fileID: 11400000, guid: 7ef66819fff2b4c0084df275c3973566, type: 2}
+  - {fileID: 11400000, guid: 334cadd7cb8d0444d88df479a8251293, type: 2}
   classPrefab: {fileID: 6621355191648621107, guid: cc3e574031cd94bf2982d69fed8a884a, type: 3}

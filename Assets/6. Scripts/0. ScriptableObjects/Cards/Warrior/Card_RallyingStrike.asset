@@ -14,12 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardName: "Rallying Strike\t"
   cost: 1
-  cardArt: {fileID: 0}
+  cardArt: {fileID: 5224580455010802363, guid: 5788d4947d51b467da8dfb36d46ed066, type: 3}
   description: "Gain 4 Block and deal 6 damage. If an ally plays a card next, they
     gain 3 Strength.\t"
   cardType: 3
   soundEffect: {fileID: 0}
-  effectTypes: 00000000
-  effectValues: 06000000
-  statusTypes: 04000000
+  effects: []
+  statusEffects: []
   vfxPrefab: {fileID: 0}

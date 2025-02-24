@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e92d2a37d62d549f98c55e8a1c5c2879, type: 3}
+  m_Name: Status_Destabilized
+  m_EditorClassIdentifier: 
+  EffectName: Destabilised
+  StatusType: 0
+  MaxDuration: 3
+  MaxAmount: 3
+  Icon: {fileID: -4733039052000751752, guid: d3e286cbd6d3a4b31ad84668f461f9cb, type: 3}
+  EffectSound: {fileID: 0}
