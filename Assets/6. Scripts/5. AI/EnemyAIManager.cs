@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class EnemyAIManager : MonoBehaviour
 {
@@ -90,7 +91,6 @@ public class EnemyAIManager : MonoBehaviour
         StartCoroutine(ProcessEnemyTurn());
     }
 
-    // UPDATED: Modified to use strategic action selection
     private IEnumerator ProcessEnemyTurn()
     {
         Debug.Log("[EnemyAI] 🤖 Processing enemy turn");
@@ -101,30 +101,40 @@ public class EnemyAIManager : MonoBehaviour
 
         foreach (var enemy in enemies)
         {
+            Debug.Log($"[EnemyAI] {enemy.Name} starts turn with {enemy.Stats.CurrentActionPoints} AP");
             enemy.Stats.RefreshActionPoints();
 
             while (enemy.Stats.CurrentActionPoints > 0)
             {
-                // CHANGED: Now using strategic action selection instead of random
-                var action = SelectStrategicAction(enemy, players);
-                var target = SelectRandomTarget(players);
+                // Select action strategically
+                AICardType sourceCategory = AICardType.Attack; // Default
+                BaseCard selectedCard = SelectStrategicAction(enemy, players);
+                
+                // Select target optimally based on the selected action
+                PlayerUnit target = SelectOptimalTarget(players, selectedCard);
 
-                if (action == null || target == null)
+                if (selectedCard == null || target == null)
                 {
                     Debug.LogWarning("[EnemyAI] ⚠️ No valid action or target found!");
                     break;
                 }
 
-                if (action.Cost > enemy.Stats.CurrentActionPoints)
+                // Log the complete decision process
+                LogDecisionProcess(enemy, selectedCard, target, 
+                    (float)enemy.GetHealth() / enemy.GetMaxHealth(),
+                    players.Any(p => p.HasDebuff()), 
+                    sourceCategory);
+
+                if (selectedCard.Cost > enemy.Stats.CurrentActionPoints)
                 {
-                    Debug.Log($"[EnemyAI] ❌ {enemy.Name} does not have enough AP for {action.CardName}");
+                    Debug.Log($"[EnemyAI] ❌ {enemy.Name} does not have enough AP for {selectedCard.CardName}");
                     break; // Not enough AP for action
                 }
 
-                yield return StartCoroutine(PerformEnemyAttack(enemy, target, action));
+                yield return StartCoroutine(PerformEnemyAttack(enemy, target, selectedCard));
 
                 // Spend AP after the attack sequence
-                enemy.Stats.UseActionPoints(action.Cost);
+                enemy.Stats.UseActionPoints(selectedCard.Cost);
 
                 yield return new WaitForSeconds(actionDelay);
             }
@@ -202,12 +212,6 @@ public class EnemyAIManager : MonoBehaviour
             sourceCategory = AICardType.Attack; // Assuming random is likely an attack
         }
 
-        // Log the decision process
-        if (selectedCard != null)
-        {
-            LogDecisionProcess(enemy, selectedCard, healthRatio, anyPlayerHasDebuff, sourceCategory);
-        }
-
         return selectedCard;
     }
 
@@ -218,13 +222,14 @@ public class EnemyAIManager : MonoBehaviour
         return cards[Random.Range(0, cards.Count)];
     }
 
-    private void LogDecisionProcess(EnemyUnit enemy, BaseCard selectedCard, float healthRatio, bool playersHaveDebuffs, AICardType sourceCategory) 
+    private void LogDecisionProcess(EnemyUnit enemy, BaseCard selectedCard, PlayerUnit target, float healthRatio, bool playersHaveDebuffs, AICardType sourceCategory) 
     {
         string logMessage = $"[EnemyAI Decision] {enemy.Name} ({healthRatio:P0} health) selected {selectedCard.CardName}\n";
         logMessage += $"→ Decision factors: {(healthRatio < defensiveThreshold ? "LOW HEALTH" : healthRatio > aggressiveThreshold ? "HIGH HEALTH" : "NORMAL HEALTH")}\n";
         logMessage += $"→ Player debuffs: {(playersHaveDebuffs ? "YES" : "NO")}\n";
         logMessage += $"→ Card source: {sourceCategory} category\n";
-        logMessage += $"→ Card details: {selectedCard.Cost} AP, {selectedCard.CardType}, \"{selectedCard.Description}\"";
+        logMessage += $"→ Card details: {selectedCard.Cost} AP, {selectedCard.CardType}, \"{selectedCard.Description}\"\n";
+        logMessage += $"→ Target: {target.Name} (Health: {(float)target.GetHealth() / target.GetMaxHealth():P0}, Block: {target.Stats.Block}, Debuffed: {target.HasDebuff()})";
         
         Debug.Log(logMessage);
     }
@@ -246,6 +251,75 @@ public class EnemyAIManager : MonoBehaviour
         if (players.Length == 0) return null;
         return players[Random.Range(0, players.Length)];
     }
+
+
+    private PlayerUnit SelectOptimalTarget(PlayerUnit[] players, BaseCard action)
+    {
+        if (players.Length == 0) return null;
+        
+        // Default to weakest player
+        PlayerUnit weakestTarget = null;
+        float lowestHealthRatio = 1.0f;
+        
+        // Find player with lowest health ratio
+        foreach (var player in players)
+        {
+            float healthRatio = (float)player.GetHealth() / player.GetMaxHealth();
+            if (healthRatio < lowestHealthRatio)
+            {
+                lowestHealthRatio = healthRatio;
+                weakestTarget = player;
+            }
+        }
+        
+        // Card-specific targeting strategies
+        if (action.CardType == Cards.CardType.Attack)
+        {
+            // Find player that's already vulnerable or debuffed
+            foreach (var player in players)
+            {
+                if (player.HasStatusEffect(StatusEffectTypes.Vulnerable) ||
+                    player.HasDebuff())
+                {
+                    return player; // Target already vulnerable players
+                }
+            }
+            
+            // Target players with low block
+            PlayerUnit lowestBlockTarget = null;
+            int lowestBlock = int.MaxValue;
+            
+            foreach (var player in players)
+            {
+                int block = player.Stats.Block;
+                if (block < lowestBlock)
+                {
+                    lowestBlock = block;
+                    lowestBlockTarget = player;
+                }
+            }
+            
+            if (lowestBlock == 0 && lowestBlockTarget != null)
+            {
+                return lowestBlockTarget;
+            }
+        }
+        else if (action.Description.ToLower().Contains("debuff") || 
+                action.Description.ToLower().Contains("weak"))
+        {
+            // For debuffs, target players that are not already debuffed
+            foreach (var player in players)
+            {
+                if (!player.HasDebuff())
+                {
+                    return player;
+                }
+            }
+        }
+        
+        // Default to weakest player or random if all have full health
+        return weakestTarget ?? players[Random.Range(0, players.Length)];
+    }   
 
     /// <summary>
     /// ✅ Moves the enemy, plays attack animation, and applies effect.

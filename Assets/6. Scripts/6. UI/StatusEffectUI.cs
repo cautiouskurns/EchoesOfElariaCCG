@@ -12,7 +12,7 @@ public class StatusEffectUI : MonoBehaviour
 
     public void UpdateStatusEffects(List<ActiveStatusEffect> activeEffects)
     {
-        Debug.Log($"[StatusEffectUI] Updating UI. Total effects: {activeEffects.Count}");
+        // Debug.Log($"[StatusEffectUI] Updating UI. Total effects: {activeEffects.Count}");
 
         // ✅ Loop through active effects and update UI
         foreach (var effect in activeEffects)
