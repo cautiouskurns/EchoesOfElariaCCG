@@ -28,7 +28,7 @@ MonoBehaviour:
     conditionValue: 0
   - statusType: 1
     duration: 3
-    intensity: 5
+    intensity: 50
     target: 0
     conditionType: 0
     conditionValue: 0

@@ -14,6 +14,15 @@ public class VulnerableEffect : BaseStatusEffect
     public override void RemoveStatus(IEffectTarget target)
     {
         Debug.Log($"[VulnerableEffect] Vulnerability removed from {target}");
-        //target.ModifyDefense(MaxAmount);  // Restore defense when removed
+        //t
+        // 
+        // arget.ModifyDefense(MaxAmount);  // Restore defense when removed
+    }
+
+    public override float GetDamageModifier()
+    {
+        // Use MaxAmount to determine the damage increase percentage
+        // For Berserker's Rage, set MaxAmount to 50 (for 50%)
+        return 1.0f + (MaxAmount / 100f); 
     }
 }

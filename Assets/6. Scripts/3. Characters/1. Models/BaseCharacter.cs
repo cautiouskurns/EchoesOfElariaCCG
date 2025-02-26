@@ -109,8 +109,29 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     // ✅ Handles taking damage
     public virtual void TakeDamage(int damage)
     {
-        Stats.ModifyHealth(-damage);
-        Debug.Log($"[BaseCharacter] {Name} took {damage} damage. HP: {Stats.CurrentHealth}/{Stats.MaxHealth}");
+        // Calculate damage multiplier from all active status effects
+        float damageMultiplier = 1.0f;
+        
+        // Check all active status effects for damage modifiers
+        foreach (var activeEffect in Effects.activeEffects)
+        {
+            damageMultiplier *= activeEffect.EffectData.GetDamageModifier();
+        }
+        
+        // Apply the damage multiplier
+        int modifiedDamage = Mathf.RoundToInt(damage * damageMultiplier);
+        
+        // Apply actual damage
+        Stats.ModifyHealth(-modifiedDamage);
+        
+        if (damageMultiplier != 1.0f)
+        {
+            Debug.Log($"[BaseCharacter] {Name} took {modifiedDamage} damage (base: {damage}, multiplier: {damageMultiplier:F2}). HP: {Stats.CurrentHealth}/{Stats.MaxHealth}");
+        }
+        else
+        {
+            Debug.Log($"[BaseCharacter] {Name} took {damage} damage. HP: {Stats.CurrentHealth}/{Stats.MaxHealth}");
+        }
 
         if (Stats.CurrentHealth <= 0 && DeathHandler != null)
         {

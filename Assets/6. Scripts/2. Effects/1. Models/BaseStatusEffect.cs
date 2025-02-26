@@ -12,5 +12,10 @@ public abstract class BaseStatusEffect : ScriptableObject, IStatusEffect
 
     public abstract void ApplyStatus(IEffectTarget target, int duration);
     public abstract void RemoveStatus(IEffectTarget target);
+
+    public virtual float GetDamageModifier()
+    {
+        return 1.0f; // Default: no modification
+    }
 }
 

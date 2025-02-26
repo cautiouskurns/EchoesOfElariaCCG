@@ -89,7 +89,6 @@ public class CardFanLayoutManager : MonoBehaviour
 
         if (isHovered)
         {
-            Debug.Log($"[CardFanLayout] Hovering card {card.name}");
             Vector3 hoverPosition = cardBasePositions[card] + Vector3.up * hoverLiftHeight;
             
             Sequence hoverSequence = DOTween.Sequence();
@@ -100,7 +99,6 @@ public class CardFanLayoutManager : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[CardFanLayout] Unhovering card {card.name}");
             Sequence unhoverSequence = DOTween.Sequence();
             unhoverSequence.Join(card.transform.DOLocalMove(cardBasePositions[card], hoverDuration))
                           .Join(card.transform.DOScale(Vector3.one, hoverDuration))
