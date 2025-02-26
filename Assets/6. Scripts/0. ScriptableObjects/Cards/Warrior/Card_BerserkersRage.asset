@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Card_BerserkersRage
   m_EditorClassIdentifier: 
   cardName: "Berserker\u2019s Rage\t"
-  cost: 1
+  cost: 2
   cardArt: {fileID: -160609429710101668, guid: 24fca65a767ec40469e1b276b739c962, type: 3}
   description: "Gain +5 Strength for 3 turns, but take 50% more damage.\t"
   cardType: 0

@@ -993,10 +993,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyActions:
-  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
-  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
-  - {fileID: 11400000, guid: ce904ef43ffae4f64be8287ab5c42866, type: 2}
+  - {fileID: 11400000, guid: 3cb6bf6dbb04b45bca74b556765c0ab2, type: 2}
+  - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
+  - {fileID: 11400000, guid: 66318e488a50a439cb60a01f2bea72a7, type: 2}
   actionDelay: 3
+  defensiveThreshold: 0.3
+  aggressiveThreshold: 0.7
 --- !u!1 &671463147
 GameObject:
   m_ObjectHideFlags: 0

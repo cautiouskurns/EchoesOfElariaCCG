@@ -22,16 +22,16 @@ MonoBehaviour:
   intelligence: 10
   luck: 10
   startingDeck:
-  - {fileID: 11400000, guid: 7fe2674c4a43e42008847aeb2ed57363, type: 2}
   - {fileID: 11400000, guid: 3cb6bf6dbb04b45bca74b556765c0ab2, type: 2}
-  - {fileID: 11400000, guid: 29aca2a1c2a4840c886d3dbe9b915362, type: 2}
-  - {fileID: 11400000, guid: 2fb99dc6da7094ab7a01c19ac8822707, type: 2}
-  - {fileID: 11400000, guid: 3eea1d0a00b144b2cae4425f5862edda, type: 2}
-  - {fileID: 11400000, guid: 66318e488a50a439cb60a01f2bea72a7, type: 2}
-  - {fileID: 11400000, guid: d98554b4580534d37a4f397fae39625a, type: 2}
+  - {fileID: 11400000, guid: 3cb6bf6dbb04b45bca74b556765c0ab2, type: 2}
+  - {fileID: 11400000, guid: 3cb6bf6dbb04b45bca74b556765c0ab2, type: 2}
   - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
-  - {fileID: 11400000, guid: f4a605a9f13ba477e91ba0b9dc7a796a, type: 2}
-  - {fileID: 11400000, guid: 96e1b792e8943457cbaf45b91c78bca9, type: 2}
-  - {fileID: 11400000, guid: 546287a269ff6451491ca536fabcac44, type: 2}
-  - {fileID: 11400000, guid: 68a4af2e87a304fa09dbb66b2d4ddbeb, type: 2}
+  - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
+  - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
+  - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
+  - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
+  - {fileID: 11400000, guid: 66318e488a50a439cb60a01f2bea72a7, type: 2}
+  - {fileID: 11400000, guid: 66318e488a50a439cb60a01f2bea72a7, type: 2}
+  - {fileID: 11400000, guid: 66318e488a50a439cb60a01f2bea72a7, type: 2}
+  - {fileID: 11400000, guid: 66318e488a50a439cb60a01f2bea72a7, type: 2}
   classPrefab: {fileID: 3636736163949351498, guid: b6764de2638dd42d88cdf7976a776cc9, type: 3}

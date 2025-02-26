@@ -16,8 +16,14 @@ MonoBehaviour:
   cost: 1
   cardArt: {fileID: -8798505841451070217, guid: eeafad64cf2cd47cc87da94b4886c6d7, type: 3}
   description: Grants 8 Block to yourself or an ally
-  cardType: 3
+  cardType: 2
   soundEffect: {fileID: 0}
-  effectTypes: 
-  effectValues: 
-  statusTypes: 04000000
+  effects: []
+  statusEffects:
+  - statusType: 4
+    duration: 3
+    intensity: 8
+    target: 0
+    conditionType: 0
+    conditionValue: 0
+  vfxPrefab: {fileID: 0}
