@@ -6,6 +6,11 @@ public class EnemyUnit : BaseCharacter
     [SerializeField] private EnemyIntentUI intentUI;
     private EnemyAnimationController animationController;
     private EnemyClass enemyData;
+
+    // Add this field to store the planned action
+    private BaseCard plannedAction;
+    private PlayerUnit plannedTarget;
+    
     public string Description { get; private set; }
 
     protected override void Awake()
@@ -128,6 +133,34 @@ public class EnemyUnit : BaseCharacter
         // ✅ Apply damage after attack animation
         player.TakeDamage(5);
         Debug.Log($"[EnemyUnit] 🔥 {player.Name} took 5 damage!");
+    }
+
+
+    // Add a method to set the planned action
+    public void SetPlannedAction(BaseCard action, PlayerUnit target)
+    {
+        plannedAction = action;
+        plannedTarget = target;
+        
+        // Display the intent immediately
+        ShowIntent(plannedAction);
+    }
+    
+    // Add a method to execute the planned action
+    public IEnumerator ExecutePlannedAction()
+    {
+        if (plannedAction == null || plannedTarget == null)
+        {
+            Debug.LogWarning($"[EnemyUnit] {Name} has no planned action to execute!");
+            yield break;
+        }
+        
+        // Execute the planned action
+        yield return StartCoroutine(EnemyAIManager.Instance.PerformEnemyAttack(this, plannedTarget, plannedAction));
+        
+        // Clear the planned action
+        plannedAction = null;
+        plannedTarget = null;
     }
 
 }

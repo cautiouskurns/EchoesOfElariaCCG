@@ -16,6 +16,8 @@ public abstract class BaseCharacter : MonoBehaviour, ICharacter, IEffectTarget
     private static BaseCharacter currentlySelectedCharacter;
     public static BaseCharacter GetSelectedCharacter() => currentlySelectedCharacter;
 
+    [HideInInspector] public BaseCard plannedCard;
+    [HideInInspector] public PlayerUnit plannedTarget;
 
     protected virtual void Awake()
     {

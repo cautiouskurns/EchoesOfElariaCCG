@@ -22,6 +22,12 @@ public class TurnManager : MonoBehaviour
 
     private void Start()
     {
+        // Plan initial enemy actions
+        if (EnemyAIManager.Instance != null)
+        {
+            EnemyAIManager.Instance.PlanEnemyActions();
+        }
+        
         StartPlayerTurn();
     }
 
@@ -56,7 +62,10 @@ public class TurnManager : MonoBehaviour
 
     public void EndEnemyTurn()
     {
-        Debug.Log("[TurnManager] Enemy turn ended");
+        Debug.Log("[TurnManager] Enemy turn ended, planning next actions");
+        
+        // Plan enemy actions for next turn
+        EnemyAIManager.Instance.PlanEnemyActions();
         CurrentTurn = TurnState.PlayerTurn;
         OnTurnChanged?.Invoke(CurrentTurn);
 

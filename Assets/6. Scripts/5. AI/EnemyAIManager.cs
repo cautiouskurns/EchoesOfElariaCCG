@@ -99,53 +99,71 @@ public class EnemyAIManager : MonoBehaviour
     {
         Debug.Log("[EnemyAI] 🤖 Processing enemy turn");
 
-        // Get all active enemy and player units
+        // Get all active enemy units
         var enemies = FindObjectsByType<EnemyUnit>(FindObjectsSortMode.None);
-        var players = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None);
 
         foreach (var enemy in enemies)
         {
             Debug.Log($"[EnemyAI] {enemy.Name} starts turn with {enemy.Stats.CurrentActionPoints} AP");
             enemy.Stats.RefreshActionPoints();
 
-            while (enemy.Stats.CurrentActionPoints > 0)
+            // Execute the previously planned action
+            if (enemy.plannedCard != null && enemy.plannedTarget != null)
             {
-                // Select action strategically
-                AICardType sourceCategory = AICardType.Attack; // Default
-                BaseCard selectedCard = SelectStrategicAction(enemy, players);
-                
-                // Select target optimally based on the selected action
-                PlayerUnit target = SelectOptimalTarget(players, selectedCard);
+                BaseCard selectedCard = enemy.plannedCard;
+                PlayerUnit target = enemy.plannedTarget;
+                AICardType sourceCategory = DetermineCardCategory(selectedCard);
 
-                if (selectedCard == null || target == null)
-                {
-                    Debug.LogWarning("[EnemyAI] ⚠️ No valid action or target found!");
-                    break;
-                }
-
-                // Log the complete decision process
+                // Log the execution
                 LogDecisionProcess(enemy, selectedCard, target, 
                     (float)enemy.GetHealth() / enemy.GetMaxHealth(),
-                    players.Any(p => p.HasDebuff()), 
+                    FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None).Any(p => p.HasDebuff()), 
                     sourceCategory);
 
-                if (selectedCard.Cost > enemy.Stats.CurrentActionPoints)
+                if (selectedCard.Cost <= enemy.Stats.CurrentActionPoints)
                 {
-                    Debug.Log($"[EnemyAI] ❌ {enemy.Name} does not have enough AP for {selectedCard.CardName}");
-                    break; // Not enough AP for action
+                    yield return StartCoroutine(PerformEnemyAttack(enemy, target, selectedCard));
+                    
+                    // Spend AP after the attack sequence
+                    enemy.Stats.UseActionPoints(selectedCard.Cost);
+                    
+                    // Record for synergy
+                    RecordPlayedCard(selectedCard);
+                }
+                else
+                {
+                    Debug.Log($"[EnemyAI] ❌ {enemy.Name} does not have enough AP for planned {selectedCard.CardName}");
                 }
 
-                yield return StartCoroutine(PerformEnemyAttack(enemy, target, selectedCard));
-
-                // Spend AP after the attack sequence
-                enemy.Stats.UseActionPoints(selectedCard.Cost);
-
-                yield return new WaitForSeconds(actionDelay);
+                // Clear the planned action
+                enemy.plannedCard = null;
+                enemy.plannedTarget = null;
             }
+            else
+            {
+                Debug.LogWarning($"[EnemyAI] {enemy.Name} had no planned action!");
+            }
+
+            yield return new WaitForSeconds(actionDelay);
         }
+
+        // Plan the next actions for the next turn
+        PlanEnemyActions();
 
         Debug.Log("[EnemyAI] ✅ Enemy turn complete");
         TurnManager.Instance.EndEnemyTurn();
+    }
+
+    private AICardType DetermineCardCategory(BaseCard card)
+    {
+        foreach (var category in categorizedCards)
+        {
+            if (category.Value.Contains(card))
+            {
+                return category.Key;
+            }
+        }
+        return AICardType.Attack; // Default
     }
 
     private BaseCard SelectStrategicAction(EnemyUnit enemy, PlayerUnit[] players)
@@ -398,13 +416,48 @@ public class EnemyAIManager : MonoBehaviour
         return weakestTarget ?? players[Random.Range(0, players.Length)];
     }   
 
+
+    public void PlanEnemyActions()
+    {
+        Debug.Log("[EnemyAI] Planning next enemy actions");
+
+        // Get all active enemy and player units
+        var enemies = FindObjectsByType<EnemyUnit>(FindObjectsSortMode.None);
+        var players = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None);
+
+        foreach (var enemy in enemies)
+        {
+            // Select action strategically
+            AICardType sourceCategory = AICardType.Attack; // Default
+            BaseCard selectedCard = SelectStrategicAction(enemy, players);
+            
+            // Select target optimally based on the selected action
+            PlayerUnit target = SelectOptimalTarget(players, selectedCard);
+
+            if (selectedCard == null || target == null)
+            {
+                Debug.LogWarning($"[EnemyAI] ⚠️ No valid action or target could be planned for {enemy.Name}!");
+                continue;
+            }
+
+            // Store the planned action (you'll need to add these fields to EnemyUnit)
+            enemy.plannedCard = selectedCard;
+            enemy.plannedTarget = target;
+            
+            // Show the intent immediately
+            enemy.ShowIntent(selectedCard);
+            
+            Debug.Log($"[EnemyAI] {enemy.Name} plans to use {selectedCard.CardName} on {target.Name} next turn");
+        }
+    }
+
     /// <summary>
     /// ✅ Moves the enemy, plays attack animation, and applies effect.
     /// </summary>
     /// <summary>
     /// ✅ Moves the enemy, plays attack animation, and applies effect.
     /// </summary>
-    private IEnumerator PerformEnemyAttack(EnemyUnit enemy, PlayerUnit target, BaseCard action)
+    public IEnumerator PerformEnemyAttack(EnemyUnit enemy, PlayerUnit target, BaseCard action)
     {
         Debug.Log($"[EnemyAI] 🎯 {enemy.Name} is attacking {target.Name} with {action.CardName}");
 

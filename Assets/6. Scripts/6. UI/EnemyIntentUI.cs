@@ -36,16 +36,16 @@ public class EnemyIntentUI : MonoBehaviour
         // transform.localPosition = Vector3.zero;
 
         // Animate
-        transform.DOKill();
-        canvasGroup.DOKill();
+        // transform.DOKill();
+        // canvasGroup.DOKill();
 
         canvasGroup.alpha = 0;
         canvasGroup.blocksRaycasts = true;
 
-        Sequence showSequence = DOTween.Sequence();
-        showSequence.Join(canvasGroup.DOFade(1, fadeInDuration))
-                   .Join(transform.DOLocalMoveY(floatHeight, fadeInDuration))
-                   .SetEase(Ease.OutQuad);
+        // Sequence showSequence = DOTween.Sequence();
+        // showSequence.Join(canvasGroup.DOFade(1, fadeInDuration))
+        //            .Join(transform.DOLocalMoveY(floatHeight, fadeInDuration))
+        //            .SetEase(Ease.OutQuad);
 
         Debug.Log($"[EnemyIntentUI] Showing intent for {card.CardName}");
     }
