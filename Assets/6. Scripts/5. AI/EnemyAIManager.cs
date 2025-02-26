@@ -12,6 +12,10 @@ public class EnemyAIManager : MonoBehaviour
 
     [SerializeField] private float defensiveThreshold = 0.3f; // Health percentage to trigger defensive play
     [SerializeField] private float aggressiveThreshold = 0.7f; // Health percentage to play aggressively
+
+    private List<BaseCard> lastPlayedCards = new List<BaseCard>();
+    private const int maxLastCardsMemory = 3;
+
     
     // NEW: Added card categorization
     private Dictionary<AICardType, List<BaseCard>> categorizedCards = new Dictionary<AICardType, List<BaseCard>>();
@@ -144,7 +148,6 @@ public class EnemyAIManager : MonoBehaviour
         TurnManager.Instance.EndEnemyTurn();
     }
 
-    // NEW: Strategic action selection method
     private BaseCard SelectStrategicAction(EnemyUnit enemy, PlayerUnit[] players)
     {
         // Calculate health ratio
@@ -174,6 +177,7 @@ public class EnemyAIManager : MonoBehaviour
         AICardType sourceCategory = AICardType.Attack; // Default category
         BaseCard selectedCard = null;
 
+        // Higher priority checks (health-based decisions)
         if (healthRatio < defensiveThreshold)
         {
             // Low health - prioritize defense or healing
@@ -198,7 +202,30 @@ public class EnemyAIManager : MonoBehaviour
             }
         }
 
-        // Default to attacks
+        // ADD SYNERGY CHECK HERE - if not in critical health situation, look for synergies
+        if (selectedCard == null && lastPlayedCards.Count > 0)
+        {
+            // Check for potential synergies across all categories
+            foreach (AICardType category in System.Enum.GetValues(typeof(AICardType)))
+            {
+                if (categorizedCards[category].Count == 0) continue;
+                
+                foreach (var card in categorizedCards[category])
+                {
+                    if (card.Cost <= enemy.Stats.CurrentActionPoints && HasSynergyPotential(card))
+                    {
+                        selectedCard = card;
+                        sourceCategory = category;
+                        Debug.Log($"[EnemyAI] Choosing {card.CardName} for synergy with previously played cards");
+                        break;
+                    }
+                }
+                
+                if (selectedCard != null) break;
+            }
+        }
+
+        // Default to attacks if no synergies or critical situations
         if (selectedCard == null && categorizedCards[AICardType.Attack].Count > 0)
         {
             selectedCard = GetRandomCard(categorizedCards[AICardType.Attack]);
@@ -215,6 +242,43 @@ public class EnemyAIManager : MonoBehaviour
         return selectedCard;
     }
 
+
+    private bool HasSynergyPotential(BaseCard card)
+    {
+        // Look for synergies with recently played cards
+        foreach (var pastCard in lastPlayedCards)
+        {
+            // Check for specific card synergies
+            if ((card.CardName.Contains("Lightning") && pastCard.CardName.Contains("Chain")) ||
+                (card.CardName.Contains("Poison") && pastCard.CardName.Contains("Dagger")) ||
+                (card.CardName.Contains("Fire") && pastCard.CardName.Contains("Combustion")))
+            {
+                return true;
+            }
+            
+            // Check for type-based synergies
+            if ((card.CardType == Cards.CardType.Attack && pastCard.CardType == Cards.CardType.Debuff) ||
+                (card.CardType == Cards.CardType.Buff && pastCard.CardType == Cards.CardType.Attack))
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    private void RecordPlayedCard(BaseCard card)
+    {
+        lastPlayedCards.Insert(0, card);
+        if (lastPlayedCards.Count > maxLastCardsMemory)
+        {
+            lastPlayedCards.RemoveAt(lastPlayedCards.Count - 1);
+        }
+    }
+
+    // In your PerformEnemyAttack method, add:
+    // RecordPlayedCard(action);
+
     // NEW: Helper method to get random card from a category
     private BaseCard GetRandomCard(List<BaseCard> cards)
     {
@@ -224,10 +288,23 @@ public class EnemyAIManager : MonoBehaviour
 
     private void LogDecisionProcess(EnemyUnit enemy, BaseCard selectedCard, PlayerUnit target, float healthRatio, bool playersHaveDebuffs, AICardType sourceCategory) 
     {
+        // Determine if this was a synergy-based decision
+        bool isSynergyBased = lastPlayedCards.Count > 0 && HasSynergyPotential(selectedCard);
+        
         string logMessage = $"[EnemyAI Decision] {enemy.Name} ({healthRatio:P0} health) selected {selectedCard.CardName}\n";
         logMessage += $"→ Decision factors: {(healthRatio < defensiveThreshold ? "LOW HEALTH" : healthRatio > aggressiveThreshold ? "HIGH HEALTH" : "NORMAL HEALTH")}\n";
         logMessage += $"→ Player debuffs: {(playersHaveDebuffs ? "YES" : "NO")}\n";
         logMessage += $"→ Card source: {sourceCategory} category\n";
+        
+        // Add synergy information if applicable
+        if (isSynergyBased) {
+            logMessage += $"→ SYNERGY DETECTED with previous cards: ";
+            for (int i = 0; i < Mathf.Min(lastPlayedCards.Count, 2); i++) {
+                logMessage += $"{lastPlayedCards[i].CardName}" + (i < Mathf.Min(lastPlayedCards.Count, 2) - 1 ? ", " : "");
+            }
+            logMessage += "\n";
+        }
+        
         logMessage += $"→ Card details: {selectedCard.Cost} AP, {selectedCard.CardType}, \"{selectedCard.Description}\"\n";
         logMessage += $"→ Target: {target.Name} (Health: {(float)target.GetHealth() / target.GetMaxHealth():P0}, Block: {target.Stats.Block}, Debuffed: {target.HasDebuff()})";
         
@@ -355,6 +432,8 @@ public class EnemyAIManager : MonoBehaviour
         }
 
         Debug.Log($"[EnemyAI] 🔥 {target.Name} was hit by {enemy.Name}'s {action.CardName}!");
+
+        RecordPlayedCard(action);
 
         // ✅ Return to original position after attack
         yield return StartCoroutine(animationController.MoveToTarget(animationController.OriginalPosition));
