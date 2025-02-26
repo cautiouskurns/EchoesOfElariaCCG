@@ -9,7 +9,7 @@ public class EnemyUnit : BaseCharacter
 
     // Add this field to store the planned action
     private BaseCard plannedAction;
-    private PlayerUnit plannedTarget;
+    private new PlayerUnit plannedTarget;
     
     public string Description { get; private set; }
 
@@ -109,7 +109,20 @@ public class EnemyUnit : BaseCharacter
 
     public void ShowIntent(BaseCard card)
     {
-        intentUI?.ShowIntent(card);
+        if (card == null)
+        {
+            Debug.LogError("[EnemyUnit] Attempted to show null intent!");
+            return;
+        }
+
+        if (intentUI == null)
+        {
+            Debug.LogError("[EnemyUnit] No IntentUI found!");
+            return;
+        }
+
+        Debug.Log($"[EnemyUnit] Showing intent for {card.CardName}");
+        intentUI.ShowIntent(card);
     }
 
     public void HideIntent()

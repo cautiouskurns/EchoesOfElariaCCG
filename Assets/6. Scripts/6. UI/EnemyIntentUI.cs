@@ -23,31 +23,22 @@ public class EnemyIntentUI : MonoBehaviour
 
     public void ShowIntent(BaseCard card)
     {
-        if (card == null) return;
+        if (card == null)
+        {
+            Debug.LogError("[EnemyIntentUI] Attempted to show intent with null card!");
+            return;
+        }
 
-        // Ensure GameObject is active
+        // Ensure UI is visible
         gameObject.SetActive(true);
-
-        // Set content
-        cardIcon.sprite = card.CardArt;
-        intentText.text = $"Will use {card.CardName}";
-
-        // Reset position before animating
-        // transform.localPosition = Vector3.zero;
-
-        // Animate
-        // transform.DOKill();
-        // canvasGroup.DOKill();
-
-        canvasGroup.alpha = 0;
+        canvasGroup.alpha = 1f;  // Set immediately visible
         canvasGroup.blocksRaycasts = true;
 
-        // Sequence showSequence = DOTween.Sequence();
-        // showSequence.Join(canvasGroup.DOFade(1, fadeInDuration))
-        //            .Join(transform.DOLocalMoveY(floatHeight, fadeInDuration))
-        //            .SetEase(Ease.OutQuad);
+        // Update UI elements
+        if (cardIcon != null) cardIcon.sprite = card.CardArt;
+        if (intentText != null) intentText.text = $"Will use {card.CardName}";
 
-        Debug.Log($"[EnemyIntentUI] Showing intent for {card.CardName}");
+        Debug.Log($"[EnemyIntentUI] Showing intent: {card.CardName}");
     }
 
     public void HideIntent()

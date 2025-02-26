@@ -961,9 +961,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f761e7d4124242b6864673d84cd4a17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterData: {fileID: 11400000, guid: ded60fc7a2a844d6ea212f59867440b8, type: 2}
-  maxHealth: 100
-  startingActionPoints: 2
 --- !u!114 &4839556746522453048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -988,11 +985,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7bb0f825cb174958904041ae99ba886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 0
-  block: 0
-  strength: 0
-  energy: 0
-  activeEffects: []
+  portrait: {fileID: 0}
+  plannedCard: {fileID: 0}
+  plannedTarget: {fileID: 0}
   intentUI: {fileID: 8975975887355227903}
 --- !u!114 &6165309935648313569
 MonoBehaviour:

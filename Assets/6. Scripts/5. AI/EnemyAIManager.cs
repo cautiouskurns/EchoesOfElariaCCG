@@ -428,7 +428,6 @@ public class EnemyAIManager : MonoBehaviour
         foreach (var enemy in enemies)
         {
             // Select action strategically
-            AICardType sourceCategory = AICardType.Attack; // Default
             BaseCard selectedCard = SelectStrategicAction(enemy, players);
             
             // Select target optimally based on the selected action
