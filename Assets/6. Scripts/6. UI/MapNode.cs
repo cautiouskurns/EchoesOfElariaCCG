@@ -72,6 +72,13 @@ public class MapNode : MonoBehaviour
         if (NodeType == NodeType.BaseCamp)
             return true;
         
+        // Check if base camp has been visited at the game level
+        if (GameManager.Instance != null && !GameManager.Instance.BaseNodeVisited)
+        {
+            // If base camp hasn't been visited, no other nodes should be accessible
+            return false;
+        }
+        
         // Already visited nodes are accessible
         if (HasBeenVisited)
             return true;
@@ -81,24 +88,14 @@ public class MapNode : MonoBehaviour
         {
             if (node != null && node.HasBeenVisited)
             {
-                Debug.Log($"[MapNode] Node {NodeType} is accessible via connection to visited node {node.NodeType}");
                 return true;
             }
-        }
-        
-        if (connectedNodes.Count > 0)
-        {
-            Debug.Log($"[MapNode] Node {NodeType} has {connectedNodes.Count} connections but none are visited");
-        }
-        else
-        {
-            Debug.Log($"[MapNode] Node {NodeType} has no connections");
         }
         
         return false;
     }
 
-    
+
     public void SetVisited(bool visited)
     {
         HasBeenVisited = visited;

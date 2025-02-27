@@ -10,6 +10,10 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private float horizontalSpacing = 150f; // Space between nodes horizontally (UI units)
     [SerializeField] private float verticalSpacing = 200f; // Space between paths vertically (UI units)
     [SerializeField] private float nodeJitterAmount = 20f; // Random offset for natural look (UI units)
+
+    [Header("Path Direction")]
+    [SerializeField] private Vector2 pathDirection = new Vector2(1, 0); // Default horizontal (1,0)
+    [SerializeField] [Range(0, 360)] private float pathAngle = 0f; // Alternative angle-based control
     
     [Header("Node Types")]
     [SerializeField] private NodeTypeConfig[] nodeTypes;
@@ -24,7 +28,7 @@ public class MapGenerator : MonoBehaviour
     [Header("Base Camp Configuration")]
     [SerializeField] private GameObject baseCampNodePrefab;
     [SerializeField] private string characterSelectionScene = "CampNode";
-    [SerializeField] private Vector2 baseCampPosition = new Vector2(50, 300);
+    [SerializeField] private Vector2 baseCampPosition; //= new Vector2(50, 300);
 
     [Header("Enemy Configurations")]
     [SerializeField] private EnemyClass[] standardEnemiesPool;
@@ -330,7 +334,7 @@ public class MapGenerator : MonoBehaviour
         return types[types.Count - 1]; // Fallback
     }
     
-private void PlaceNodesOnMap()
+    private void PlaceNodesOnMap()
     {
         Debug.Log("[MapGenerator] Placing nodes on UI map");
         
