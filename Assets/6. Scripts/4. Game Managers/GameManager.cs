@@ -9,6 +9,13 @@ public class GameManager : MonoBehaviour
     private string lastScene;
     public CharacterClass[] selectedClasses = new CharacterClass[2]; // ✅ Store all 3 classes
     private DialogueData currentLoreDialogue;
+
+    [HideInInspector] public BattleType CurrentBattleType { get; private set; }
+    [HideInInspector] public EnemyClass[] CurrentEnemies { get; private set; }
+
+    public bool BaseNodeVisited { get; set; } = false;
+
+
     private void Awake()
     {
         if (Instance == null)
@@ -53,12 +60,19 @@ public class GameManager : MonoBehaviour
         Debug.Log($"[GameManager] 🏹 Player {index + 1} class set to: {selectedClasses[index].className}");
     }
 
-    public void StartBattle(string battleScene, string overworldScene)
+
+    
+    // Modified method to include battle type and enemies
+    public void StartBattle(string battleScene, string returnScene, BattleType battleType, EnemyClass[] enemies = null)
     {
-        overworldSceneName = overworldScene;
-        Debug.Log($"[GameManager] 🔄 Transitioning to battle scene: {battleScene}");
+        overworldSceneName = returnScene;
+        CurrentBattleType = battleType;
+        CurrentEnemies = enemies;
+        
+        Debug.Log($"[GameManager] Starting {battleType} battle in scene: {battleScene}");
         SceneManager.LoadScene(battleScene);
     }
+
 
     public void ReturnToOverworld()
     {

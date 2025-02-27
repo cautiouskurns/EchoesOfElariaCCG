@@ -187,7 +187,7 @@ public class LoreManager : MonoBehaviour
     {
         if (outcome.energyChange != 0) Debug.Log($"[LoreManager] ⚡ Energy changed by {outcome.energyChange}");
         if (outcome.strengthChange != 0) Debug.Log($"[LoreManager] 💪 Strength changed by {outcome.strengthChange}");
-        if (outcome.triggerBattle) GameManager.Instance.StartBattle("BattleScene", "OverworldMap");
+        // if (outcome.triggerBattle) GameManager.Instance.StartBattle("BattleScene", "OverworldMap");
     }
 
     public void Continue()
