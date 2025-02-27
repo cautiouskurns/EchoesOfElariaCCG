@@ -22,13 +22,13 @@ MonoBehaviour:
   statusEffects:
   - statusType: 3
     duration: 3
-    intensity: 5
+    intensity: 0
     target: 0
     conditionType: 0
     conditionValue: 0
   - statusType: 1
-    duration: 3
-    intensity: 50
+    duration: 1
+    intensity: 0
     target: 0
     conditionType: 0
     conditionValue: 0

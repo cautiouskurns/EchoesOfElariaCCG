@@ -20,7 +20,7 @@ MonoBehaviour:
   soundEffect: {fileID: 0}
   effects:
   - effectType: 0
-    value: 50
+    value: 5
     target: 2
     condition: 0
     conditionValue: 0

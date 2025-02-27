@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/0. Scenes/TitleScreen.unity
+    guid: 7f6eee67b6b614ab88df81365b6b5f7a
+  - enabled: 1
+    path: Assets/0. Scenes/MainMenu.unity
+    guid: a98d718bee1ce4af7a7d0804abe24e53
+  - enabled: 1
     path: Assets/0. Scenes/OverworldMap.unity
     guid: a6b3bb90a9702497194b0b688e8e6c42
   - enabled: 1
