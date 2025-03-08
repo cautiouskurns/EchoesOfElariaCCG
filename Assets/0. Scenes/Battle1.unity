@@ -2347,6 +2347,7 @@ MonoBehaviour:
   playerSpawnPoints:
   - {fileID: 1035442949}
   - {fileID: 252647900}
+  maxPlayersToSpawn: 2
   enemySpawnPoints:
   - {fileID: 853742751}
   - {fileID: 1387618056}
