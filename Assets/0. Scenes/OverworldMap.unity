@@ -2336,6 +2336,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5844796607e9c4c5b9f6dc9552c43dfb, type: 2}
   mapContainer: {fileID: 419866054}
   connectionPrefab: {fileID: 446827027973479989, guid: 96983fc1d62424f79bb1bbead1dc1ba1, type: 3}
+  lineColor: {r: 0, g: 0, b: 0, a: 0.8}
+  lineThickness: 3
   startNodePosition: {x: 0, y: 0}
 --- !u!1001 &1824381730
 PrefabInstance:

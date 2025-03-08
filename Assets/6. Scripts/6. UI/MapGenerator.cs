@@ -41,7 +41,9 @@ public class MapGenerator : MonoBehaviour
     [Header("UI Settings")]
     [SerializeField] private RectTransform mapContainer; // The parent container for the map
     [SerializeField] private LineRenderer connectionPrefab; // For drawing connections
-    
+    [SerializeField] private Color lineColor = new Color(0.6f, 0.6f, 0.6f, 0.8f); // Default gray, semi-transparent
+    [SerializeField] private float lineThickness = 3f;
+        
     private Dictionary<NodeType, NodeTypeConfig> typeConfigMap = new Dictionary<NodeType, NodeTypeConfig>();
     private List<NodeType>[] paths; // Each path has its own sequence of nodes
     private Canvas parentCanvas;
@@ -249,90 +251,142 @@ public class MapGenerator : MonoBehaviour
     }
     
     
-    private void GenerateNodeSequences()
+private void GenerateNodeSequences()
+{
+    // Track counts of each node type
+    Dictionary<NodeType, int> typeCounts = new Dictionary<NodeType, int>();
+    Dictionary<NodeType, int> lastSeenPosition = new Dictionary<NodeType, int>();
+    
+    foreach (var config in nodeTypes)
     {
-        // Track counts of each node type
-        Dictionary<NodeType, int> typeCounts = new Dictionary<NodeType, int>();
-        Dictionary<NodeType, int> lastSeenPosition = new Dictionary<NodeType, int>();
-        
-        foreach (var config in nodeTypes)
+        typeCounts[config.type] = 0;
+        lastSeenPosition[config.type] = -999; // Initialize to far in the past
+    }
+    
+    // Generate each path
+    for (int pathIndex = 0; pathIndex < pathsCount; pathIndex++)
+    {
+        for (int nodeIndex = 0; nodeIndex < runLength; nodeIndex++)
         {
-            typeCounts[config.type] = 0;
-            lastSeenPosition[config.type] = -999; // Initialize to far in the past
-        }
-        
-        // Generate each path
-        for (int pathIndex = 0; pathIndex < pathsCount; pathIndex++)
-        {
-            for (int nodeIndex = 0; nodeIndex < runLength; nodeIndex++)
+            // Last node in the run should be skipped (reserved for boss)
+            if (nodeIndex == runLength - 1) continue;
+            
+            // Skip if first in path (reserved for start nodes)
+            if (nodeIndex == 0) 
             {
-                // Last node in the run should be skipped (reserved for boss)
-                if (nodeIndex == runLength - 1) continue;
-                
-                // Skip if first or last in path (reserved for start/branch nodes)
-                if (nodeIndex == 0) 
-                {
-                    paths[pathIndex].Add(NodeType.StandardBattle);
-                    continue;
-                }
-                
-                // Get eligible node types for this position
-                List<NodeType> eligibleTypes = new List<NodeType>();
-                List<float> typeWeights = new List<float>();
-                
-                foreach (var config in nodeTypes)
-                {
-                    // Check if too close to same type
-                    bool tooClose = (nodeIndex - lastSeenPosition[config.type] <= config.minDistance);
-                    // Check if exceeded max count
-                    bool exceededMax = (typeCounts[config.type] >= config.maxPerRun);
-                    
-                    // Standard battles can be placed anywhere
-                    if (config.type == NodeType.StandardBattle || (!tooClose && !exceededMax))
-                    {
-                        eligibleTypes.Add(config.type);
-                        typeWeights.Add(config.weight);
-                    }
-                }
-                
-                // Select a node type based on weights
-                NodeType selectedType = SelectWeightedRandom(eligibleTypes, typeWeights);
-                
-                // Update tracking info
-                paths[pathIndex].Add(selectedType);
-                lastSeenPosition[selectedType] = nodeIndex;
-                typeCounts[selectedType]++;
+                paths[pathIndex].Add(NodeType.StandardBattle);
+                continue;
             }
             
-            // Last node is always empty (for boss node)
-            paths[pathIndex].Add(NodeType.StandardBattle);
+            // Get eligible node types for this position
+            List<NodeType> eligibleTypes = new List<NodeType>();
+            List<float> typeWeights = new List<float>();
+            
+            // Debug logging for node selection
+            Debug.Log($"[MapGenerator] Selecting node type for path {pathIndex}, position {nodeIndex}");
+            
+            foreach (var config in nodeTypes)
+            {
+                // Check if too close to same type
+                bool tooClose = (nodeIndex - lastSeenPosition[config.type] <= config.minDistance);
+                // Check if exceeded max count
+                bool exceededMax = (typeCounts[config.type] >= config.maxPerRun);
+                
+                // Log eligibility for this type
+                Debug.Log($"[MapGenerator] {config.type} eligible? tooClose={tooClose}, exceededMax={exceededMax}, count={typeCounts[config.type]}/{config.maxPerRun}, weight={config.weight}");
+                
+                // Special case for LoreEvent - ensure we get enough
+                if (config.type == NodeType.LoreEvent)
+                {
+                    // Reduce distance constraint for lore events
+                    tooClose = (nodeIndex - lastSeenPosition[config.type] <= Mathf.Min(1, config.minDistance));
+                    
+                    // Increase weight based on scarcity
+                    float adjustedWeight = config.weight;
+                    if (typeCounts[NodeType.LoreEvent] < config.maxPerRun / 2)
+                    {
+                        adjustedWeight *= 1.5f; // Boost weight if we're below half of max count
+                    }
+                    
+                    if (!tooClose && !exceededMax)
+                    {
+                        eligibleTypes.Add(config.type);
+                        typeWeights.Add(adjustedWeight);
+                        Debug.Log($"[MapGenerator] Added LoreEvent with adjusted weight {adjustedWeight}");
+                    }
+                }
+                // Standard battles can be placed anywhere
+                else if (config.type == NodeType.StandardBattle || (!tooClose && !exceededMax))
+                {
+                    eligibleTypes.Add(config.type);
+                    typeWeights.Add(config.weight);
+                }
+            }
+            
+            // Select a node type based on weights
+            NodeType selectedType = SelectWeightedRandom(eligibleTypes, typeWeights);
+            Debug.Log($"[MapGenerator] Selected {selectedType} for path {pathIndex}, position {nodeIndex}");
+            
+            // Update tracking info
+            paths[pathIndex].Add(selectedType);
+            lastSeenPosition[selectedType] = nodeIndex;
+            typeCounts[selectedType]++;
+            
+            // Log running counts
+            foreach (var kvp in typeCounts)
+            {
+                Debug.Log($"[MapGenerator] Current counts: {kvp.Key}={kvp.Value}");
+            }
+        }
+        
+        // Last node is always empty (for boss node)
+        paths[pathIndex].Add(NodeType.StandardBattle);
+    }
+    
+    // Log final distribution
+    Debug.Log("[MapGenerator] Final node type distribution:");
+    foreach (var kvp in typeCounts)
+    {
+        Debug.Log($"[MapGenerator] {kvp.Key}: {kvp.Value}");
+    }
+}
+
+private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
+{
+    if (types.Count == 0) return NodeType.StandardBattle; // Default
+    
+    // Debug log the options
+    for (int i = 0; i < types.Count; i++)
+    {
+        Debug.Log($"[MapGenerator] Option {i}: {types[i]} with weight {weights[i]}");
+    }
+    
+    float totalWeight = 0f;
+    foreach (float weight in weights)
+    {
+        totalWeight += weight;
+    }
+    
+    float randomValue = Random.Range(0f, totalWeight);
+    float cumulativeWeight = 0f;
+    
+    Debug.Log($"[MapGenerator] Random value: {randomValue} out of total weight {totalWeight}");
+    
+    for (int i = 0; i < types.Count; i++)
+    {
+        cumulativeWeight += weights[i];
+        Debug.Log($"[MapGenerator] Checking {types[i]}, cumulative weight: {cumulativeWeight}");
+        if (randomValue <= cumulativeWeight)
+        {
+            Debug.Log($"[MapGenerator] Selected {types[i]}");
+            return types[i];
         }
     }
     
-    private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
-    {
-        if (types.Count == 0) return NodeType.StandardBattle; // Default
-        
-        float totalWeight = 0f;
-        foreach (float weight in weights)
-        {
-            totalWeight += weight;
-        }
-        
-        float randomValue = Random.Range(0f, totalWeight);
-        float cumulativeWeight = 0f;
-        
-        for (int i = 0; i < types.Count; i++)
-        {
-            cumulativeWeight += weights[i];
-            if (randomValue <= cumulativeWeight)
-            {
-                return types[i];
-            }
-        }
-        
-        return types[types.Count - 1]; // Fallback
-    }
+    Debug.Log($"[MapGenerator] Defaulted to {types[types.Count - 1]}");
+    return types[types.Count - 1]; // Fallback
+}
+
     
     private void PlaceNodesOnMap()
     {
@@ -446,11 +500,40 @@ public class MapGenerator : MonoBehaviour
             }
         }
         
+        // Connect nodes within each path
+        ConnectPathNodes(nodeObjects);
+        
         // Generate connections between paths occasionally
         GeneratePathConnections(nodeObjects);
+        
+        // Connect base camp to first tier nodes
         ConnectBaseCampToFirstTier(baseCampNode, nodeObjects);
     }
-    
+
+    // Add this new method for connecting nodes along the same path
+    private void ConnectPathNodes(GameObject[,] nodeObjects)
+    {
+        // Connect nodes in sequence within each path
+        for (int pathIndex = 0; pathIndex < pathsCount; pathIndex++)
+        {
+            for (int nodeIndex = 1; nodeIndex < runLength - 1; nodeIndex++)
+            {
+                // Connect current node to next node in path
+                GameObject currentNode = nodeObjects[pathIndex, nodeIndex];
+                GameObject nextNode = nodeObjects[pathIndex, nodeIndex + 1];
+                
+                if (currentNode != null && nextNode != null)
+                {
+                    // Create the connection
+                    CreateNodeConnection(currentNode, nextNode, true);
+                    
+                    // Log the connection
+                    Debug.Log($"[MapGenerator] Connected path {pathIndex} node {nodeIndex} to node {nodeIndex + 1}");
+                }
+            }
+        }
+    }
+        
     private void ConnectBaseCampToFirstTier(GameObject baseCampNode, GameObject[,] nodeObjects)
     {
         MapNode baseCampMapNode = baseCampNode.GetComponent<MapNode>();
@@ -479,22 +562,53 @@ public class MapGenerator : MonoBehaviour
 
     private void DrawConnectionLine(RectTransform from, RectTransform to)
     {
-        if (connectionPrefab == null) return;
+        // Create a UI line using an Image
+        GameObject lineObj = new GameObject("UILine");
+        lineObj.transform.SetParent(transform, false);
         
-        GameObject connectionObj = Instantiate(connectionPrefab.gameObject, transform);
-        connectionObj.transform.SetAsFirstSibling(); // Put connections behind nodes
+        // Add image component
+        Image lineImage = lineObj.AddComponent<Image>();
+        lineImage.color = lineColor; // Use the inspector-configurable color
         
-        LineRenderer line = connectionObj.GetComponent<LineRenderer>();
-        if (line != null)
+        // Create a 1x1 white texture if needed
+        if (lineImage.sprite == null)
         {
-            // Convert UI positions to world space
-            Vector3 startPos = from.TransformPoint(from.rect.center);
-            Vector3 endPos = to.TransformPoint(to.rect.center);
-            
-            line.positionCount = 2;
-            line.SetPosition(0, startPos);
-            line.SetPosition(1, endPos);
+            // Use Unity's built-in white texture
+            lineImage.sprite = Sprite.Create(
+                Texture2D.whiteTexture,
+                new Rect(0, 0, 4, 4),
+                new Vector2(0.5f, 0.5f)
+            );
         }
+        
+        // Get rect transform and set proper anchoring
+        RectTransform lineRect = lineObj.GetComponent<RectTransform>();
+        
+        // These settings are critical for proper orientation
+        lineRect.anchorMin = new Vector2(0, 0);
+        lineRect.anchorMax = new Vector2(0, 0);
+        lineRect.pivot = new Vector2(0, 0.5f); // Pivot at left center for correct rotation
+        
+        // Calculate positions and distances
+        Vector2 fromAnchoredPos = from.anchoredPosition;
+        Vector2 toAnchoredPos = to.anchoredPosition;
+        Vector2 direction = toAnchoredPos - fromAnchoredPos;
+        float distance = direction.magnitude;
+        
+        // Set position to start point
+        lineRect.anchoredPosition = fromAnchoredPos;
+        
+        // Set width/height (width is the distance, height is the thickness)
+        lineRect.sizeDelta = new Vector2(distance, lineThickness); // Use the inspector-configurable thickness
+        
+        // Calculate angle in degrees
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        lineRect.localEulerAngles = new Vector3(0, 0, angle);
+        
+        // Ensure lines are drawn behind nodes
+        lineRect.SetAsFirstSibling();
+        
+        Debug.Log($"[MapGenerator] Created UI line from {fromAnchoredPos} to {toAnchoredPos}, distance: {distance}, angle: {angle}");
     }
 
     // New method to configure UI components
@@ -511,7 +625,7 @@ public class MapGenerator : MonoBehaviour
         // Set transition mode to color tint to provide visual feedback
         button.transition = Selectable.Transition.ColorTint;
         
-        // Make sure it has an Image component (required for Button)
+        // Get or add the Image component (required for Button)
         Image image = node.GetComponent<Image>();
         if (image == null)
         {
@@ -519,25 +633,50 @@ public class MapGenerator : MonoBehaviour
             Debug.LogWarning($"[MapGenerator] Added missing Image component to {nodeType} node");
         }
         
-        // Set up the button to call the MapNode's OnNodeClicked method
-        button.onClick.RemoveAllListeners();
-        MapNode mapNode = node.GetComponent<MapNode>();
-        if (mapNode != null)
+        // Fix the white background issue
+        image.color = Color.white; // Default to fully opaque
+        
+        // Important: If this is a camp node, make the background transparent
+        if (nodeType == NodeType.BaseCamp)
         {
-            button.onClick.AddListener(() => {
-                Debug.Log($"[MapGenerator] Button clicked for {nodeType} node");
-                mapNode.OnNodeClicked();
-            });
+            // Make background transparent but keep sprite visible
+            image.color = new Color(1f, 1f, 1f, 0f); // Fully transparent
+            
+            // Check for any additional background images in children
+            Image[] childImages = node.GetComponentsInChildren<Image>();
+            foreach (Image childImage in childImages)
+            {
+                if (childImage != image) // Don't modify the main image again
+                {
+                    // Set any additional image to be transparent if it's just a background
+                    if (childImage.sprite == null || childImage.sprite == Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), Vector2.zero))
+                    {
+                        childImage.color = new Color(1f, 1f, 1f, 0f); // Fully transparent
+                        Debug.Log("[MapGenerator] Made background image transparent");
+                    }
+                }
+            }
         }
         
-        // You could set different sprites based on node type
+        // If we have a sprite, make sure it's displayed correctly
         foreach (var config in nodeTypes)
         {
             if (config.type == nodeType && config.nodeSprite != null)
             {
                 image.sprite = config.nodeSprite;
+                image.preserveAspect = true; // Maintain the aspect ratio
+                image.color = Color.white; // Reset color to ensure visibility
+                image.type = Image.Type.Simple; // Use the sprite as-is
                 break;
             }
+        }
+        
+        // Set up the button to call the MapNode's OnNodeClicked method
+        button.onClick.RemoveAllListeners();
+        MapNode mapNode = node.GetComponent<MapNode>();
+        if (mapNode != null)
+        {
+            button.onClick.AddListener(() => mapNode.OnNodeClicked());
         }
     }
 
@@ -548,23 +687,35 @@ public class MapGenerator : MonoBehaviour
         {
             for (int pathIndex = 0; pathIndex < pathsCount - 1; pathIndex++)
             {
-                // 30% chance to create a connection
+                // 30% chance to create a diagonal connection
                 if (Random.value < 0.3f)
                 {
-                    CreateNodeConnection(
-                        nodeObjects[pathIndex, nodeIndex], 
-                        nodeObjects[pathIndex + 1, nodeIndex + 1]
-                    );
+                    // Connect to node diagonally forward-up
+                    if (nodeObjects[pathIndex, nodeIndex] != null && 
+                        nodeObjects[pathIndex + 1, nodeIndex + 1] != null)
+                    {
+                        CreateNodeConnection(
+                            nodeObjects[pathIndex, nodeIndex], 
+                            nodeObjects[pathIndex + 1, nodeIndex + 1],
+                            true // Visualize this connection
+                        );
+                    }
                     
-                    CreateNodeConnection(
-                        nodeObjects[pathIndex + 1, nodeIndex], 
-                        nodeObjects[pathIndex, nodeIndex + 1]
-                    );
+                    // Connect to node diagonally forward-down
+                    if (nodeObjects[pathIndex + 1, nodeIndex] != null && 
+                        nodeObjects[pathIndex, nodeIndex + 1] != null)
+                    {
+                        CreateNodeConnection(
+                            nodeObjects[pathIndex + 1, nodeIndex], 
+                            nodeObjects[pathIndex, nodeIndex + 1],
+                            true // Visualize this connection
+                        );
+                    }
                 }
             }
         }
     }
-    
+
     private void ConnectNodes()
     {
         // For UI, you might use a different approach for connections
@@ -572,7 +723,7 @@ public class MapGenerator : MonoBehaviour
         Debug.Log("[MapGenerator] Node connections are not yet implemented for UI");
     }
     
-    private void CreateNodeConnection(GameObject sourceNode, GameObject targetNode)
+    private void CreateNodeConnection(GameObject sourceNode, GameObject targetNode, bool visualize = false)
     {
         if (sourceNode == null || targetNode == null)
         {
@@ -588,6 +739,14 @@ public class MapGenerator : MonoBehaviour
         {
             // Add the connection in the node's data
             sourceMapNode.AddConnection(targetMapNode);
+            targetMapNode.AddConnection(sourceMapNode); // Make connection bidirectional
+            
+            // Visualize the connection if requested
+            if (visualize)
+            {
+                DrawConnectionLine(sourceNode.GetComponent<RectTransform>(), 
+                                targetNode.GetComponent<RectTransform>());
+            }
             
             Debug.Log($"[MapGenerator] Created connection between nodes at {sourceNode.GetComponent<RectTransform>().anchoredPosition} and {targetNode.GetComponent<RectTransform>().anchoredPosition}");
         }
