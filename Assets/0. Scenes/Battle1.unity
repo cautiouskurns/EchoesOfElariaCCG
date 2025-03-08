@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &41691857
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156,7 +156,7 @@ MonoBehaviour:
   - {fileID: 1387618056}
   - {fileID: 735387798}
   standardEnemiesPool:
-  - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
+  - {fileID: 11400000, guid: f2331b8cd288044c692fd38f416eea37, type: 2}
   eliteEnemiesPool: []
   bossEnemy: {fileID: 0}
 --- !u!4 &41691858
@@ -2347,14 +2347,15 @@ MonoBehaviour:
   playerSpawnPoints:
   - {fileID: 1035442949}
   - {fileID: 252647900}
-  enemyClasses:
-  - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
-  - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
-  - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
-  enemySpawnLocations:
+  enemySpawnPoints:
   - {fileID: 853742751}
   - {fileID: 1387618056}
   - {fileID: 735387798}
+  standardEnemiesPool:
+  - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
+  - {fileID: 11400000, guid: f2331b8cd288044c692fd38f416eea37, type: 2}
+  eliteEnemiesPool: []
+  bossEnemy: {fileID: 0}
 --- !u!1 &1455236468
 GameObject:
   m_ObjectHideFlags: 0

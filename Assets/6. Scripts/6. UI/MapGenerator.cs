@@ -191,7 +191,7 @@ public class MapGenerator : MonoBehaviour
                 if (mapNode != null)
                 {
                     mapNode.NodeType = NodeType.StandardBattle;
-                    mapNode.BattleSceneName = "BattleScene";
+                    mapNode.BattleSceneName = "Battle1";
                 }
                 
                 Debug.Log($"[MapGenerator] Created test node at {position}");

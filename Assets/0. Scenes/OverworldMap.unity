@@ -2299,25 +2299,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42cfa7c684f544ac9a0bbb45deaa3fde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runLength: 5
-  pathsCount: 2
-  horizontalSpacing: 20
-  verticalSpacing: 20
-  nodeJitterAmount: 20
+  runLength: 10
+  pathsCount: 3
+  horizontalSpacing: 10
+  verticalSpacing: 10
+  nodeJitterAmount: 40
   pathDirection: {x: 1, y: 0}
   pathAngle: 90
   nodeTypes:
   - type: 0
     nodePrefab: {fileID: 6844116733815092636, guid: b57b567a63d39478f91f7fb8d095f18f, type: 3}
     minDistance: 200
-    weight: 10
+    weight: 5
     maxPerRun: 10
     nodeSprite: {fileID: 0}
   - type: 2
     nodePrefab: {fileID: 5779656102766373519, guid: e3e071abbce62463ba277928befb06d0, type: 3}
     minDistance: 200
-    weight: 3
-    maxPerRun: 5
+    weight: 5
+    maxPerRun: 10
     nodeSprite: {fileID: 0}
   startNodePrefab: {fileID: 5779656102766373519, guid: 7213ae5bf67114a78ad12043ae302611, type: 3}
   bossNodePrefab: {fileID: 6844116733815092636, guid: b57b567a63d39478f91f7fb8d095f18f, type: 3}
@@ -2328,7 +2328,7 @@ MonoBehaviour:
   characterSelectionScene: CampNode
   baseCampPosition: {x: 0, y: 0}
   standardEnemiesPool:
-  - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
+  - {fileID: 11400000, guid: f2331b8cd288044c692fd38f416eea37, type: 2}
   eliteEnemiesPool:
   - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
   bossEnemy: {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
