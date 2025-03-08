@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 public class TurnManager : MonoBehaviour
 {
@@ -22,12 +23,35 @@ public class TurnManager : MonoBehaviour
 
     private void Start()
     {
-        // Plan initial enemy actions
+        // Start with the enemy turn first
+        CurrentTurn = TurnState.EnemyTurn;
+        
+        // Execute enemy's first turn without showing intent
         if (EnemyAIManager.Instance != null)
         {
-            EnemyAIManager.Instance.PlanEnemyActions();
+            StartCoroutine(FirstEnemyTurn());
         }
+        else
+        {
+            // If no enemy manager, go directly to player turn
+            CurrentTurn = TurnState.PlayerTurn;
+            StartPlayerTurn();
+        }
+    }
+    
+    // Special first enemy turn that happens at game start
+    private IEnumerator FirstEnemyTurn()
+    {
+        Debug.Log("[TurnManager] 👿 First enemy turn");
         
+        // Execute immediate actions without prior intent
+        yield return StartCoroutine(EnemyAIManager.Instance.ExecuteImmediateEnemyTurn());
+        
+        // Plan next turn's actions (displays intent)
+        EnemyAIManager.Instance.PlanEnemyActions();
+        
+        // Now switch to player turn
+        CurrentTurn = TurnState.PlayerTurn;
         StartPlayerTurn();
     }
 

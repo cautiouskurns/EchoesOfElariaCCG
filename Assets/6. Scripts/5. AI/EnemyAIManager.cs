@@ -40,6 +40,44 @@ public class EnemyAIManager : MonoBehaviour
     private void Start()
     {
         CategorizeAvailableCards();
+
+         // Plan actions and immediately set them as the current actions for the first turn
+        PlanEnemyActions(true); // Add a parameter to indicate this is the initial planning
+
+    }
+
+    public void PlanEnemyActions(bool isInitialPlanning = false)
+    {
+        Debug.Log("[EnemyAI] Planning next enemy actions");
+
+        // Get all active enemy and player units
+        var enemies = FindObjectsByType<EnemyUnit>(FindObjectsSortMode.None);
+        var players = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None);
+
+        foreach (var enemy in enemies)
+        {
+            // Select action strategically
+            BaseCard selectedCard = SelectStrategicAction(enemy, players);
+            
+            // Select target optimally based on the selected action
+            PlayerUnit target = SelectOptimalTarget(players, selectedCard);
+
+            if (selectedCard == null || target == null)
+            {
+                Debug.LogWarning($"[EnemyAI] ⚠️ No valid action or target could be planned for {enemy.Name}!");
+                continue;
+            }
+
+            // Store the planned action
+            enemy.plannedCard = selectedCard;
+            enemy.plannedTarget = target;
+            
+            // Show the intent immediately
+            enemy.ShowIntent(selectedCard);
+            
+            string timing = isInitialPlanning ? "first turn" : "next turn";
+            Debug.Log($"[EnemyAI] {enemy.Name} plans to use {selectedCard.CardName} on {target.Name} on {timing}");
+        }
     }
 
     // NEW: Added method to categorize cards
@@ -492,6 +530,75 @@ public class EnemyAIManager : MonoBehaviour
 
         // Hide intent after attack
         enemy.HideIntent();
+    }
+
+    public void ExecuteInitialTurn()
+    {
+        Debug.Log("[EnemyAI] Setting up initial enemy actions");
+        
+        var enemies = FindObjectsByType<EnemyUnit>(FindObjectsSortMode.None);
+        var players = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None);
+
+        foreach (var enemy in enemies)
+        {
+            // Select action and target for immediate execution
+            BaseCard selectedCard = SelectStrategicAction(enemy, players);
+            PlayerUnit target = SelectOptimalTarget(players, selectedCard);
+
+            if (selectedCard != null && target != null)
+            {
+                // Set as immediate action without showing intent
+                enemy.plannedCard = selectedCard;
+                enemy.plannedTarget = target;
+            }
+        }
+    }
+
+    // Method for immediate action execution without showing intent first
+    public IEnumerator ExecuteImmediateEnemyTurn()
+    {
+        Debug.Log("[EnemyAI] 🤖 Executing immediate enemy turn");
+
+        // Get all active enemy units
+        var enemies = FindObjectsByType<EnemyUnit>(FindObjectsSortMode.None);
+        var players = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None);
+
+        foreach (var enemy in enemies)
+        {
+            Debug.Log($"[EnemyAI] {enemy.Name} performing first turn action");
+            enemy.Stats.RefreshActionPoints();
+
+            // Select an action and target immediately
+            BaseCard selectedAction = SelectStrategicAction(enemy, players);
+            PlayerUnit target = SelectOptimalTarget(players, selectedAction);
+
+            if (selectedAction != null && target != null)
+            {
+                AICardType sourceCategory = DetermineCardCategory(selectedAction);
+
+                LogDecisionProcess(enemy, selectedAction, target, 
+                    (float)enemy.GetHealth() / enemy.GetMaxHealth(),
+                    players.Any(p => p.HasDebuff()), 
+                    sourceCategory);
+
+                if (selectedAction.Cost <= enemy.Stats.CurrentActionPoints)
+                {
+                    // No intent shown, just execute attack
+                    yield return StartCoroutine(PerformEnemyAttack(enemy, target, selectedAction));
+                    
+                    enemy.Stats.UseActionPoints(selectedAction.Cost);
+                    RecordPlayedCard(selectedAction);
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[EnemyAI] {enemy.Name} couldn't select an action or target!");
+            }
+
+            yield return new WaitForSeconds(actionDelay);
+        }
+
+        Debug.Log("[EnemyAI] ✅ Immediate enemy turn complete");
     }
 
 }
