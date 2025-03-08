@@ -2281,7 +2281,7 @@ Transform:
   m_GameObject: {fileID: 1558243429}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -175.1, y: -103.4, z: 0}
+  m_LocalPosition: {x: -214.8, y: -83.5, z: 0}
   m_LocalScale: {x: 0.5232178, y: 0.5232178, z: 0.5232178}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2300,12 +2300,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   runLength: 10
-  pathsCount: 3
-  horizontalSpacing: 10
-  verticalSpacing: 10
-  nodeJitterAmount: 40
-  pathDirection: {x: 1, y: 0}
-  pathAngle: 90
+  pathsCount: 2
+  horizontalSpacing: 90
+  verticalSpacing: 90
+  nodeJitterAmount: 20
+  pathDirection: {x: 0, y: 0}
+  pathAngle: 24
   nodeTypes:
   - type: 0
     nodePrefab: {fileID: 6844116733815092636, guid: b57b567a63d39478f91f7fb8d095f18f, type: 3}

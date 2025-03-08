@@ -343,17 +343,12 @@ public class MapGenerator : MonoBehaviour
         float containerWidth = containerRect.rect.width;
         float containerHeight = containerRect.rect.height;
         
-        // Calculate margins and step sizes based on container dimensions
-        float leftMargin = startNodePosition.x;
-        float bottomMargin = containerHeight * 0.1f;
-        float usableWidth = containerWidth * 0.8f;
-        float usableHeight = containerHeight * 0.8f;
+        // Use pathAngle to determine direction
+        float angleInRadians = pathAngle * Mathf.Deg2Rad;
+        Vector2 direction = new Vector2(Mathf.Cos(angleInRadians), Mathf.Sin(angleInRadians)).normalized;
         
-        float horizontalStep = usableWidth / (runLength - 1);
-        float verticalStep = usableHeight / (pathsCount - 1);
-        
-        Debug.Log($"[MapGenerator] Container size: {containerWidth}x{containerHeight}, " +
-                $"Step sizes: {horizontalStep}x{verticalStep}");
+        // Calculate step size based on the path direction
+        float stepSize = horizontalSpacing; // Base step size
         
         // Clear existing nodes
         foreach (Transform child in transform)
@@ -361,7 +356,7 @@ public class MapGenerator : MonoBehaviour
             Destroy(child.gameObject);
         }
         
-    // Place base camp node
+        // Place base camp node
         GameObject baseCampNode = Instantiate(baseCampNodePrefab, transform);
         RectTransform baseCampRectTransform = baseCampNode.GetComponent<RectTransform>();
         baseCampRectTransform.anchoredPosition = baseCampPosition;
@@ -392,6 +387,11 @@ public class MapGenerator : MonoBehaviour
         // Place path nodes
         for (int pathIndex = 0; pathIndex < pathsCount; pathIndex++)
         {
+            // Calculate the perpendicular offset for this path
+            Vector2 perpendicular = new Vector2(-direction.y, direction.x);
+            float pathOffset = (pathIndex - pathsCount/2) * verticalSpacing;
+            Vector2 pathStartPos = startNodePosition + (perpendicular * pathOffset);
+            
             for (int nodeIndex = 0; nodeIndex < runLength; nodeIndex++)
             {
                 // Skip first node (we already placed the start node)
@@ -410,21 +410,25 @@ public class MapGenerator : MonoBehaviour
                     nodePrefab = typeConfigMap[nodeType].nodePrefab;
                 }
                 
-                // Calculate position with some jitter for natural look
+                // Calculate position along the path direction with jitter
                 float xJitter = Random.Range(-nodeJitterAmount, nodeJitterAmount);
                 float yJitter = Random.Range(-nodeJitterAmount, nodeJitterAmount);
                 
-                float xPos = leftMargin + (nodeIndex * horizontalStep) + xJitter;
-                float yPos = bottomMargin + (pathIndex * verticalStep) + yJitter;
+                // Move in the path direction
+                Vector2 nodePos = pathStartPos + (direction * nodeIndex * stepSize);
+                
+                // Add jitter (perpendicular and parallel to the path)
+                Vector2 jitter = (perpendicular * xJitter) + (direction * yJitter);
+                nodePos += jitter;
                 
                 // Instantiate node as UI element
                 GameObject node = Instantiate(nodePrefab, transform);
                 RectTransform rectTransform = node.GetComponent<RectTransform>();
                 
                 // Position the node using anchoredPosition (UI positioning)
-                rectTransform.anchoredPosition = new Vector2(xPos, yPos);
+                rectTransform.anchoredPosition = nodePos;
                 
-                Debug.Log($"[MapGenerator] Placed {nodeType} node at UI position ({xPos}, {yPos})");
+                Debug.Log($"[MapGenerator] Placed {nodeType} node at UI position ({nodePos.x}, {nodePos.y})");
                 
                 // Configure node component
                 MapNode mapNode = node.GetComponent<MapNode>();
@@ -438,9 +442,6 @@ public class MapGenerator : MonoBehaviour
                     Debug.LogError($"[MapGenerator] Node prefab is missing MapNode component!");
                 }
                 
-                // Make sure UI components are properly set up
-                //ConfigureUIComponents(node, nodeType);
-                
                 nodeObjects[pathIndex, nodeIndex] = node;
             }
         }
@@ -448,7 +449,6 @@ public class MapGenerator : MonoBehaviour
         // Generate connections between paths occasionally
         GeneratePathConnections(nodeObjects);
         ConnectBaseCampToFirstTier(baseCampNode, nodeObjects);
-
     }
     
     private void ConnectBaseCampToFirstTier(GameObject baseCampNode, GameObject[,] nodeObjects)
