@@ -702,11 +702,11 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
             
             // Make sure it has an Image component (required for Button)
             Image image = node.GetComponent<Image>();
-            if (image == null)
-            {
-                image = node.AddComponent<Image>();
-                Debug.LogWarning($"[MapGenerator] Added missing Image component to {nodeType} node");
-            }
+            // if (image == null)
+            // {
+            //     image = node.AddComponent<Image>();
+            //     Debug.LogWarning($"[MapGenerator] Added missing Image component to {nodeType} node");
+            // }
             
             // Set node sprite based on type
             foreach (var config in nodeTypes)
