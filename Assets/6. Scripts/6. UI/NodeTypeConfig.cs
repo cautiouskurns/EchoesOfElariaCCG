@@ -24,8 +24,6 @@ public class NodeTypeConfig
     public GameObject nodePrefab;
     public int minDistance; // Minimum nodes between same type (except standard)
     public float weight = 1.0f; // Likelihood of appearing
-    public int maxPerRun = 3; // Maximum number of this node type per run
+    public int maxPerRun = 10; // Maximum number of this node type per run
     public Sprite nodeSprite; // Add this for UI representation
-    public bool transparentBackground = false; // Add this field
-
 }
