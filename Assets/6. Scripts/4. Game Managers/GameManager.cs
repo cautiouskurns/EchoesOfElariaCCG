@@ -7,13 +7,16 @@ public class GameManager : MonoBehaviour
 
     private string overworldSceneName = "OverworldMap"; // Default overworld scene
     private string lastScene;
-    public CharacterClass[] selectedClasses = new CharacterClass[2]; // ✅ Store all 2 classes
+    public CharacterClass[] selectedClasses = new CharacterClass[2]; // Store 2 classes
     private DialogueData currentLoreDialogue;
 
     [HideInInspector] public BattleType CurrentBattleType { get; private set; }
     [HideInInspector] public EnemyClass[] CurrentEnemies { get; private set; }
 
     public bool BaseNodeVisited { get; set; } = false;
+
+    // Add a reference to a fallback lore event
+    [SerializeField] private DialogueData fallbackLoreEvent;
 
 
     private void Awake()
@@ -47,7 +50,17 @@ public class GameManager : MonoBehaviour
         Debug.Log($"[GameManager] Scene loaded: {scene.name}. Instance ID: {gameObject.GetInstanceID()}");
     }
 
-    // ✅ Set the three selected classes
+    // Method to explicitly set the overworld scene name
+    public void SetOverworldScene(string sceneName)
+    {
+        if (!string.IsNullOrEmpty(sceneName))
+        {
+            overworldSceneName = sceneName;
+            Debug.Log($"[GameManager] Overworld scene set to: {overworldSceneName}");
+        }
+    }
+
+    // Set the player classes
     public void SetPlayerClass(int index, CharacterClass newClass)
     {
         if (index < 0 || index >= selectedClasses.Length)
@@ -59,20 +72,18 @@ public class GameManager : MonoBehaviour
         selectedClasses[index] = newClass;
         Debug.Log($"[GameManager] 🏹 Player {index + 1} class set to: {selectedClasses[index].className}");
     }
-
-
     
     // Modified method to include battle type and enemies
     public void StartBattle(string battleScene, string returnScene, BattleType battleType, EnemyClass[] enemies = null)
     {
         overworldSceneName = returnScene;
+        lastScene = SceneManager.GetActiveScene().name; // Store the current scene
         CurrentBattleType = battleType;
         CurrentEnemies = enemies;
         
         Debug.Log($"[GameManager] Starting {battleType} battle in scene: {battleScene}");
         SceneManager.LoadScene(battleScene);
     }
-
 
     public void ReturnToOverworld()
     {
@@ -83,7 +94,8 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[GameManager] ❌ No overworld scene stored!");
+            Debug.LogError("[GameManager] ❌ No overworld scene stored! Loading default map scene.");
+            SceneManager.LoadScene("OverworldMap"); // Hardcoded fallback
         }
     }
 
@@ -92,8 +104,26 @@ public class GameManager : MonoBehaviour
     {
         if (dialogueData == null)
         {
-            Debug.LogError("[GameManager] Cannot start lore event with null dialogue!");
-            return;
+            Debug.LogError("[GameManager] Cannot start lore event with null dialogue! Attempting fallback.");
+            
+            // Try using fallback dialogue
+            if (fallbackLoreEvent != null)
+            {
+                dialogueData = fallbackLoreEvent;
+                Debug.Log("[GameManager] Using fallback lore event");
+            }
+            else
+            {
+                Debug.LogError("[GameManager] No fallback dialogue available either!");
+                
+                // Just load the scene if provided
+                if (!string.IsNullOrEmpty(loreScene))
+                {
+                    lastScene = SceneManager.GetActiveScene().name;
+                    SceneManager.LoadScene(loreScene);
+                }
+                return;
+            }
         }
 
         lastScene = SceneManager.GetActiveScene().name;
@@ -103,10 +133,16 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(loreScene);
     }
 
-    // ✅ Get the stored dialogue data
+    // Get the stored dialogue data
     public DialogueData GetStoredLoreDialogue()
     {
         return currentLoreDialogue;
+    }
+
+    // Provide a fallback lore event
+    public DialogueData GetFallbackLoreEvent()
+    {
+        return fallbackLoreEvent;
     }
 
     public void ReturnFromLore()
@@ -119,7 +155,7 @@ public class GameManager : MonoBehaviour
         else
         {
             Debug.LogError("[GameManager] ❌ No previous scene stored, returning to overworld.");
-            SceneManager.LoadScene(overworldSceneName);
+            ReturnToOverworld(); // Use our ReturnToOverworld method which has fallbacks
         }
     }
 }

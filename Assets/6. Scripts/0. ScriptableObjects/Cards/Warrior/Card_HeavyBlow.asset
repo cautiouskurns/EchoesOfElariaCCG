@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Card_HeavyBlow
   m_EditorClassIdentifier: 
   cardName: "Heavy Blow\t"
-  cost: 2
+  cost: 1
   cardArt: {fileID: 3851987926030758752, guid: 2c0273cdfc9904b9bae68d31c462bd1e, type: 3}
   description: "Deals 12 damage, but stuns self next turn.\t"
   cardType: 1
   soundEffect: {fileID: 0}
   effects:
   - effectType: 0
-    value: 12
+    value: 100
     target: 1
     condition: 0
     conditionValue: 0

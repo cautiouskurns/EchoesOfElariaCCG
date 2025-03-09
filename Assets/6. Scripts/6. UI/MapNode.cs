@@ -65,6 +65,8 @@ public class MapNode : MonoBehaviour
             MapPersistenceManager.Instance.LeaveMapScene();
         }
 
+        string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
         switch (NodeType)
         {
             case NodeType.BaseCamp:
@@ -74,22 +76,28 @@ public class MapNode : MonoBehaviour
 
             case NodeType.StandardBattle:
                 if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.SetOverworldScene(currentSceneName); // Store current scene name
                     GameManager.Instance.StartBattle(
                         BattleSceneName, 
-                        SceneManager.GetActiveScene().name, 
+                        currentSceneName, 
                         BattleType.Standard,
                         EnemyEncounter);
+                }
                 else
                     SceneManager.LoadScene(BattleSceneName);
                 break;
                 
             case NodeType.EliteBattle:
                 if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.SetOverworldScene(currentSceneName); // Store current scene name
                     GameManager.Instance.StartBattle(
                         BattleSceneName, 
-                        SceneManager.GetActiveScene().name,
+                        currentSceneName,
                         BattleType.Elite,
                         EnemyEncounter);
+                }
                 else
                     SceneManager.LoadScene(BattleSceneName);
                 break;
@@ -99,16 +107,36 @@ public class MapNode : MonoBehaviour
                 if (LoreEvent != null)
                 {
                     if (GameManager.Instance != null)
+                    {
+                        GameManager.Instance.SetOverworldScene(currentSceneName); // Store current scene name
                         GameManager.Instance.StartLoreEvent(LoreEvent, EventSceneName);
+                    }
                     else if (!string.IsNullOrEmpty(EventSceneName))
                         SceneManager.LoadScene(EventSceneName);
                 }
                 else
                 {
-                    Debug.LogError($"[MapNode] LoreEvent is null for node {nodeId}! Cannot start lore event.");
-                    // Fallback to just loading the scene
-                    if (!string.IsNullOrEmpty(EventSceneName))
+                    Debug.LogError($"[MapNode] LoreEvent is null for node {nodeId}! Cannot start lore event. Attempting fallback...");
+                    // Try to get a fallback event
+                    if (GameManager.Instance != null)
+                    {
+                        DialogueData fallbackEvent = GameManager.Instance.GetFallbackLoreEvent();
+                        if (fallbackEvent != null)
+                        {
+                            GameManager.Instance.SetOverworldScene(currentSceneName); // Store current scene name
+                            GameManager.Instance.StartLoreEvent(fallbackEvent, EventSceneName);
+                        }
+                        else if (!string.IsNullOrEmpty(EventSceneName))
+                        {
+                            // Just load the scene directly as last resort
+                            SceneManager.LoadScene(EventSceneName);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(EventSceneName))
+                    {
+                        // Fallback to just loading the scene
                         SceneManager.LoadScene(EventSceneName);
+                    }
                 }
                 break;
                 

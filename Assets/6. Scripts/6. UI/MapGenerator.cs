@@ -237,30 +237,44 @@ public class MapGenerator : MonoBehaviour
     }
     private void ConfigureNodeBehavior(MapNode node)
     {
-        // Configure node based on type
-        switch (node.NodeType)
+        try
         {
-            case NodeType.BaseCamp:
-            // No need to set scene names since we directly load the scene
-                break;
+            // Configure node based on type
+            switch (node.NodeType)
+            {
+                case NodeType.BaseCamp:
+                    // No need to set scene names since we directly load the scene
+                    break;
 
-            case NodeType.StandardBattle:
-                node.BattleSceneName = standardBattleScene;
-                // Assign random enemies from standard pool
-                node.EnemyEncounter = GetRandomEnemies(standardEnemiesPool, 1, 3);
-                break;
-                
-            case NodeType.EliteBattle:
-                node.BattleSceneName = eliteBattleScene;
-                // Assign random elite enemies
-                node.EnemyEncounter = GetRandomEnemies(eliteEnemiesPool, 1, 2);
-                break;
-                
-            case NodeType.LoreEvent:
-                node.EventSceneName = loreEventScene;
-                // Assign random lore event
-                node.LoreEvent = GetRandomLoreEvent();
-                break;
+                case NodeType.StandardBattle:
+                    node.BattleSceneName = standardBattleScene;
+                    // Assign random enemies from standard pool
+                    node.EnemyEncounter = GetRandomEnemies(standardEnemiesPool, 1, 3);
+                    break;
+                    
+                case NodeType.EliteBattle:
+                    node.BattleSceneName = eliteBattleScene;
+                    // Assign random elite enemies
+                    node.EnemyEncounter = GetRandomEnemies(eliteEnemiesPool, 1, 2);
+                    break;
+                    
+                case NodeType.LoreEvent:
+                    node.EventSceneName = loreEventScene;
+                    // Assign a random lore event with error handling
+                    DialogueData loreEvent = GetRandomLoreEvent();
+                    if (loreEvent == null)
+                    {
+                        Debug.LogWarning($"[MapGenerator] No lore event available for node {node.GetNodeId()}. Creating a fallback.");
+                        loreEvent = CreateFallbackLoreEvent();
+                    }
+                    node.LoreEvent = loreEvent;
+                    Debug.Log($"[MapGenerator] Assigned lore event '{(loreEvent != null ? loreEvent.name : "NULL")}' to node {node.GetNodeId()}");
+                    break;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[MapGenerator] Error configuring node behavior: {ex.Message}");
         }
     }
     
@@ -281,8 +295,51 @@ public class MapGenerator : MonoBehaviour
     
     private DialogueData GetRandomLoreEvent()
     {
-        if (loreEventsPool == null || loreEventsPool.Length == 0) return null;
-        return loreEventsPool[Random.Range(0, loreEventsPool.Length)];
+        if (loreEventsPool == null || loreEventsPool.Length == 0)
+        {
+            Debug.LogWarning("[MapGenerator] Lore events pool is null or empty!");
+            return null;
+        }
+        
+        // Filter out null entries
+        System.Collections.Generic.List<DialogueData> validEvents = new System.Collections.Generic.List<DialogueData>();
+        foreach (DialogueData evt in loreEventsPool)
+        {
+            if (evt != null)
+                validEvents.Add(evt);
+        }
+        
+        if (validEvents.Count == 0)
+        {
+            Debug.LogWarning("[MapGenerator] No valid lore events in the pool!");
+            return null;
+        }
+        
+        return validEvents[Random.Range(0, validEvents.Count)];
+    }
+
+    // Add this method to create a basic fallback lore event
+    private DialogueData CreateFallbackLoreEvent()
+    {
+        try
+        {
+            // Create a new dialogue data scriptable object
+            DialogueData fallbackEvent = ScriptableObject.CreateInstance<DialogueData>();
+            fallbackEvent.name = "Fallback Lore Event";
+            
+            // Set minimum required properties - adjust these based on your DialogueData structure
+            // Assuming DialogueData has these properties:
+            // fallbackEvent.title = "Mysterious Encounter";
+            // fallbackEvent.dialogueText = "You encounter something strange, but can't quite make out what it is.";
+            
+            Debug.Log("[MapGenerator] Created fallback lore event");
+            return fallbackEvent;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[MapGenerator] Failed to create fallback lore event: {ex.Message}");
+            return null;
+        }
     }
     
     
@@ -891,6 +948,31 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
                     );
                     
                     Debug.Log($"[MapGenerator] Restored connection from {nodeData.id} to {targetId}");
+                }
+            }
+        }
+        
+        // When restoring nodes, specifically check LoreEvent nodes and ensure they have events
+        foreach (SerializedNodeData nodeData in savedNodes)
+        {
+            // ...existing node creation code...
+            
+            // After setting basic node properties:
+            if (nodesById.ContainsKey(nodeData.id))
+            {
+                MapNode mapNode = nodesById[nodeData.id];
+                if (mapNode != null && nodeData.nodeType == NodeType.LoreEvent)
+                {
+                    // Ensure Lore nodes have valid DialogueData
+                    if (mapNode.LoreEvent == null)
+                    {
+                        DialogueData loreEvent = GetRandomLoreEvent();
+                        if (loreEvent == null)
+                            loreEvent = CreateFallbackLoreEvent();
+                            
+                        mapNode.LoreEvent = loreEvent;
+                        Debug.Log($"[MapGenerator] Fixed missing LoreEvent for restored node {nodeData.id}");
+                    }
                 }
             }
         }
