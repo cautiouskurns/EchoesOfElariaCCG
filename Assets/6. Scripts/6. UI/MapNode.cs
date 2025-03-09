@@ -12,6 +12,8 @@ public class MapNode : MonoBehaviour
     public DialogueData LoreEvent { get; set; }
     
     [SerializeField] private List<MapNode> connectedNodes = new List<MapNode>();
+
+    
     
     public void OnNodeClicked()
     {

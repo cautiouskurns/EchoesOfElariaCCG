@@ -41,9 +41,12 @@ public class MapGenerator : MonoBehaviour
     [Header("UI Settings")]
     [SerializeField] private RectTransform mapContainer; // The parent container for the map
     [SerializeField] private LineRenderer connectionPrefab; // For drawing connections
-    [SerializeField] private Color lineColor = new Color(0.6f, 0.6f, 0.6f, 0.8f); // Default gray, semi-transparent
-    [SerializeField] private float lineThickness = 3f;
-        
+
+    [Header("UI Settings")]
+
+[SerializeField] private Color lineColor = new Color(0.6f, 0.6f, 0.6f, 0.8f); // Default gray, semi-transparent
+[SerializeField] private float lineThickness = 3f;
+    
     private Dictionary<NodeType, NodeTypeConfig> typeConfigMap = new Dictionary<NodeType, NodeTypeConfig>();
     private List<NodeType>[] paths; // Each path has its own sequence of nodes
     private Canvas parentCanvas;
@@ -622,61 +625,75 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
             Debug.LogWarning($"[MapGenerator] Added missing Button component to {nodeType} node");
         }
         
-        // Set transition mode to color tint to provide visual feedback
-        button.transition = Selectable.Transition.ColorTint;
-        
-        // Get or add the Image component (required for Button)
-        Image image = node.GetComponent<Image>();
-        if (image == null)
-        {
-            image = node.AddComponent<Image>();
-            Debug.LogWarning($"[MapGenerator] Added missing Image component to {nodeType} node");
-        }
-        
-        // Fix the white background issue
-        image.color = Color.white; // Default to fully opaque
-        
-        // Important: If this is a camp node, make the background transparent
+        // Special handling for BaseCamp node to fix white background issue
         if (nodeType == NodeType.BaseCamp)
         {
-            // Make background transparent but keep sprite visible
-            image.color = new Color(1f, 1f, 1f, 0f); // Fully transparent
+            // Disable default transition visual - we'll handle this differently
+            button.transition = Selectable.Transition.None;
             
-            // Check for any additional background images in children
-            Image[] childImages = node.GetComponentsInChildren<Image>();
-            foreach (Image childImage in childImages)
+            // Find ALL Image components on the node and its children
+            Image[] allImages = node.GetComponentsInChildren<Image>(true);
+            
+            Debug.Log($"[MapGenerator] Found {allImages.Length} images in Base Camp node");
+            
+            foreach (Image img in allImages)
             {
-                if (childImage != image) // Don't modify the main image again
+                // Check if this is a background image (usually the one directly on the node)
+                if (img.gameObject == node && (img.sprite == null || img.sprite.name == "Background" || img.sprite.name == "UISprite"))
                 {
-                    // Set any additional image to be transparent if it's just a background
-                    if (childImage.sprite == null || childImage.sprite == Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), Vector2.zero))
-                    {
-                        childImage.color = new Color(1f, 1f, 1f, 0f); // Fully transparent
-                        Debug.Log("[MapGenerator] Made background image transparent");
-                    }
+                    // This is likely the background - make it fully transparent
+                    img.color = new Color(0, 0, 0, 0);
+                    Debug.Log("[MapGenerator] Made base camp background transparent");
+                }
+                // If it's a child with a proper sprite, keep it visible
+                else if (img.sprite != null && img.sprite.name != "Background" && img.sprite.name != "UISprite")
+                {
+                    // This is likely an icon or meaningful image - keep it visible
+                    img.color = Color.white;
+                    Debug.Log($"[MapGenerator] Keeping sprite '{img.sprite.name}' visible");
+                }
+                // Any other images - make transparent
+                else
+                {
+                    img.color = new Color(0, 0, 0, 0);
+                    Debug.Log($"[MapGenerator] Made extra image transparent: {img.gameObject.name}");
+                }
+            }
+        }
+        else
+        {
+            // For other nodes, use standard button behavior
+            button.transition = Selectable.Transition.ColorTint;
+            
+            // Make sure it has an Image component (required for Button)
+            Image image = node.GetComponent<Image>();
+            if (image == null)
+            {
+                image = node.AddComponent<Image>();
+                Debug.LogWarning($"[MapGenerator] Added missing Image component to {nodeType} node");
+            }
+            
+            // Set node sprite based on type
+            foreach (var config in nodeTypes)
+            {
+                if (config.type == nodeType && config.nodeSprite != null)
+                {
+                    image.sprite = config.nodeSprite;
+                    image.preserveAspect = true;
+                    break;
                 }
             }
         }
         
-        // If we have a sprite, make sure it's displayed correctly
-        foreach (var config in nodeTypes)
-        {
-            if (config.type == nodeType && config.nodeSprite != null)
-            {
-                image.sprite = config.nodeSprite;
-                image.preserveAspect = true; // Maintain the aspect ratio
-                image.color = Color.white; // Reset color to ensure visibility
-                image.type = Image.Type.Simple; // Use the sprite as-is
-                break;
-            }
-        }
-        
-        // Set up the button to call the MapNode's OnNodeClicked method
+        // Set up button click handler for all nodes
         button.onClick.RemoveAllListeners();
         MapNode mapNode = node.GetComponent<MapNode>();
         if (mapNode != null)
         {
-            button.onClick.AddListener(() => mapNode.OnNodeClicked());
+            button.onClick.AddListener(() => {
+                Debug.Log($"[MapGenerator] Button clicked for {nodeType} node");
+                mapNode.OnNodeClicked();
+            });
         }
     }
 
