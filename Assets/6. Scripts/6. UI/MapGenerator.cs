@@ -54,6 +54,9 @@ public class MapGenerator : MonoBehaviour
     [Header("Starting Position")]
     [SerializeField] private Vector2 startNodePosition = new Vector2(100, 300); // Customize this in inspector
 
+    // Add tracking of nodes by ID
+    private Dictionary<string, MapNode> nodesById = new Dictionary<string, MapNode>();
+
     private void Awake()
     {
         Debug.Log("[MapGenerator] Awake called");
@@ -78,10 +81,39 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        // Subscribe to the map restore event
+        if (MapPersistenceManager.Instance != null)
+        {
+            MapPersistenceManager.Instance.OnRestoreMapRequest += RestoreMap;
+        }
+    }
+    
+    private void OnDisable()
+    {
+        // Unsubscribe when disabled
+        if (MapPersistenceManager.Instance != null)
+        {
+            MapPersistenceManager.Instance.OnRestoreMapRequest -= RestoreMap;
+        }
+    }
+
     private void Start()
     {
-        Debug.Log("[MapGenerator] Start called - about to generate map");
-        GenerateNewMap();
+        Debug.Log("[MapGenerator] Start called");
+        
+        // Check if we need to restore a map
+        if (MapPersistenceManager.Instance != null && MapPersistenceManager.Instance.HasSavedMap())
+        {
+            Debug.Log("[MapGenerator] Found saved map data, restoring...");
+            RestoreMap();
+        }
+        else
+        {
+            Debug.Log("[MapGenerator] No saved map found, generating new map");
+            GenerateNewMap();
+        }
     }
 
     public void GenerateNewMap()
@@ -511,6 +543,9 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
         
         // Connect base camp to first tier nodes
         ConnectBaseCampToFirstTier(baseCampNode, nodeObjects);
+
+        // After placing all nodes and creating connections
+        SaveMapStructure();
     }
 
     // Add this new method for connecting nodes along the same path
@@ -767,6 +802,184 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
             
             Debug.Log($"[MapGenerator] Created connection between nodes at {sourceNode.GetComponent<RectTransform>().anchoredPosition} and {targetNode.GetComponent<RectTransform>().anchoredPosition}");
         }
+    }
+
+    // Add this method to restore the map
+    private void RestoreMap()
+    {
+        Debug.Log("[MapGenerator] Restoring map...");
+        
+        if (MapPersistenceManager.Instance == null || !MapPersistenceManager.Instance.HasSavedMap())
+        {
+            Debug.LogError("[MapGenerator] Cannot restore map - no saved data");
+            return;
+        }
+        
+        // Clear existing nodes
+        ClearExistingNodes();
+        
+        // Get the saved node data
+        List<SerializedNodeData> savedNodes = MapPersistenceManager.Instance.GetMapData();
+        
+        if (savedNodes == null || savedNodes.Count == 0)
+        {
+            Debug.LogError("[MapGenerator] No nodes in saved data");
+            return;
+        }
+        
+        Debug.Log($"[MapGenerator] Restoring {savedNodes.Count} nodes");
+        
+        // First pass: Create all nodes
+        foreach (SerializedNodeData nodeData in savedNodes)
+        {
+            // Get the appropriate prefab
+            GameObject prefab = GetNodePrefab(nodeData.nodeType);
+            if (prefab == null)
+            {
+                Debug.LogError($"[MapGenerator] No prefab found for node type {nodeData.nodeType}");
+                continue;
+            }
+            
+            // Create the node
+            GameObject nodeObject = Instantiate(prefab, transform);
+            RectTransform rt = nodeObject.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(nodeData.xPos, nodeData.yPos);
+            
+            // Configure the node
+            MapNode mapNode = nodeObject.GetComponent<MapNode>();
+            if (mapNode != null)
+            {
+                // Set basic properties
+                mapNode.NodeType = nodeData.nodeType;
+                mapNode.PathIndex = nodeData.pathIndex;
+                mapNode.NodeIndex = nodeData.nodeIndex;
+                mapNode.BattleSceneName = nodeData.battleSceneName;
+                mapNode.EventSceneName = nodeData.eventSceneName;
+                mapNode.SetNodeId(nodeData.id);
+                
+                // Store reference for connections
+                nodesById[nodeData.id] = mapNode;
+                
+                // Apply visited state
+                mapNode.SetVisited(nodeData.visited);
+                
+                // Configure UI components
+                ConfigureUIComponents(nodeObject, nodeData.nodeType);
+            }
+            
+            Debug.Log($"[MapGenerator] Restored node {nodeData.id} at ({nodeData.xPos}, {nodeData.yPos})");
+        }
+        
+        // Second pass: Restore connections
+        foreach (SerializedNodeData nodeData in savedNodes)
+        {
+            if (!nodesById.ContainsKey(nodeData.id)) continue;
+            
+            MapNode sourceNode = nodesById[nodeData.id];
+            
+            foreach (string targetId in nodeData.connectedNodeIds)
+            {
+                if (nodesById.ContainsKey(targetId))
+                {
+                    MapNode targetNode = nodesById[targetId];
+                    sourceNode.AddConnection(targetNode);
+                    
+                    // Draw a visual line between them
+                    DrawConnectionLine(
+                        sourceNode.GetComponent<RectTransform>(),
+                        targetNode.GetComponent<RectTransform>()
+                    );
+                    
+                    Debug.Log($"[MapGenerator] Restored connection from {nodeData.id} to {targetId}");
+                }
+            }
+        }
+        
+        Debug.Log("[MapGenerator] Map restoration complete");
+    }
+    
+    // Add this method to clear existing nodes
+    private void ClearExistingNodes()
+    {
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+        
+        nodesById.Clear();
+    }
+    
+    // Add this method to get the prefab for a node type
+    private GameObject GetNodePrefab(NodeType type)
+    {
+        if (type == NodeType.BaseCamp)
+            return baseCampNodePrefab;
+        
+        // For other types, check configs
+        foreach (var config in nodeTypes)
+        {
+            if (config.type == type)
+            {
+                return config.nodePrefab;
+            }
+        }
+        
+        return null;
+    }
+
+    // Add this method to save map structure
+    private void SaveMapStructure()
+    {
+        if (MapPersistenceManager.Instance == null)
+        {
+            Debug.LogError("[MapGenerator] Cannot save map - no MapPersistenceManager found");
+            return;
+        }
+        
+        List<SerializedNodeData> nodeDataList = new List<SerializedNodeData>();
+        
+        // Go through each child (node) of this object
+        foreach (Transform child in transform)
+        {
+            MapNode node = child.GetComponent<MapNode>();
+            if (node != null)
+            {
+                // Get the node's position in UI space
+                RectTransform rt = child.GetComponent<RectTransform>();
+                Vector2 position = rt.anchoredPosition;
+                
+                // Create connection list
+                List<string> connections = new List<string>();
+                foreach (MapNode connectedNode in node.GetConnectedNodes())
+                {
+                    if (connectedNode != null)
+                    {
+                        connections.Add(connectedNode.GetNodeId());
+                    }
+                }
+                
+                // Create serialized data
+                SerializedNodeData nodeData = new SerializedNodeData
+                {
+                    id = node.GetNodeId(),
+                    nodeType = node.NodeType,
+                    xPos = position.x,
+                    yPos = position.y,
+                    pathIndex = node.PathIndex,
+                    nodeIndex = node.NodeIndex,
+                    visited = node.HasBeenVisited,
+                    connectedNodeIds = connections,
+                    battleSceneName = node.BattleSceneName,
+                    eventSceneName = node.EventSceneName
+                };
+                
+                nodeDataList.Add(nodeData);
+            }
+        }
+        
+        // Save to the persistence manager
+        MapPersistenceManager.Instance.SaveMapStructure(nodeDataList);
+        Debug.Log($"[MapGenerator] Saved map structure with {nodeDataList.Count} nodes");
     }
     
 }

@@ -4,17 +4,38 @@ using System.Collections.Generic;
 
 public class MapNode : MonoBehaviour
 {
+    // Add unique identifier for this node
+    [SerializeField] private string nodeId;
+
     public NodeType NodeType { get; set; }
     public string BattleSceneName { get; set; }
     public string EventSceneName { get; set; }
     public bool HasBeenVisited { get; private set; }
     public EnemyClass[] EnemyEncounter { get; set; }
     public DialogueData LoreEvent { get; set; }
-    
+    public int PathIndex { get; set; }
+    public int NodeIndex { get; set; }
     [SerializeField] private List<MapNode> connectedNodes = new List<MapNode>();
 
-    
-    
+    private void Awake()
+    {
+        // Generate unique ID if not already assigned
+        if (string.IsNullOrEmpty(nodeId))
+        {
+            nodeId = System.Guid.NewGuid().ToString();
+        }
+    }
+
+    public string GetNodeId()
+    {
+        return nodeId;
+    }
+
+    public void SetNodeId(string id)
+    {
+        nodeId = id;
+    }
+
     public void OnNodeClicked()
     {
         Debug.Log($"[MapNode] Node clicked: {NodeType}");
@@ -28,12 +49,20 @@ public class MapNode : MonoBehaviour
         Debug.Log($"[MapNode] Processing click for node type: {NodeType}");
         
         // Mark as visited BEFORE loading the new scene
-        HasBeenVisited = true;
+        SetVisited(true);
         
         // If this is the base camp node, save that information
         if (NodeType == NodeType.BaseCamp)
         {
-            GameManager.Instance.BaseNodeVisited = true;
+            if (GameManager.Instance != null)
+                GameManager.Instance.BaseNodeVisited = true;
+        }
+
+        // Inform the MapPersistenceManager we're leaving the map
+        if (MapPersistenceManager.Instance != null)
+        {
+            MapPersistenceManager.Instance.SetNodeVisited(nodeId, true);
+            MapPersistenceManager.Instance.LeaveMapScene();
         }
 
         switch (NodeType)
@@ -44,23 +73,47 @@ public class MapNode : MonoBehaviour
                 break;
 
             case NodeType.StandardBattle:
-                GameManager.Instance.StartBattle(
-                    BattleSceneName, 
-                    SceneManager.GetActiveScene().name, 
-                    BattleType.Standard,
-                    EnemyEncounter);
+                if (GameManager.Instance != null)
+                    GameManager.Instance.StartBattle(
+                        BattleSceneName, 
+                        SceneManager.GetActiveScene().name, 
+                        BattleType.Standard,
+                        EnemyEncounter);
+                else
+                    SceneManager.LoadScene(BattleSceneName);
                 break;
                 
             case NodeType.EliteBattle:
-                GameManager.Instance.StartBattle(
-                    BattleSceneName, 
-                    SceneManager.GetActiveScene().name,
-                    BattleType.Elite,
-                    EnemyEncounter);
+                if (GameManager.Instance != null)
+                    GameManager.Instance.StartBattle(
+                        BattleSceneName, 
+                        SceneManager.GetActiveScene().name,
+                        BattleType.Elite,
+                        EnemyEncounter);
+                else
+                    SceneManager.LoadScene(BattleSceneName);
                 break;
                 
             case NodeType.LoreEvent:
-                GameManager.Instance.StartLoreEvent(LoreEvent, EventSceneName);
+                // Add null check for LoreEvent
+                if (LoreEvent != null)
+                {
+                    if (GameManager.Instance != null)
+                        GameManager.Instance.StartLoreEvent(LoreEvent, EventSceneName);
+                    else if (!string.IsNullOrEmpty(EventSceneName))
+                        SceneManager.LoadScene(EventSceneName);
+                }
+                else
+                {
+                    Debug.LogError($"[MapNode] LoreEvent is null for node {nodeId}! Cannot start lore event.");
+                    // Fallback to just loading the scene
+                    if (!string.IsNullOrEmpty(EventSceneName))
+                        SceneManager.LoadScene(EventSceneName);
+                }
+                break;
+                
+            default:
+                Debug.LogWarning($"[MapNode] No action defined for node type {NodeType}");
                 break;
         }
         
