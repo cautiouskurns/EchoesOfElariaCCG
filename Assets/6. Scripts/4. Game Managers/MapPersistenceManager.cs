@@ -140,6 +140,27 @@ public class MapPersistenceManager : MonoBehaviour
         {
             node.visited = visited;
             Debug.Log($"[MapPersistenceManager] Set node {nodeId} visited state to {visited}");
+            
+            // Update node visuals if in active scene
+            UpdateNodeVisualsInScene(nodeId);
+        }
+    }
+    
+    // Update visual appearance of any MapNode with the given ID in the active scene
+    private void UpdateNodeVisualsInScene(string nodeId)
+    {
+        MapNode[] allNodes = GameObject.FindObjectsByType<MapNode>(FindObjectsSortMode.None);
+        foreach (MapNode node in allNodes)
+        {
+            if (node.GetNodeId() == nodeId)
+            {
+                node.UpdateNodeAppearance();
+            }
+            else
+            {
+                // Other nodes may have changed accessibility based on this node
+                node.RefreshAccessibility();
+            }
         }
     }
 }

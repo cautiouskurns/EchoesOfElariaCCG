@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class MapNode : MonoBehaviour
 {
@@ -17,6 +18,15 @@ public class MapNode : MonoBehaviour
     public int NodeIndex { get; set; }
     [SerializeField] private List<MapNode> connectedNodes = new List<MapNode>();
 
+    [Header("Node Appearance")]
+    [SerializeField] private float accessibleAlpha = 1.0f;  // Full visibility for accessible nodes
+    [SerializeField] private float inaccessibleAlpha = 0.7f;  // 40% visibility for inaccessible nodes
+    [SerializeField] private float visitedBrightness = 1.2f;  // Slightly brighter for visited nodes
+    [SerializeField] private Color visitedTint = new Color(0.7f, 0.9f, 1.0f);  // Light blue tint for visited
+    
+    // Reference to the node's image component
+    private Image nodeImage;
+
     private void Awake()
     {
         // Generate unique ID if not already assigned
@@ -24,6 +34,15 @@ public class MapNode : MonoBehaviour
         {
             nodeId = System.Guid.NewGuid().ToString();
         }
+        
+        // Cache the image component
+        nodeImage = GetComponent<Image>();
+    }
+
+    private void Start()
+    {
+        // Update visuals on start
+        UpdateNodeAppearance();
     }
 
     public string GetNodeId()
@@ -178,10 +197,86 @@ public class MapNode : MonoBehaviour
         return false;
     }
 
+    // Update the UpdateNodeAppearance method in MapNode.cs
+    public void UpdateNodeAppearance()
+    {
+        // Get the main image component if not already cached
+        if (nodeImage == null)
+        {
+            nodeImage = GetComponent<Image>();
+        }
+        
+        // Determine the alpha based on accessibility
+        float alpha = IsAccessible() ? accessibleAlpha : inaccessibleAlpha;
+        
+        // Apply to main node image if it exists
+        if (nodeImage != null)
+        {
+            Color newColor = nodeImage.color;
+            newColor.a = alpha;
+            
+            // If visited, apply tint and brightness
+            if (HasBeenVisited)
+            {
+                newColor.r *= visitedTint.r * visitedBrightness;
+                newColor.g *= visitedTint.g * visitedBrightness;
+                newColor.b *= visitedTint.b * visitedBrightness;
+            }
+            
+            nodeImage.color = newColor;
+            Debug.Log($"[MapNode] Updated main image alpha to {alpha} for node {name}");
+        }
+        
+        // Also apply to ALL child images, which may contain the actual visuals
+        Image[] childImages = GetComponentsInChildren<Image>(true);
+        foreach (Image img in childImages)
+        {
+            // Skip the main image which we already handled
+            if (img == nodeImage) continue;
+            
+            Color childColor = img.color;
+            childColor.a = alpha; // Apply same alpha
+            img.color = childColor;
+            Debug.Log($"[MapNode] Updated child image alpha to {alpha} for {img.name} in node {name}");
+        }
+        
+        // Make sure any Button component is interactable only if accessible
+        Button button = GetComponent<Button>();
+        if (button != null)
+        {
+            button.interactable = IsAccessible();
+        }
+    }
+    
+    private void UpdateChildImages()
+    {
+        // Get all child images (icons, etc.)
+        Image[] childImages = GetComponentsInChildren<Image>();
+        foreach (Image img in childImages)
+        {
+            // Skip the main node image
+            if (img == nodeImage) continue;
+            
+            // Apply same alpha but keep its original color
+            Color imgColor = img.color;
+            imgColor.a = IsAccessible() ? accessibleAlpha : inaccessibleAlpha;
+            img.color = imgColor;
+        }
+    }
 
     public void SetVisited(bool visited)
     {
         HasBeenVisited = visited;
+        UpdateNodeAppearance();
+        
+        // Also update the appearance of connected nodes, as their accessibility may have changed
+        foreach (MapNode connectedNode in connectedNodes)
+        {
+            if (connectedNode != null)
+            {
+                connectedNode.RefreshAccessibility();
+            }
+        }
     }
     
     public List<MapNode> GetConnectedNodes()
@@ -195,5 +290,15 @@ public class MapNode : MonoBehaviour
         {
             connectedNodes.Add(targetNode);
         }
+    }
+
+    // Call this after IsAccessible() may have changed (e.g., when another node becomes visited)
+    public void RefreshAccessibility()
+    {
+        bool wasAccessible = IsAccessible();
+        UpdateNodeAppearance();
+        
+        // Log for debugging
+        Debug.Log($"[MapNode] Refreshed node {name} accessibility: {wasAccessible} -> {IsAccessible()}");
     }
 }

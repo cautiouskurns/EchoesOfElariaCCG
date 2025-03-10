@@ -125,7 +125,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 124f38bb18c4947f9955999b13ddcdc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nodeId: 
   connectedNodes: []
+  accessibleAlpha: 1
+  inaccessibleAlpha: 0.7
+  visitedBrightness: 1.2
+  visitedTint: {r: 0.7, g: 0.9, b: 1, a: 1}
 --- !u!114 &1172318377679831287
 MonoBehaviour:
   m_ObjectHideFlags: 0

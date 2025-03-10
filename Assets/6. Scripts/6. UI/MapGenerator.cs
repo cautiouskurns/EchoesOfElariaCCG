@@ -785,6 +785,9 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
             button.onClick.AddListener(() => {
                 Debug.Log($"[MapGenerator] Button clicked for {nodeType} node");
                 mapNode.OnNodeClicked();
+                
+                // Update all node visuals after a node is clicked (accessibility may have changed)
+                StartCoroutine(RefreshAllNodes());
             });
         }
     }
@@ -977,6 +980,9 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
             }
         }
         
+        // After all connections have been restored, refresh accessibility of all nodes
+        StartCoroutine(RefreshAllNodes());
+        
         Debug.Log("[MapGenerator] Map restoration complete");
     }
     
@@ -1062,6 +1068,23 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
         // Save to the persistence manager
         MapPersistenceManager.Instance.SaveMapStructure(nodeDataList);
         Debug.Log($"[MapGenerator] Saved map structure with {nodeDataList.Count} nodes");
+    }
+
+    // Method to refresh all nodes' accessibility
+    private System.Collections.IEnumerator RefreshAllNodes()
+    {
+        // Wait one frame to make sure the node state has been updated
+        yield return null;
+        
+        // Find all MapNode components in children
+        MapNode[] allNodes = GetComponentsInChildren<MapNode>();
+        foreach (MapNode node in allNodes)
+        {
+            if (node != null)
+            {
+                node.RefreshAccessibility();
+            }
+        }
     }
     
 }
