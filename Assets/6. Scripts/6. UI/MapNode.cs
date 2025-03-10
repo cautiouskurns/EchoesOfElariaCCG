@@ -3,6 +3,15 @@ using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+public enum NodeDifficulty
+{
+    Easy,
+    Medium,
+    Hard,
+    Elite,
+    Boss
+}
+
 public class MapNode : MonoBehaviour
 {
     // Add unique identifier for this node
@@ -27,6 +36,32 @@ public class MapNode : MonoBehaviour
     // Reference to the node's image component
     private Image nodeImage;
 
+    // Then add this to your MapNode class
+    [Header("Battle Settings")]
+    [SerializeField] private NodeDifficulty nodeDifficulty = NodeDifficulty.Medium;
+
+    public void RandomizeDifficulty(float eliteChance = 0.15f, float hardChance = 0.3f)
+    {
+        float random = Random.value;
+        if (random < eliteChance)
+        {
+            nodeDifficulty = NodeDifficulty.Elite;
+        }
+        else if (random < eliteChance + hardChance)
+        {
+            nodeDifficulty = NodeDifficulty.Hard;
+        }
+        else
+        {
+            nodeDifficulty = NodeDifficulty.Medium;
+        }
+        UpdateDifficultyIndicator();
+    }
+
+
+    // Add a public accessor for other classes to check the difficulty
+    public NodeDifficulty Difficulty => nodeDifficulty;
+
     private void Awake()
     {
         // Generate unique ID if not already assigned
@@ -43,6 +78,7 @@ public class MapNode : MonoBehaviour
     {
         // Update visuals on start
         UpdateNodeAppearance();
+        RandomizeDifficulty();
     }
 
     public string GetNodeId()
@@ -57,6 +93,8 @@ public class MapNode : MonoBehaviour
 
     public void OnNodeClicked()
     {
+        Debug.Log($"[MapNode] Node clicked: {NodeType} - Difficulty: {nodeDifficulty}");
+
         Debug.Log($"[MapNode] Node clicked: {NodeType}");
         
         if (!IsAccessible())
@@ -300,5 +338,31 @@ public class MapNode : MonoBehaviour
         
         // Log for debugging
         Debug.Log($"[MapNode] Refreshed node {name} accessibility: {wasAccessible} -> {IsAccessible()}");
+    }
+
+    // Add a method to set the difficulty
+    public void SetDifficulty(NodeDifficulty difficulty)
+    {
+        nodeDifficulty = difficulty;
+        Debug.Log($"[MapNode] Set node {nodeId} difficulty to {difficulty}");
+        
+        // You can optionally update visual indicators here based on difficulty
+        UpdateDifficultyIndicator();
+    }
+
+    // Optional method to visually indicate the difficulty
+    private void UpdateDifficultyIndicator()
+    {
+        // Simple visual indicator in debug mode - you can expand this later
+        string difficultyName = nodeDifficulty.ToString();
+        if (gameObject.name.Contains("Node"))
+        {
+            gameObject.name = $"Node_{difficultyName}_{PathIndex}_{NodeIndex}";
+        }
+        
+        // In future versions, you could add visual elements like:
+        // - Color tint based on difficulty
+        // - Display small star icons for harder nodes
+        // - Add special border or glow effects
     }
 }
