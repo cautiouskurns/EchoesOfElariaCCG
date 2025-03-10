@@ -14,6 +14,9 @@ public class BattleManager : MonoBehaviour
     [Header("Enemy Configuration")]
     [SerializeField] private Transform[] enemySpawnPoints;
     [SerializeField] private EnemyClass[] standardEnemiesPool;
+    [SerializeField] private EnemyClass[] easyEnemiesPool;
+    [SerializeField] private EnemyClass[] mediumEnemiesPool;
+    [SerializeField] private EnemyClass[] hardEnemiesPool;
     [SerializeField] private EnemyClass[] eliteEnemiesPool;
     [SerializeField] private EnemyClass bossEnemy;
     
@@ -54,11 +57,15 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(MonitorBattleOutcome());
     }
     
+    // In BattleManager.cs, modify InitializeEnemies method
     private void InitializeEnemies()
     {
         // Get battle information from GameManager
         BattleType battleType = GameManager.Instance.CurrentBattleType;
         EnemyClass[] predefinedEnemies = GameManager.Instance.CurrentEnemies;
+        NodeDifficulty nodeDifficulty = GameManager.Instance.CurrentNodeDifficulty;
+        
+        Debug.Log($"[BattleManager] Setting up battle with difficulty: {nodeDifficulty}");
         
         // Spawn appropriate enemies
         if (predefinedEnemies != null && predefinedEnemies.Length > 0)
@@ -68,15 +75,55 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            // Use random enemies based on battle type
+            // Use random enemies based on battle type and difficulty
             switch (battleType)
             {
                 case BattleType.Standard:
-                    SpawnRandomEnemies(standardEnemiesPool, 2, 3); // 2-3 standard enemies
+                    // Choose appropriate enemy pool based on difficulty
+                    EnemyClass[] pool;
+                    int minEnemies, maxEnemies;
+                    
+                    switch (nodeDifficulty)
+                    {
+                        case NodeDifficulty.Easy:
+                            pool = easyEnemiesPool;
+                            minEnemies = 1;
+                            maxEnemies = 2;
+                            break;
+                        case NodeDifficulty.Medium:
+                            pool = mediumEnemiesPool;
+                            minEnemies = 2;
+                            maxEnemies = 3;
+                            break;
+                        case NodeDifficulty.Hard:
+                            pool = hardEnemiesPool;
+                            minEnemies = 2;
+                            maxEnemies = 4;
+                            break;
+                        case NodeDifficulty.Elite:
+                            pool = eliteEnemiesPool;
+                            minEnemies = 1;
+                            maxEnemies = 2;
+                            break;
+                        default:
+                            pool = standardEnemiesPool;
+                            minEnemies = 2;
+                            maxEnemies = 3;
+                            break;
+                    }
+                    
+                    // If the selected pool is empty, fall back to standard pool
+                    if (pool == null || pool.Length == 0)
+                    {
+                        Debug.LogWarning($"[BattleManager] No enemies in {nodeDifficulty} pool, using standard enemies");
+                        pool = standardEnemiesPool;
+                    }
+                    
+                    SpawnRandomEnemies(pool, minEnemies, maxEnemies);
                     break;
                     
                 case BattleType.Elite:
-                    SpawnRandomEnemies(eliteEnemiesPool, 1, 2); // 1-2 elite enemies
+                    SpawnRandomEnemies(eliteEnemiesPool, 1, 2);
                     break;
                     
                 case BattleType.Boss:

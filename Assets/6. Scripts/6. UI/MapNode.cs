@@ -139,7 +139,8 @@ public class MapNode : MonoBehaviour
                         BattleSceneName, 
                         currentSceneName, 
                         BattleType.Standard,
-                        EnemyEncounter);
+                        EnemyEncounter,
+                        nodeDifficulty);
                 }
                 else
                     SceneManager.LoadScene(BattleSceneName);

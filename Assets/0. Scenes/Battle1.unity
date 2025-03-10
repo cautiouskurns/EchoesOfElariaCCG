@@ -1048,9 +1048,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyActions:
-  - {fileID: 11400000, guid: 3cb6bf6dbb04b45bca74b556765c0ab2, type: 2}
-  - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
-  - {fileID: 11400000, guid: 66318e488a50a439cb60a01f2bea72a7, type: 2}
+  - {fileID: 11400000, guid: 29aca2a1c2a4840c886d3dbe9b915362, type: 2}
   actionDelay: 3
   defensiveThreshold: 0.3
   aggressiveThreshold: 0.7
@@ -2355,7 +2353,18 @@ MonoBehaviour:
   standardEnemiesPool:
   - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
   - {fileID: 11400000, guid: f2331b8cd288044c692fd38f416eea37, type: 2}
-  eliteEnemiesPool: []
+  easyEnemiesPool:
+  - {fileID: 11400000, guid: 6bb0e332742614369a635fe04877b25f, type: 2}
+  - {fileID: 11400000, guid: f2331b8cd288044c692fd38f416eea37, type: 2}
+  mediumEnemiesPool:
+  - {fileID: 11400000, guid: 7cc8efbbc9edd4e7ba5de08c5cc2c37c, type: 2}
+  - {fileID: 11400000, guid: 960851cc5fdca430a93aacf32b07eee1, type: 2}
+  hardEnemiesPool:
+  - {fileID: 0}
+  - {fileID: 0}
+  eliteEnemiesPool:
+  - {fileID: 0}
+  - {fileID: 0}
   bossEnemy: {fileID: 0}
 --- !u!1 &1455236468
 GameObject:

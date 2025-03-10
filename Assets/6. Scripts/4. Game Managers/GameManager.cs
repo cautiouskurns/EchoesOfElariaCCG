@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     // Add a reference to a fallback lore event
     [SerializeField] private DialogueData fallbackLoreEvent;
 
+    [HideInInspector] public NodeDifficulty CurrentNodeDifficulty { get; private set; }
 
     private void Awake()
     {
@@ -73,15 +74,17 @@ public class GameManager : MonoBehaviour
         Debug.Log($"[GameManager] 🏹 Player {index + 1} class set to: {selectedClasses[index].className}");
     }
     
-    // Modified method to include battle type and enemies
-    public void StartBattle(string battleScene, string returnScene, BattleType battleType, EnemyClass[] enemies = null)
+    // Update StartBattle method to accept difficulty
+    public void StartBattle(string battleScene, string returnScene, BattleType battleType, 
+                        EnemyClass[] enemies = null, NodeDifficulty difficulty = NodeDifficulty.Medium)
     {
         overworldSceneName = returnScene;
-        lastScene = SceneManager.GetActiveScene().name; // Store the current scene
+        lastScene = SceneManager.GetActiveScene().name;
         CurrentBattleType = battleType;
         CurrentEnemies = enemies;
+        CurrentNodeDifficulty = difficulty;
         
-        Debug.Log($"[GameManager] Starting {battleType} battle in scene: {battleScene}");
+        Debug.Log($"[GameManager] Starting {battleType} battle with {difficulty} difficulty in scene: {battleScene}");
         SceneManager.LoadScene(battleScene);
     }
 
