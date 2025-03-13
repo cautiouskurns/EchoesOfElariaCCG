@@ -936,7 +936,7 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
                 mapNode.BattleSceneName = nodeData.battleSceneName;
                 mapNode.EventSceneName = nodeData.eventSceneName;
                 mapNode.SetNodeId(nodeData.id);
-                
+                mapNode.SetDifficulty(nodeData.nodeDifficulty); // Make sure this line is added
                 // Store reference for connections
                 nodesById[nodeData.id] = mapNode;
                 
