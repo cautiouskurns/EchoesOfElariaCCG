@@ -36,7 +36,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -38.662773, y: 91.44263}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3067240147834473446
 MonoBehaviour:
@@ -52,6 +52,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nodeId: 
   connectedNodes: []
+  accessibleAlpha: 1
+  inaccessibleAlpha: 0.7
+  visitedBrightness: 1.2
+  visitedTint: {r: 0.7, g: 0.9, b: 1, a: 1}
+  nodeDifficulty: 1
 --- !u!114 &5021668395759618473
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,7 +148,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 75, y: 75}
+  m_SizeDelta: {x: 110, y: 110}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &793996286769924207
 CanvasRenderer:
@@ -173,7 +178,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -7593389055599273749, guid: 1113e4b22520f4dec87116b2ce5e6e14, type: 3}
+  m_Sprite: {fileID: -1652527762799230555, guid: 0a9c1e37d8fe6444eb03abbf57d214df, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

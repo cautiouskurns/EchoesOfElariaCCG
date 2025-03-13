@@ -187,4 +187,6 @@ public class SerializedNodeData
     public List<string> connectedNodeIds;
     public string battleSceneName;
     public string eventSceneName;
+    public NodeDifficulty nodeDifficulty;
+
 }

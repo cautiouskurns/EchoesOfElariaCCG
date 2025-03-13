@@ -581,6 +581,26 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
                 if (mapNode != null)
                 {
                     mapNode.NodeType = nodeType;
+                    mapNode.PathIndex = pathIndex;
+                    mapNode.NodeIndex = nodeIndex;
+                    
+                    // Assign appropriate difficulty based on node type
+                    if (nodeType == NodeType.StandardBattle)
+                    {
+                        // For standard battles, randomize difficulty
+                        mapNode.RandomizeDifficulty(0.15f, 0.3f);
+                    }
+                    else if (nodeType == NodeType.EliteBattle)
+                    {
+                        // Elite battles are always Elite difficulty
+                        mapNode.SetDifficulty(NodeDifficulty.Elite);
+                    }
+                    else if (nodeIndex == runLength - 1)
+                    {
+                        // Last node is a boss
+                        mapNode.SetDifficulty(NodeDifficulty.Boss);
+                    }
+                    
                     ConfigureNodeBehavior(mapNode);
                 }
                 else
@@ -1058,7 +1078,8 @@ private NodeType SelectWeightedRandom(List<NodeType> types, List<float> weights)
                     visited = node.HasBeenVisited,
                     connectedNodeIds = connections,
                     battleSceneName = node.BattleSceneName,
-                    eventSceneName = node.EventSceneName
+                    eventSceneName = node.EventSceneName,
+                    nodeDifficulty = node.Difficulty
                 };
                 
                 nodeDataList.Add(nodeData);

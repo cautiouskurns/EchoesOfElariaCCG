@@ -9,8 +9,8 @@ public class EnemyUnit : BaseCharacter
     private EnemyClass enemyData;
 
     // Store the planned action
-    public BaseCard plannedCard;
-    public PlayerUnit plannedTarget;
+    public new BaseCard plannedCard;
+    public new PlayerUnit plannedTarget;
     
     // Add a property to store this enemy's specific action deck
     private List<BaseCard> actionDeck = new List<BaseCard>();

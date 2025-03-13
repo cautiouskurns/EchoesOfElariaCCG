@@ -40,7 +40,7 @@ public class MapNode : MonoBehaviour
     [Header("Battle Settings")]
     [SerializeField] private NodeDifficulty nodeDifficulty = NodeDifficulty.Medium;
 
-    public void RandomizeDifficulty(float eliteChance = 0.15f, float hardChance = 0.3f)
+    public void RandomizeDifficulty(float eliteChance = 0.15f, float hardChance = 0.25f, float mediumChance = 0.35f)
     {
         float random = Random.value;
         if (random < eliteChance)
@@ -51,9 +51,13 @@ public class MapNode : MonoBehaviour
         {
             nodeDifficulty = NodeDifficulty.Hard;
         }
-        else
+        else if (random < eliteChance + hardChance + mediumChance)
         {
             nodeDifficulty = NodeDifficulty.Medium;
+        }
+        else
+        {
+            nodeDifficulty = NodeDifficulty.Easy;
         }
         UpdateDifficultyIndicator();
     }
@@ -352,6 +356,7 @@ public class MapNode : MonoBehaviour
     }
 
     // Optional method to visually indicate the difficulty
+    // In MapNode.cs, modify the UpdateDifficultyIndicator method
     private void UpdateDifficultyIndicator()
     {
         // Simple visual indicator in debug mode - you can expand this later
@@ -361,9 +366,11 @@ public class MapNode : MonoBehaviour
             gameObject.name = $"Node_{difficultyName}_{PathIndex}_{NodeIndex}";
         }
         
-        // In future versions, you could add visual elements like:
-        // - Color tint based on difficulty
-        // - Display small star icons for harder nodes
-        // - Add special border or glow effects
+        // Update visual indicators if available
+        DifficultyIndicator indicator = GetComponentInChildren<DifficultyIndicator>();
+        if (indicator != null)
+        {
+            indicator.UpdateSkullIcons();
+        }
     }
 }
