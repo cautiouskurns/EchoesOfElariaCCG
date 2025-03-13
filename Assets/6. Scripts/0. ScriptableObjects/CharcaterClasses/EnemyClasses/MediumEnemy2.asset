@@ -17,7 +17,7 @@ MonoBehaviour:
   enemyPrefab: {fileID: 1594980137760161270, guid: c26316a7f2f89419cba29c0f57b76f74, type: 3}
   enemySprite: {fileID: 0}
   baseHealth: 200
-  baseEnergy: 0
+  baseEnergy: 3
   strength: 0
   dexterity: 0
   intelligence: 0
@@ -29,6 +29,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
   isElite: 0
   isBoss: 0
-  actionsPerTurn: 0
+  actionsPerTurn: 1
   goldValue: 0
   possibleCardDrops: []

@@ -112,6 +112,12 @@ public class MapPersistenceManager : MonoBehaviour
     // Save the entire map structure
     public void SaveMapStructure(List<SerializedNodeData> nodes)
     {
+        // Log difficulties before saving to verify they're correct
+        foreach (var node in nodes)
+        {
+            Debug.Log($"[MapPersistenceManager] Saving node {node.id} with difficulty: {node.nodeDifficulty}");
+        }
+        
         mapData.nodeData = nodes;
         mapData.isGenerated = true;
         

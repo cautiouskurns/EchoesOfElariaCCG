@@ -87,8 +87,8 @@ public class BattleManager : MonoBehaviour
                     {
                         case NodeDifficulty.Easy:
                             pool = easyEnemiesPool;
-                            minEnemies = 1;
-                            maxEnemies = 2;
+                            minEnemies = 2;
+                            maxEnemies = 3;
                             break;
                         case NodeDifficulty.Medium:
                             pool = mediumEnemiesPool;

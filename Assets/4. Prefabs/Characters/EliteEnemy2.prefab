@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2581829989390881081, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
       propertyPath: m_Name
-      value: MediumEnemy1
+      value: EliteEnemy2
       objectReference: {fileID: 0}
     - target: {fileID: 2853951261988319604, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
       propertyPath: maxHealth
@@ -70,12 +70,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7656671638520276691, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.099
+      value: 0.215
       objectReference: {fileID: 0}
     - target: {fileID: 9129017017263540383, guid: f051e8c85ef6645df8f745d012cfabb6, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 8334834758588279888, guid: a001351fbae0f42f7be141ed51155ea5, type: 3}
+      objectReference: {fileID: 4216621045997856024, guid: 29c03f66a3a584cae88e9bee9a9ebdf7, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

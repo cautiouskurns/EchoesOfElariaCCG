@@ -82,7 +82,14 @@ public class MapNode : MonoBehaviour
     {
         // Update visuals on start
         UpdateNodeAppearance();
-        RandomizeDifficulty();
+        
+        // Only randomize if this is during the initial map generation
+        // We can check if the map is being restored by checking MapPersistenceManager
+        if (MapPersistenceManager.Instance != null && !MapPersistenceManager.Instance.HasSavedMap())
+        {
+            // This should only run when generating a brand new map
+            RandomizeDifficulty();
+        }
     }
 
     public string GetNodeId()

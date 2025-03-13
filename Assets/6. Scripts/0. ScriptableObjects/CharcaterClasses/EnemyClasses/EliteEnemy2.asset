@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc42999632f7c4e348e0dddd4fe1964c, type: 3}
-  m_Name: MediumEnemy1
+  m_Name: EliteEnemy2
   m_EditorClassIdentifier: 
-  enemyName: MediumEnemy1
+  enemyName: EliteEnemy2
   classDescription: 
-  enemyPrefab: {fileID: 1594980137760161270, guid: f5645ff85702a4229bbde54245db0392, type: 3}
+  enemyPrefab: {fileID: 1594980137760161270, guid: e3ae73d6ed2c649e4921866189197c7b, type: 3}
   enemySprite: {fileID: 0}
-  baseHealth: 200
+  baseHealth: 500
   baseEnergy: 3
   strength: 0
   dexterity: 0
@@ -25,7 +25,6 @@ MonoBehaviour:
   baseDefense: 0
   speed: 0
   actionDeck:
-  - {fileID: 11400000, guid: 29aca2a1c2a4840c886d3dbe9b915362, type: 2}
   - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
   isElite: 0
   isBoss: 0

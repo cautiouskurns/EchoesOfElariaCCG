@@ -1047,8 +1047,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 732eb6cd874a0469d9bbd18949d69b39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyActions:
-  - {fileID: 11400000, guid: 29aca2a1c2a4840c886d3dbe9b915362, type: 2}
+  fallbackEnemyActions: []
   actionDelay: 3
   defensiveThreshold: 0.3
   aggressiveThreshold: 0.7
@@ -2360,8 +2359,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7cc8efbbc9edd4e7ba5de08c5cc2c37c, type: 2}
   - {fileID: 11400000, guid: 960851cc5fdca430a93aacf32b07eee1, type: 2}
   hardEnemiesPool:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: f5f91dd92ef55479d97ee2928cf0cb07, type: 2}
+  - {fileID: 11400000, guid: b229cbdefcaf447e8b168eda575dae55, type: 2}
   eliteEnemiesPool:
   - {fileID: 0}
   - {fileID: 0}

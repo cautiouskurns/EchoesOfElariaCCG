@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc42999632f7c4e348e0dddd4fe1964c, type: 3}
   m_Name: HardEnemy2
   m_EditorClassIdentifier: 
-  enemyName: HardEnemy1
+  enemyName: HardEnemy2
   classDescription: 
   enemyPrefab: {fileID: 1594980137760161270, guid: fdc654fa22a27474f9119850ee4fde21, type: 3}
   enemySprite: {fileID: 0}
   baseHealth: 300
-  baseEnergy: 0
+  baseEnergy: 3
   strength: 0
   dexterity: 0
   intelligence: 0
@@ -28,6 +28,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
   isElite: 0
   isBoss: 0
-  actionsPerTurn: 0
+  actionsPerTurn: 1
   goldValue: 0
   possibleCardDrops: []
