@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class EnemyUnit : BaseCharacter
 {
@@ -7,9 +8,15 @@ public class EnemyUnit : BaseCharacter
     private EnemyAnimationController animationController;
     private EnemyClass enemyData;
 
-    // Add this field to store the planned action
-    private BaseCard plannedAction;
-    private new PlayerUnit plannedTarget;
+    // Store the planned action
+    public BaseCard plannedCard;
+    public PlayerUnit plannedTarget;
+    
+    // Add a property to store this enemy's specific action deck
+    private List<BaseCard> actionDeck = new List<BaseCard>();
+    
+    // Make this accessible to EnemyAIManager
+    public IReadOnlyList<BaseCard> ActionDeck => actionDeck;
     
     public string Description { get; private set; }
 
@@ -38,8 +45,9 @@ public class EnemyUnit : BaseCharacter
         }
     }
 
-
-    /// ✅ **Override BaseCharacter's InitializeFromClass to handle enemy-specific adjustments**
+    /// <summary>
+    /// Override BaseCharacter's InitializeFromClass to handle enemy-specific adjustments
+    /// </summary>
     public override void InitializeFromClass(ICharacterClass characterClass)
     {
         if (!(characterClass is EnemyClass enemyClass))
@@ -51,10 +59,22 @@ public class EnemyUnit : BaseCharacter
         enemyData = enemyClass;
         Description = enemyClass.ClassDescription;
 
-        // ✅ Call base method to initialize standard stats
+        // Call base method to initialize standard stats
         base.InitializeFromClass(enemyClass);
 
-        // ✅ Apply Elite/Boss Modifiers AFTER Initialization
+        // Copy the enemy's specific action deck
+        if (enemyClass.actionDeck != null && enemyClass.actionDeck.Count > 0)
+        {
+            actionDeck.Clear();
+            actionDeck.AddRange(enemyClass.actionDeck);
+            Debug.Log($"[EnemyUnit] Loaded {actionDeck.Count} cards for {Name}");
+        }
+        else
+        {
+            Debug.LogWarning($"[EnemyUnit] No action deck defined for {Name}");
+        }
+
+        // Apply Elite/Boss Modifiers AFTER Initialization
         if (enemyClass.isElite || enemyClass.isBoss)
         {
             float multiplier = enemyClass.isBoss ? 2.5f : 1.5f;
@@ -62,7 +82,7 @@ public class EnemyUnit : BaseCharacter
             Stats.ModifyStrength((int)(Stats.Strength * (multiplier - 1))); // Increase Strength
         }
 
-        // ✅ Set up visuals
+        // Set up visuals
         if (enemyClass.enemySprite != null)
         {
             var spriteRenderer = GetComponentInChildren<SpriteRenderer>();
@@ -77,8 +97,7 @@ public class EnemyUnit : BaseCharacter
                   $"\nStrength: {Stats.Strength}");
     }
 
-
-    // ✅ Override BaseCharacter methods to use CharacterStats properly
+    // Override BaseCharacter methods to use CharacterStats properly
     public override int GetHealth() => Stats.CurrentHealth;
     public override int GetMaxHealth() => Stats.MaxHealth;
     public override int GetStrength() => Stats.Strength;
@@ -93,12 +112,6 @@ public class EnemyUnit : BaseCharacter
             Die();
         }
     }
-    // protected override void Die()
-    // {
-    //     Debug.Log($"[EnemyUnit] {Name} has been defeated!");
-    //     // TODO: Add death animation
-    //     Destroy(gameObject);
-    // }
 
     protected void Die()
     {
@@ -140,41 +153,38 @@ public class EnemyUnit : BaseCharacter
 
         Debug.Log($"[EnemyUnit] ⚔️ Enemy is attacking {player.Name}!");
 
-        // ✅ Play enemy attack animation
+        // Play enemy attack animation
         yield return StartCoroutine(animationController.PlayAttackSequence(player.transform.position));
 
-        // ✅ Apply damage after attack animation
+        // Apply damage after attack animation
         player.TakeDamage(5);
         Debug.Log($"[EnemyUnit] 🔥 {player.Name} took 5 damage!");
     }
 
-
-    // Add a method to set the planned action
+    // Set the planned action
     public void SetPlannedAction(BaseCard action, PlayerUnit target)
     {
-        plannedAction = action;
+        plannedCard = action;
         plannedTarget = target;
         
         // Display the intent immediately
-        ShowIntent(plannedAction);
+        ShowIntent(plannedCard);
     }
     
-    // Add a method to execute the planned action
+    // Execute the planned action
     public IEnumerator ExecutePlannedAction()
     {
-        if (plannedAction == null || plannedTarget == null)
+        if (plannedCard == null || plannedTarget == null)
         {
             Debug.LogWarning($"[EnemyUnit] {Name} has no planned action to execute!");
             yield break;
         }
         
         // Execute the planned action
-        yield return StartCoroutine(EnemyAIManager.Instance.PerformEnemyAttack(this, plannedTarget, plannedAction));
+        yield return StartCoroutine(EnemyAIManager.Instance.PerformEnemyAttack(this, plannedTarget, plannedCard));
         
         // Clear the planned action
-        plannedAction = null;
+        plannedCard = null;
         plannedTarget = null;
     }
-
 }
-

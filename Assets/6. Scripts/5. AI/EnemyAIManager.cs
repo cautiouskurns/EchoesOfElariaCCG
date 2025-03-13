@@ -7,7 +7,8 @@ public class EnemyAIManager : MonoBehaviour
 {
     public static EnemyAIManager Instance { get; private set; }
 
-    [SerializeField] private List<BaseCard> enemyActions;
+    // Keep this as a fallback pool
+    [SerializeField] private List<BaseCard> fallbackEnemyActions;
     [SerializeField] private float actionDelay = 1.5f;
 
     [SerializeField] private float defensiveThreshold = 0.3f; // Health percentage to trigger defensive play
@@ -15,12 +16,12 @@ public class EnemyAIManager : MonoBehaviour
 
     private List<BaseCard> lastPlayedCards = new List<BaseCard>();
     private const int maxLastCardsMemory = 3;
-
     
-    // NEW: Added card categorization
-    private Dictionary<AICardType, List<BaseCard>> categorizedCards = new Dictionary<AICardType, List<BaseCard>>();
+    // Changed to store per-enemy card categorization
+    private Dictionary<EnemyUnit, Dictionary<AICardType, List<BaseCard>>> enemyCardCategories = 
+        new Dictionary<EnemyUnit, Dictionary<AICardType, List<BaseCard>>>();
     
-    // NEW: Added enum for card types
+    // Enum for card types
     private enum AICardType
     {
         Attack,
@@ -36,14 +37,11 @@ public class EnemyAIManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    // NEW: Modified Start method to initialize card categories
     private void Start()
     {
-        CategorizeAvailableCards();
-
-         // Plan actions and immediately set them as the current actions for the first turn
+        // No need to initialize here anymore - will initialize per enemy when planning
+        // Plan actions and immediately set them as the current actions for the first turn
         PlanEnemyActions(true); // Add a parameter to indicate this is the initial planning
-
     }
 
     public void PlanEnemyActions(bool isInitialPlanning = false)
@@ -56,6 +54,12 @@ public class EnemyAIManager : MonoBehaviour
 
         foreach (var enemy in enemies)
         {
+            // Initialize categories for this enemy if needed
+            if (!enemyCardCategories.ContainsKey(enemy))
+            {
+                CategorizeAvailableCards(enemy);
+            }
+            
             // Select action strategically
             BaseCard selectedCard = SelectStrategicAction(enemy, players);
             
@@ -80,29 +84,44 @@ public class EnemyAIManager : MonoBehaviour
         }
     }
 
-    // NEW: Added method to categorize cards
-    private void CategorizeAvailableCards()
+    // Modified to handle per-enemy categorization
+    private void CategorizeAvailableCards(EnemyUnit enemy)
     {
+        // Create new dictionary for this enemy
+        Dictionary<AICardType, List<BaseCard>> categorizedEnemyCards = new Dictionary<AICardType, List<BaseCard>>();
+        
         // Initialize categories
         foreach (AICardType type in System.Enum.GetValues(typeof(AICardType)))
         {
-            categorizedCards[type] = new List<BaseCard>();
+            categorizedEnemyCards[type] = new List<BaseCard>();
+        }
+        
+        // Use the enemy's specific deck or fallback
+        IEnumerable<BaseCard> cardsToUse = enemy.ActionDeck.Count > 0 
+            ? enemy.ActionDeck 
+            : fallbackEnemyActions;
+        
+        if (cardsToUse == null || !cardsToUse.Any())
+        {
+            Debug.LogError($"[EnemyAI] No cards available for {enemy.Name}");
+            enemyCardCategories[enemy] = categorizedEnemyCards;
+            return;
         }
         
         // Categorize each card
-        foreach (var card in enemyActions)
+        foreach (var card in cardsToUse)
         {
             switch (card.CardType)
             {
                 case Cards.CardType.Attack:
-                    categorizedCards[AICardType.Attack].Add(card);
+                    categorizedEnemyCards[AICardType.Attack].Add(card);
                     break;
                 case Cards.CardType.Defense:
                 case Cards.CardType.Utility:
                     if (card.Description.ToLower().Contains("block") || 
                         card.Description.ToLower().Contains("shield"))
                     {
-                        categorizedCards[AICardType.Defense].Add(card);
+                        categorizedEnemyCards[AICardType.Defense].Add(card);
                     }
                     break;
             }
@@ -111,20 +130,30 @@ public class EnemyAIManager : MonoBehaviour
             if (card.Description.ToLower().Contains("poison") || 
                 card.Description.ToLower().Contains("weak"))
             {
-                categorizedCards[AICardType.Debuff].Add(card);
+                categorizedEnemyCards[AICardType.Debuff].Add(card);
             }
             
             if (card.Description.ToLower().Contains("heal") || 
                 card.Description.ToLower().Contains("restore"))
             {
-                categorizedCards[AICardType.Heal].Add(card);
+                categorizedEnemyCards[AICardType.Heal].Add(card);
             }
             
             if (card.Description.ToLower().Contains("strength") || 
                 card.Description.ToLower().Contains("buff"))
             {
-                categorizedCards[AICardType.Buff].Add(card);
+                categorizedEnemyCards[AICardType.Buff].Add(card);
             }
+        }
+        
+        // Store the categorized cards for this enemy
+        enemyCardCategories[enemy] = categorizedEnemyCards;
+        
+        // Log the result
+        Debug.Log($"[EnemyAI] Categorized {cardsToUse.Count()} cards for {enemy.Name}");
+        foreach (var category in categorizedEnemyCards)
+        {
+            Debug.Log($"[EnemyAI] {enemy.Name} - {category.Key}: {category.Value.Count} cards");
         }
     }
 
@@ -150,7 +179,7 @@ public class EnemyAIManager : MonoBehaviour
             {
                 BaseCard selectedCard = enemy.plannedCard;
                 PlayerUnit target = enemy.plannedTarget;
-                AICardType sourceCategory = DetermineCardCategory(selectedCard);
+                AICardType sourceCategory = DetermineCardCategory(enemy, selectedCard);
 
                 // Log the execution
                 LogDecisionProcess(enemy, selectedCard, target, 
@@ -192,9 +221,16 @@ public class EnemyAIManager : MonoBehaviour
         TurnManager.Instance.EndEnemyTurn();
     }
 
-    private AICardType DetermineCardCategory(BaseCard card)
+    private AICardType DetermineCardCategory(EnemyUnit enemy, BaseCard card)
     {
-        foreach (var category in categorizedCards)
+        if (!enemyCardCategories.ContainsKey(enemy))
+        {
+            CategorizeAvailableCards(enemy);
+        }
+        
+        var categories = enemyCardCategories[enemy];
+        
+        foreach (var category in categories)
         {
             if (category.Value.Contains(card))
             {
@@ -206,6 +242,15 @@ public class EnemyAIManager : MonoBehaviour
 
     private BaseCard SelectStrategicAction(EnemyUnit enemy, PlayerUnit[] players)
     {
+        // Make sure we have categories for this enemy
+        if (!enemyCardCategories.ContainsKey(enemy))
+        {
+            CategorizeAvailableCards(enemy);
+        }
+        
+        // Get the categories for this enemy
+        var categorizedCards = enemyCardCategories[enemy];
+        
         // Calculate health ratio
         float healthRatio = (float)enemy.GetHealth() / enemy.GetMaxHealth();
         
@@ -298,7 +343,6 @@ public class EnemyAIManager : MonoBehaviour
         return selectedCard;
     }
 
-
     private bool HasSynergyPotential(BaseCard card)
     {
         // Look for synergies with recently played cards
@@ -332,10 +376,7 @@ public class EnemyAIManager : MonoBehaviour
         }
     }
 
-    // In your PerformEnemyAttack method, add:
-    // RecordPlayedCard(action);
-
-    // NEW: Helper method to get random card from a category
+    // Helper method to get random card from a category
     private BaseCard GetRandomCard(List<BaseCard> cards)
     {
         if (cards.Count == 0) return null;
@@ -367,24 +408,29 @@ public class EnemyAIManager : MonoBehaviour
         Debug.Log(logMessage);
     }
 
-    /// <summary>
-    /// ✅ Selects a random action from the enemy's available actions.
-    /// </summary>
+    // Selects a random action from the enemy's available actions
     private BaseCard SelectRandomAction(EnemyUnit enemy)
     {
-        if (enemyActions.Count == 0) return null;
-        return enemyActions[Random.Range(0, enemyActions.Count)];
+        // Use enemy's specific deck or fallback
+        var availableCards = enemy.ActionDeck.Count > 0 
+            ? enemy.ActionDeck.ToList() 
+            : fallbackEnemyActions;
+        
+        if (availableCards == null || availableCards.Count == 0)
+        {
+            Debug.LogError($"[EnemyAI] No cards available for {enemy.Name}");
+            return null;
+        }
+        
+        return availableCards[Random.Range(0, availableCards.Count)];
     }
 
-    /// <summary>
-    /// ✅ Selects a random player target.
-    /// </summary>
+    // Selects a random player target
     private PlayerUnit SelectRandomTarget(PlayerUnit[] players)
     {
         if (players.Length == 0) return null;
         return players[Random.Range(0, players.Length)];
     }
-
 
     private PlayerUnit SelectOptimalTarget(PlayerUnit[] players, BaseCard action)
     {
@@ -454,46 +500,7 @@ public class EnemyAIManager : MonoBehaviour
         return weakestTarget ?? players[Random.Range(0, players.Length)];
     }   
 
-
-    public void PlanEnemyActions()
-    {
-        Debug.Log("[EnemyAI] Planning next enemy actions");
-
-        // Get all active enemy and player units
-        var enemies = FindObjectsByType<EnemyUnit>(FindObjectsSortMode.None);
-        var players = FindObjectsByType<PlayerUnit>(FindObjectsSortMode.None);
-
-        foreach (var enemy in enemies)
-        {
-            // Select action strategically
-            BaseCard selectedCard = SelectStrategicAction(enemy, players);
-            
-            // Select target optimally based on the selected action
-            PlayerUnit target = SelectOptimalTarget(players, selectedCard);
-
-            if (selectedCard == null || target == null)
-            {
-                Debug.LogWarning($"[EnemyAI] ⚠️ No valid action or target could be planned for {enemy.Name}!");
-                continue;
-            }
-
-            // Store the planned action (you'll need to add these fields to EnemyUnit)
-            enemy.plannedCard = selectedCard;
-            enemy.plannedTarget = target;
-            
-            // Show the intent immediately
-            enemy.ShowIntent(selectedCard);
-            
-            Debug.Log($"[EnemyAI] {enemy.Name} plans to use {selectedCard.CardName} on {target.Name} next turn");
-        }
-    }
-
-    /// <summary>
-    /// ✅ Moves the enemy, plays attack animation, and applies effect.
-    /// </summary>
-    /// <summary>
-    /// ✅ Moves the enemy, plays attack animation, and applies effect.
-    /// </summary>
+    // Moves the enemy, plays attack animation, and applies effect
     public IEnumerator PerformEnemyAttack(EnemyUnit enemy, PlayerUnit target, BaseCard action)
     {
         Debug.Log($"[EnemyAI] 🎯 {enemy.Name} is attacking {target.Name} with {action.CardName}");
@@ -512,20 +519,20 @@ public class EnemyAIManager : MonoBehaviour
 
         Vector3 targetPosition = target.transform.position;
 
-        // ✅ Move toward the player
+        // Move toward the player
         yield return StartCoroutine(animationController.PlayAttackSequence(targetPosition));
 
-        // ✅ Apply all effects from `BaseCard`
-        foreach (EffectData effect in action.Effects)  // ✅ FIXED
+        // Apply all effects from BaseCard
+        foreach (EffectData effect in action.Effects)
         {
-            EffectManager.Instance.ApplySingleEffect(effect, target);  // ✅ FIXED
+            EffectManager.Instance.ApplySingleEffect(effect, target);
         }
 
         Debug.Log($"[EnemyAI] 🔥 {target.Name} was hit by {enemy.Name}'s {action.CardName}!");
 
         RecordPlayedCard(action);
 
-        // ✅ Return to original position after attack
+        // Return to original position after attack
         yield return StartCoroutine(animationController.MoveToTarget(animationController.OriginalPosition));
 
         // Hide intent after attack
@@ -541,6 +548,12 @@ public class EnemyAIManager : MonoBehaviour
 
         foreach (var enemy in enemies)
         {
+            // Initialize categories for this enemy if needed
+            if (!enemyCardCategories.ContainsKey(enemy))
+            {
+                CategorizeAvailableCards(enemy);
+            }
+            
             // Select action and target for immediate execution
             BaseCard selectedCard = SelectStrategicAction(enemy, players);
             PlayerUnit target = SelectOptimalTarget(players, selectedCard);
@@ -568,13 +581,19 @@ public class EnemyAIManager : MonoBehaviour
             Debug.Log($"[EnemyAI] {enemy.Name} performing first turn action");
             enemy.Stats.RefreshActionPoints();
 
+            // Initialize categories for this enemy if needed
+            if (!enemyCardCategories.ContainsKey(enemy))
+            {
+                CategorizeAvailableCards(enemy);
+            }
+
             // Select an action and target immediately
             BaseCard selectedAction = SelectStrategicAction(enemy, players);
             PlayerUnit target = SelectOptimalTarget(players, selectedAction);
 
             if (selectedAction != null && target != null)
             {
-                AICardType sourceCategory = DetermineCardCategory(selectedAction);
+                AICardType sourceCategory = DetermineCardCategory(enemy, selectedAction);
 
                 LogDecisionProcess(enemy, selectedAction, target, 
                     (float)enemy.GetHealth() / enemy.GetMaxHealth(),
@@ -600,5 +619,4 @@ public class EnemyAIManager : MonoBehaviour
 
         Debug.Log("[EnemyAI] ✅ Immediate enemy turn complete");
     }
-
 }

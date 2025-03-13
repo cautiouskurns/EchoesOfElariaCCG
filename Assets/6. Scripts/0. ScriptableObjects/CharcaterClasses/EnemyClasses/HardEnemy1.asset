@@ -24,7 +24,8 @@ MonoBehaviour:
   luck: 0
   baseDefense: 0
   speed: 0
-  actionDeck: []
+  actionDeck:
+  - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
   isElite: 0
   isBoss: 0
   actionsPerTurn: 0

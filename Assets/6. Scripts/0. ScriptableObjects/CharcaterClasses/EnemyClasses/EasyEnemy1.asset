@@ -25,9 +25,7 @@ MonoBehaviour:
   baseDefense: 5
   speed: 5
   actionDeck:
-  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
-  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
-  - {fileID: 11400000, guid: 37a317d05d02644579216b0d2c803c4c, type: 2}
+  - {fileID: 11400000, guid: fba4cea17f2584f5a96af9c43d622107, type: 2}
   isElite: 0
   isBoss: 0
   actionsPerTurn: 1
